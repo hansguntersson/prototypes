@@ -5,37 +5,64 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<title>Isometric Tap/Swipe Move — Starter</title>
+<title>Isometric Tap/Swipe — Grid Data Starter</title>
 <style>
-  html,body{margin:0;height:100%;background:#101114;overscroll-behavior:contain}
+  html,body{margin:0;height:100%;background:#ffffff;overscroll-behavior:contain}
   canvas{display:block;width:100vw;height:100vh;touch-action:none}
-  .hud{
+
+  .hud-top{
     position:fixed; left:0; right:0; top:env(safe-area-inset-top);
     display:flex; justify-content:space-between; padding:10px 14px;
-    font:14px system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:#fff;
-    text-shadow:0 1px 2px rgba(0,0,0,.6); user-select:none; -webkit-user-select:none
+    font:14px system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:#222;
+    user-select:none; -webkit-user-select:none
   }
-  .btns{position:fixed; left:0; right:0; bottom:calc(12px + env(safe-area-inset-bottom));
+
+  .hud-bottom{
+    position:fixed; left:0; right:0; bottom:calc(8px + env(safe-area-inset-bottom));
+    display:flex; flex-wrap:wrap; gap:8px 14px; justify-content:center; align-items:center;
+    padding:10px 14px; font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:#222;
+    user-select:none; -webkit-user-select:none; background:rgba(255,255,255,.7); backdrop-filter:saturate(1.2) blur(4px);
+    border-radius:12px; margin:0 10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.06);
+  }
+  .hud-bottom b{font-weight:600}
+  .btns{position:fixed; left:0; right:0; bottom:calc(64px + env(safe-area-inset-bottom));
         display:flex; gap:12px; justify-content:center}
-  button{padding:10px 14px; border:0; border-radius:12px; background:#2b2b2b; color:#fff}
+  button{padding:10px 14px; border:1px solid #e5e6ea; border-radius:12px; background:#fafbff; color:#222}
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
-<div class="hud">
-  <div>Tap near the player <b>or swipe</b> to move one tile</div>
+
+<div class="hud-top">
+  <div>Tap or swipe to move one tile</div>
   <div id="pos"></div>
 </div>
+
 <div class="btns"><button id="reset">↻ Reset</button></div>
 
+<div class="hud-bottom" id="stats">
+  <div><b>Player</b></div>
+  <div>Temperature: <span id="pTemp">0</span></div>
+  <div>Density: <span id="pDensity">0</span></div>
+  <div>Brightness: <span id="pBright">0</span></div>
+</div>
+
 <script>
+/* ====== Config ====== */
+const GRID = { cols: 10, rows: 10 };
+const STAT_RANGE = { min: -100, max: 100 };
+
+/* ====== Canvas setup ====== */
 const cvs = document.getElementById('game');
 const ctx = cvs.getContext('2d');
 const posEl = document.getElementById('pos');
+const pTempEl = document.getElementById('pTemp');
+const pDensityEl = document.getElementById('pDensity');
+const pBrightEl = document.getElementById('pBright');
 
-const GRID = { cols: 10, rows: 10 };
-let TILE_W = 64;
-let TILE_H = TILE_W/2;
+let TILE_W = 64;         // top width (flat-to-flat)
+let TILE_H = TILE_W / 2; // vertical diamond height
 let ORIGIN = { x: 0, y: 0 };
 
 function fit(){
@@ -45,13 +72,69 @@ function fit(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
 
   TILE_W = Math.max(44, Math.min(72, Math.floor(cvs.clientWidth / 9)));
-  TILE_H = TILE_W/2;
-  ORIGIN.x = cvs.clientWidth/2;
+  TILE_H = TILE_W / 2;
+
+  ORIGIN.x = cvs.clientWidth / 2;
   ORIGIN.y = 80;
 }
 addEventListener('resize', fit, {passive:true});
 fit();
 
+/* ====== Grid data structure (cells) ====== */
+function makeCell(){
+  return {
+    Temperature: 0, // [-100, 100]
+    Density: 0,     // [-100, 100]
+    Brightness: 0   // [-100, 100]
+  };
+}
+function clampStat(v){ return Math.max(STAT_RANGE.min, Math.min(STAT_RANGE.max, v|0)); }
+
+const cells = [];
+for (let j=0; j<GRID.rows; j++){
+  const row = [];
+  for (let i=0; i<GRID.cols; i++){
+    row.push(makeCell());
+  }
+  cells.push(row);
+}
+
+/* ====== Player with stats ====== */
+const player = {
+  i: 4, j: 4,      // current integer grid coords
+  ti: 4, tj: 4,    // target grid coords
+  t: 1,            // tween progress [0..1]
+  speed: 8/1000,   // tiles per ms (lerp speed)
+
+  // stats (same range and names as cells)
+  Temperature: 0,
+  Density: 0,
+  Brightness: 0
+};
+
+function updateHud(){
+  posEl.textContent = `(${player.i}, ${player.j})`;
+  pTempEl.textContent = player.Temperature;
+  pDensityEl.textContent = player.Density;
+  pBrightEl.textContent = player.Brightness;
+}
+updateHud();
+
+function reset(){
+  player.i = player.ti = Math.floor(GRID.cols/2);
+  player.j = player.tj = Math.floor(GRID.rows/2);
+  player.t = 1;
+
+  // reset player stats to 0
+  player.Temperature = 0;
+  player.Density = 0;
+  player.Brightness = 0;
+
+  updateHud();
+}
+document.getElementById('reset').onclick = reset;
+
+/* ====== Iso transforms ====== */
 function gridToScreen(i,j){
   const x = (i - j) * (TILE_W/2);
   const y = (i + j) * (TILE_H/2);
@@ -65,20 +148,9 @@ function screenToGrid(x,y){
   return { i, j };
 }
 
-const player = { i:4, j:4, ti:4, tj:4, t:1, speed:8/1000 };
-updateHud();
-
-function reset(){
-  player.i = player.ti = Math.floor(GRID.cols/2);
-  player.j = player.tj = Math.floor(GRID.rows/2);
-  player.t = 1;
-  updateHud();
-}
-document.getElementById('reset').onclick = reset;
-
-// --- Input: tap or swipe ---
+/* ====== Input: tap or swipe (one-tile steps) ====== */
 let start = null;
-const SWIPE_THRESHOLD = 28;
+const SWIPE_THRESHOLD = 28; // CSS pixels
 
 addEventListener('pointerdown', (e)=>{
   const r = cvs.getBoundingClientRect();
@@ -86,43 +158,45 @@ addEventListener('pointerdown', (e)=>{
 }, {passive:true});
 
 addEventListener('pointerup', (e)=>{
-  if (player.t < 1) return;
+  if (player.t < 1) return; // ignore while tweening
   const r = cvs.getBoundingClientRect();
   const end = { x: e.clientX - r.left, y: e.clientY - r.top };
   if (!start){ return; }
+
   const dx = end.x - start.x;
   const dy = end.y - start.y;
   const dist = Math.hypot(dx, dy);
 
   if (dist >= SWIPE_THRESHOLD){
-    const u = dx + dy;
-    const v = dy - dx;
-    if (Math.abs(u) > Math.abs(v)){
-      step(sign(u), 0);
-    } else {
-      step(0, sign(v));
-    }
+    // Swipe -> iso axis step
+    const u = dx + dy;      // east-west-ish
+    const v = dy - dx;      // south-north-ish
+    if (Math.abs(u) > Math.abs(v)) step(sign(u), 0);
+    else                           step(0, sign(v));
   } else {
+    // Tap -> move toward tap along dominant axis
     const g = screenToGrid(end.x, end.y);
     const di = g.i - player.i;
     const dj = g.j - player.j;
     if (Math.abs(di) > Math.abs(dj)) step(sign(di), 0);
-    else step(0, sign(dj));
+    else                             step(0, sign(dj));
   }
   start = null;
 }, {passive:true});
 
 function sign(v){ return v>0 ? 1 : v<0 ? -1 : 0; }
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
 function step(stepI, stepJ){
   const ni = clamp(player.i + stepI, 0, GRID.cols-1);
   const nj = clamp(player.j + stepJ, 0, GRID.rows-1);
   if (ni !== player.i || nj !== player.j){
     player.ti = ni; player.tj = nj; player.t = 0;
+    // (future: react to destination cell stats if you want)
   }
 }
-function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
+/* ====== Rendering ====== */
 function drawTile(i,j,fill){
   const {x,y} = gridToScreen(i,j);
   ctx.beginPath();
@@ -132,68 +206,87 @@ function drawTile(i,j,fill){
   ctx.lineTo(x - TILE_W/2, y);
   ctx.closePath();
   ctx.fillStyle = fill; ctx.fill();
-  ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.stroke();
+  ctx.strokeStyle = 'rgba(0,0,0,.18)'; ctx.stroke();
 }
+
 function drawPlayer(x,y){
+  // Simple block with light shading (works on white bg)
   const h = TILE_H;
+  // top
   ctx.beginPath();
   ctx.moveTo(x, y - TILE_H/2 - h);
   ctx.lineTo(x + TILE_W/2, y - h);
   ctx.lineTo(x, y + TILE_H/2 - h);
   ctx.lineTo(x - TILE_W/2, y - h);
   ctx.closePath();
-  ctx.fillStyle = '#4cc9f0'; ctx.fill();
+  ctx.fillStyle = '#2a7abf'; ctx.fill();
 
+  // right
   ctx.beginPath();
   ctx.moveTo(x, y + TILE_H/2 - h);
   ctx.lineTo(x + TILE_W/2, y - h);
   ctx.lineTo(x + TILE_W/2, y);
   ctx.lineTo(x, y + TILE_H/2);
   ctx.closePath();
-  ctx.fillStyle = '#1f7fa0'; ctx.fill();
+  ctx.fillStyle = '#1f5f93'; ctx.fill();
 
+  // left
   ctx.beginPath();
   ctx.moveTo(x, y + TILE_H/2 - h);
   ctx.lineTo(x - TILE_W/2, y - h);
   ctx.lineTo(x - TILE_W/2, y);
   ctx.lineTo(x, y + TILE_H/2);
   ctx.closePath();
-  ctx.fillStyle = '#2a9bc0'; ctx.fill();
+  ctx.fillStyle = '#2770aa'; ctx.fill();
 }
 
+function render(){
+  ctx.clearRect(0,0,cvs.clientWidth,cvs.clientHeight);
+
+  // white background already set via CSS; optional subtle ground tint:
+  // ctx.fillStyle = '#fff'; ctx.fillRect(0,0,cvs.clientWidth,cvs.clientHeight);
+
+  // pastel iso grid for contrast on white
+  for (let j=0;j<GRID.rows;j++){
+    for (let i=0;i<GRID.cols;i++){
+      const even = ((i+j)&1)===0;
+      drawTile(i,j, even ? '#eef3f8' : '#e7edf5'); // light grays/blues on white
+    }
+  }
+
+  // player (interpolated)
+  const pi = lerp(player.i, player.ti, player.t);
+  const pj = lerp(player.j, player.tj, player.t);
+  const pxy = gridToScreen(pi, pj);
+
+  // target highlight
+  ctx.globalAlpha = 0.25;
+  drawTile(player.ti, player.tj, '#2a7abf');
+  ctx.globalAlpha = 1;
+
+  drawPlayer(pxy.x, pxy.y);
+}
+
+function lerp(a,b,t){ return a + (b - a) * t; }
+
+/* ====== Main loop ====== */
 let last = 0;
 function loop(t=0){
   requestAnimationFrame(loop);
   const dt = Math.min(33, t - last || 16.7); last = t;
+
   if (player.t < 1){
     const dist = Math.hypot(player.ti - player.i, player.tj - player.j);
     const k = (player.speed * dt) / Math.max(0.0001, dist);
     player.t = Math.min(1, player.t + k);
     if (player.t === 1){ player.i = player.ti; player.j = player.tj; updateHud(); }
   }
+
   render();
 }
 loop();
 
-function render(){
-  ctx.clearRect(0,0,cvs.clientWidth,cvs.clientHeight);
-  ctx.fillStyle = '#101114'; ctx.fillRect(0,0,cvs.clientWidth,cvs.clientHeight);
-  for (let j=0;j<GRID.rows;j++){
-    for (let i=0;i<GRID.cols;i++){
-      drawTile(i,j, ((i+j)&1)===0 ? '#1a1c20':'#17191c');
-    }
-  }
-  const pi = lerp(player.i, player.ti, player.t);
-  const pj = lerp(player.j, player.tj, player.t);
-  const pxy = gridToScreen(pi, pj);
-  ctx.globalAlpha = 0.25;
-  drawTile(player.ti, player.tj, '#4cc9f0');
-  ctx.globalAlpha = 1;
-  drawPlayer(pxy.x, pxy.y);
-}
-function lerp(a,b,t){ return a + (b - a) * t; }
-function updateHud(){ posEl.textContent = `(${player.i}, ${player.j})`; }
-
+/* ====== Touch niceties ====== */
 let lastTouch=0;
 addEventListener('touchend', e=>{
   const now = Date.now();

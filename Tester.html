@@ -5,54 +5,251 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<title>Prototype</title>
+<title>Isometric Tap Move — Starter</title>
 <style>
-  html,body{margin:0;height:100%;background:#111;overscroll-behavior:contain}
+  html,body{margin:0;height:100%;background:#101114;overscroll-behavior:contain}
   canvas{display:block;width:100vw;height:100vh;touch-action:none}
-  .hud{position:fixed;inset:auto 0 0 0;display:flex;gap:12px;justify-content:center;
-       padding:10px env(safe-area-inset-right) calc(12px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
-       font:16px system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#fff}
-  button{padding:10px 14px;border:0;border-radius:12px;background:#2b2b2b;color:#fff}
+  .hud{
+    position:fixed; left:0; right:0; top:env(safe-area-inset-top);
+    display:flex; justify-content:space-between; padding:10px 14px;
+    font:14px system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:#fff;
+    text-shadow:0 1px 2px rgba(0,0,0,.6); user-select:none; -webkit-user-select:none
+  }
+  .btns{position:fixed; left:0; right:0; bottom:calc(12px + env(safe-area-inset-bottom));
+        display:flex; gap:12px; justify-content:center}
+  button{padding:10px 14px; border:0; border-radius:12px; background:#2b2b2b; color:#fff}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div class="hud">
-  <button id="reset">↻ Reset</button>
-  <button id="pause">⏸︎ Pause</button>
-</div>
+<canvas id="game"></canvas>
+<div class="hud"><div>Tap near the player to step one tile in that direction</div><div id="pos"></div></div>
+<div class="btns"><button id="reset">↻ Reset</button></div>
+
 <script>
-const cvs=document.getElementById('c'),ctx=cvs.getContext('2d');
-function fit(){const dpr=Math.max(1,Math.min(3,devicePixelRatio||1));
-  cvs.width=Math.floor(cvs.clientWidth*dpr);cvs.height=Math.floor(cvs.clientHeight*dpr);
-  ctx.setTransform(dpr,0,0,dpr,0,0);} addEventListener('resize',fit,{passive:true}); fit();
-let running=true; document.getElementById('pause').onclick=()=>{running=!running; event.target.textContent=running?'⏸︎ Pause':'▶︎ Resume';};
-document.getElementById('reset').onclick=()=>reset();
-let player, obst, score;
-function reset(){player={x:48,y:0,vy:0,s:26,ground:()=>cvs.clientHeight-80,on:true};
-  obst=[]; score=0;} reset();
-let spawn=0, speed=3.2, g=0.8, input=false; addEventListener('pointerdown',()=>input=true); addEventListener('pointerup',()=>input=false);
-function rnd(a,b){return Math.random()*(b-a)+a}
-function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}
-let last=0; function loop(t=0){requestAnimationFrame(loop); const dt=Math.min(33, t-last||16.7); last=t;
-  if(!running){draw(true);return}
-  spawn-=dt; if(spawn<=0){spawn=rnd(700,1200)/speed; const w=rnd(20,40),h=rnd(30,60); obst.push({x:cvs.clientWidth+w,y:player.ground()-h,w,h})}
-  if(input&&player.on){player.vy=-15; player.on=false}
-  player.vy+=g; player.y+=player.vy; if(player.y>player.ground()-player.s){player.y=player.ground()-player.s; player.vy=0; player.on=true}
-  for(let i=obst.length-1;i>=0;i--){const o=obst[i]; o.x-=speed;
-    if(o.x+o.w<0){obst.splice(i,1); score++; speed+=0.02}
-    else if(player.x < o.x+o.w && player.x+player.s > o.x && player.y < o.y+o.h && player.y+player.s > o.y){running=false}
-  }
-  draw(false)
+const cvs = document.getElementById('game');
+const ctx = cvs.getContext('2d');
+const posEl = document.getElementById('pos');
+
+const GRID = { cols: 10, rows: 10 };
+let TILE_W = 64;      // pixel width of a tile (flat side to flat side)
+let TILE_H = TILE_W/2;// iso height (point to point vertically)
+let ORIGIN = { x: 0, y: 0 }; // where (0,0) draws on screen
+
+function fit(){
+  const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+  cvs.width  = Math.floor(cvs.clientWidth  * dpr);
+  cvs.height = Math.floor(cvs.clientHeight * dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  // scale tiles a bit based on viewport width so it feels good on phones
+  TILE_W = Math.max(44, Math.min(72, Math.floor(cvs.clientWidth / 9)));
+  TILE_H = TILE_W/2;
+
+  // center the grid horizontally; lift it a bit vertically
+  const gridPxW = (GRID.cols + GRID.rows) * (TILE_W/2);
+  ORIGIN.x = cvs.clientWidth/2;
+  ORIGIN.y = 80; // distance from top
 }
-function draw(paused){ctx.clearRect(0,0,cvs.clientWidth,cvs.clientHeight);
-  rect(0,0,cvs.clientWidth,cvs.clientHeight,'#111'); rect(0,player.ground(),cvs.clientWidth,4,'#3b3b3b');
-  ctx.fillStyle='#e85d04'; obst.forEach(o=>rect(o.x,o.y,o.w,o.h,ctx.fillStyle));
-  rect(player.x,player.y,player.s,player.s,'#4cc9f0');
-  ctx.fillStyle='#fff'; ctx.font='16px system-ui,-apple-system,Segoe UI,Roboto,sans-serif'; ctx.fillText('Score '+score,12,24);
-  if(!running){ctx.textAlign='center'; ctx.fillText('Game Over — tap ↻', cvs.clientWidth/2, cvs.clientHeight/2)}
+addEventListener('resize', fit, {passive:true});
+fit();
+
+/*--------------------------
+  Isometric transforms
+---------------------------*/
+// grid -> screen (top of tile center)
+function gridToScreen(i,j){
+  // diamond center
+  const x = (i - j) * (TILE_W/2);
+  const y = (i + j) * (TILE_H/2);
+  return { x: ORIGIN.x + x, y: ORIGIN.y + y };
+}
+
+// screen -> fractional grid (inverse transform)
+function screenToGrid(x,y){
+  const sx = x - ORIGIN.x;
+  const sy = y - ORIGIN.y;
+  const i = (sx/(TILE_W/2) + sy/(TILE_H/2)) / 2;
+  const j = (sy/(TILE_H/2) - sx/(TILE_W/2)) / 2;
+  return { i, j };
+}
+
+/*--------------------------
+  World / player
+---------------------------*/
+const player = {
+  i: 4, j: 4,          // grid coords (integers)
+  ti: 4, tj: 4,        // target coords (integers)
+  t: 1,                // 0..1 tween progress
+  speed: 8/1000        // tiles per ms for tween; higher is faster
+};
+updateHud();
+
+function reset(){
+  player.i = player.ti = Math.floor(GRID.cols/2);
+  player.j = player.tj = Math.floor(GRID.rows/2);
+  player.t = 1;
+  updateHud();
+}
+document.getElementById('reset').onclick = reset;
+
+/*--------------------------
+  Input: tap near player to step
+---------------------------*/
+addEventListener('pointerdown', (e)=>{
+  const rect = cvs.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  // ignore taps while moving
+  if (player.t < 1) return;
+
+  // convert tap to fractional grid coords
+  const g = screenToGrid(x, y);
+
+  // decide direction: whichever axis delta is larger
+  const di = g.i - player.i;
+  const dj = g.j - player.j;
+
+  let stepI = 0, stepJ = 0;
+  if (Math.abs(di) > Math.abs(dj)) {
+    stepI = Math.sign(di);
+  } else {
+    stepJ = Math.sign(dj);
+  }
+
+  // clamp to bounds
+  const ni = clamp(player.i + stepI, 0, GRID.cols-1);
+  const nj = clamp(player.j + stepJ, 0, GRID.rows-1);
+
+  // start tween if moved
+  if (ni !== player.i || nj !== player.j){
+    player.ti = ni; player.tj = nj;
+    player.t = 0; // start moving
+  }
+}, {passive:true});
+
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+/*--------------------------
+  Render helpers
+---------------------------*/
+function drawTile(i,j,fill){
+  const {x,y} = gridToScreen(i,j);
+  ctx.beginPath();
+  ctx.moveTo(x, y - TILE_H/2);
+  ctx.lineTo(x + TILE_W/2, y);
+  ctx.lineTo(x, y + TILE_H/2);
+  ctx.lineTo(x - TILE_W/2, y);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  // subtle outline
+  ctx.strokeStyle = 'rgba(0,0,0,.35)';
+  ctx.stroke();
+}
+
+function drawPlayer(x,y){
+  // simple column block
+  const h = TILE_H; // visual height
+  // top diamond
+  ctx.beginPath();
+  ctx.moveTo(x, y - TILE_H/2 - h);
+  ctx.lineTo(x + TILE_W/2, y - h);
+  ctx.lineTo(x, y + TILE_H/2 - h);
+  ctx.lineTo(x - TILE_W/2, y - h);
+  ctx.closePath();
+  ctx.fillStyle = '#4cc9f0';
+  ctx.fill();
+
+  // right face
+  ctx.beginPath();
+  ctx.moveTo(x, y + TILE_H/2 - h);
+  ctx.lineTo(x + TILE_W/2, y - h);
+  ctx.lineTo(x + TILE_W/2, y);
+  ctx.lineTo(x, y + TILE_H/2);
+  ctx.closePath();
+  ctx.fillStyle = '#1f7fa0';
+  ctx.fill();
+
+  // left face
+  ctx.beginPath();
+  ctx.moveTo(x, y + TILE_H/2 - h);
+  ctx.lineTo(x - TILE_W/2, y - h);
+  ctx.lineTo(x - TILE_W/2, y);
+  ctx.lineTo(x, y + TILE_H/2);
+  ctx.closePath();
+  ctx.fillStyle = '#2a9bc0';
+  ctx.fill();
+}
+
+/*--------------------------
+  Main loop
+---------------------------*/
+let last = 0;
+function loop(t=0){
+  requestAnimationFrame(loop);
+  const dt = Math.min(33, t - last || 16.7); last = t;
+
+  // tween position if moving
+  if (player.t < 1){
+    const dist = Math.hypot(player.ti - player.i, player.tj - player.j);
+    const k = (player.speed * dt) / Math.max(0.0001, dist); // normalize to 1 tile
+    player.t = Math.min(1, player.t + k);
+    if (player.t === 1){
+      player.i = player.ti; player.j = player.tj;
+      updateHud();
+    }
+  }
+
+  render();
 }
 loop();
+
+function render(){
+  ctx.clearRect(0,0,cvs.clientWidth,cvs.clientHeight);
+
+  // background
+  ctx.fillStyle = '#101114';
+  ctx.fillRect(0,0,cvs.clientWidth,cvs.clientHeight);
+
+  // draw grid back-to-front (rows then cols) for simple depth
+  for (let j=0;j<GRID.rows;j++){
+    for (let i=0;i<GRID.cols;i++){
+      const even = ((i+j)&1)===0;
+      drawTile(i,j, even ? '#1a1c20' : '#17191c');
+    }
+  }
+
+  // compute player's interpolated screen position
+  const pi = lerp(player.i, player.ti, player.t);
+  const pj = lerp(player.j, player.tj, player.t);
+  const pxy = gridToScreen(pi, pj);
+
+  // highlight current target tile (optional)
+  const {x:tx,y:ty} = gridToScreen(player.ti, player.tj);
+  ctx.globalAlpha = 0.25;
+  drawTile(player.ti, player.tj, '#4cc9f0');
+  ctx.globalAlpha = 1;
+
+  // draw player
+  drawPlayer(pxy.x, pxy.y);
+}
+
+function lerp(a,b,t){ return a + (b - a) * t; }
+
+function updateHud(){
+  posEl.textContent = `(${player.i}, ${player.j})`;
+}
+
+/*--------------------------
+  Prevent double-tap zoom / overscroll quirks
+---------------------------*/
+let lastTouch=0;
+addEventListener('touchend', e=>{
+  const now = Date.now();
+  if (now-lastTouch<300) e.preventDefault();
+  lastTouch = now;
+}, {passive:false});
 </script>
 </body>
 </html>

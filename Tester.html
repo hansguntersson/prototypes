@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<title>Isometric Tap Move — Starter</title>
+<title>Isometric Tap/Swipe Move — Starter</title>
 <style>
   html,body{margin:0;height:100%;background:#101114;overscroll-behavior:contain}
   canvas{display:block;width:100vw;height:100vh;touch-action:none}
@@ -22,7 +22,10 @@
 </head>
 <body>
 <canvas id="game"></canvas>
-<div class="hud"><div>Tap near the player to step one tile in that direction</div><div id="pos"></div></div>
+<div class="hud">
+  <div>Tap near the player <b>or swipe</b> to move one tile</div>
+  <div id="pos"></div>
+</div>
 <div class="btns"><button id="reset">↻ Reset</button></div>
 
 <script>
@@ -31,9 +34,9 @@ const ctx = cvs.getContext('2d');
 const posEl = document.getElementById('pos');
 
 const GRID = { cols: 10, rows: 10 };
-let TILE_W = 64;      // pixel width of a tile (flat side to flat side)
-let TILE_H = TILE_W/2;// iso height (point to point vertically)
-let ORIGIN = { x: 0, y: 0 }; // where (0,0) draws on screen
+let TILE_W = 64;
+let TILE_H = TILE_W/2;
+let ORIGIN = { x: 0, y: 0 };
 
 function fit(){
   const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
@@ -41,30 +44,19 @@ function fit(){
   cvs.height = Math.floor(cvs.clientHeight * dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
 
-  // scale tiles a bit based on viewport width so it feels good on phones
   TILE_W = Math.max(44, Math.min(72, Math.floor(cvs.clientWidth / 9)));
   TILE_H = TILE_W/2;
-
-  // center the grid horizontally; lift it a bit vertically
-  const gridPxW = (GRID.cols + GRID.rows) * (TILE_W/2);
   ORIGIN.x = cvs.clientWidth/2;
-  ORIGIN.y = 80; // distance from top
+  ORIGIN.y = 80;
 }
 addEventListener('resize', fit, {passive:true});
 fit();
 
-/*--------------------------
-  Isometric transforms
----------------------------*/
-// grid -> screen (top of tile center)
 function gridToScreen(i,j){
-  // diamond center
   const x = (i - j) * (TILE_W/2);
   const y = (i + j) * (TILE_H/2);
   return { x: ORIGIN.x + x, y: ORIGIN.y + y };
 }
-
-// screen -> fractional grid (inverse transform)
 function screenToGrid(x,y){
   const sx = x - ORIGIN.x;
   const sy = y - ORIGIN.y;
@@ -73,15 +65,7 @@ function screenToGrid(x,y){
   return { i, j };
 }
 
-/*--------------------------
-  World / player
----------------------------*/
-const player = {
-  i: 4, j: 4,          // grid coords (integers)
-  ti: 4, tj: 4,        // target coords (integers)
-  t: 1,                // 0..1 tween progress
-  speed: 8/1000        // tiles per ms for tween; higher is faster
-};
+const player = { i:4, j:4, ti:4, tj:4, t:1, speed:8/1000 };
 updateHud();
 
 function reset(){
@@ -92,47 +76,53 @@ function reset(){
 }
 document.getElementById('reset').onclick = reset;
 
-/*--------------------------
-  Input: tap near player to step
----------------------------*/
+// --- Input: tap or swipe ---
+let start = null;
+const SWIPE_THRESHOLD = 28;
+
 addEventListener('pointerdown', (e)=>{
-  const rect = cvs.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  // ignore taps while moving
-  if (player.t < 1) return;
-
-  // convert tap to fractional grid coords
-  const g = screenToGrid(x, y);
-
-  // decide direction: whichever axis delta is larger
-  const di = g.i - player.i;
-  const dj = g.j - player.j;
-
-  let stepI = 0, stepJ = 0;
-  if (Math.abs(di) > Math.abs(dj)) {
-    stepI = Math.sign(di);
-  } else {
-    stepJ = Math.sign(dj);
-  }
-
-  // clamp to bounds
-  const ni = clamp(player.i + stepI, 0, GRID.cols-1);
-  const nj = clamp(player.j + stepJ, 0, GRID.rows-1);
-
-  // start tween if moved
-  if (ni !== player.i || nj !== player.j){
-    player.ti = ni; player.tj = nj;
-    player.t = 0; // start moving
-  }
+  const r = cvs.getBoundingClientRect();
+  start = { x: e.clientX - r.left, y: e.clientY - r.top, time: performance.now() };
 }, {passive:true});
 
+addEventListener('pointerup', (e)=>{
+  if (player.t < 1) return;
+  const r = cvs.getBoundingClientRect();
+  const end = { x: e.clientX - r.left, y: e.clientY - r.top };
+  if (!start){ return; }
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const dist = Math.hypot(dx, dy);
+
+  if (dist >= SWIPE_THRESHOLD){
+    const u = dx + dy;
+    const v = dy - dx;
+    if (Math.abs(u) > Math.abs(v)){
+      step(sign(u), 0);
+    } else {
+      step(0, sign(v));
+    }
+  } else {
+    const g = screenToGrid(end.x, end.y);
+    const di = g.i - player.i;
+    const dj = g.j - player.j;
+    if (Math.abs(di) > Math.abs(dj)) step(sign(di), 0);
+    else step(0, sign(dj));
+  }
+  start = null;
+}, {passive:true});
+
+function sign(v){ return v>0 ? 1 : v<0 ? -1 : 0; }
+
+function step(stepI, stepJ){
+  const ni = clamp(player.i + stepI, 0, GRID.cols-1);
+  const nj = clamp(player.j + stepJ, 0, GRID.rows-1);
+  if (ni !== player.i || nj !== player.j){
+    player.ti = ni; player.tj = nj; player.t = 0;
+  }
+}
 function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
-/*--------------------------
-  Render helpers
----------------------------*/
 function drawTile(i,j,fill){
   const {x,y} = gridToScreen(i,j);
   ctx.beginPath();
@@ -141,109 +131,69 @@ function drawTile(i,j,fill){
   ctx.lineTo(x, y + TILE_H/2);
   ctx.lineTo(x - TILE_W/2, y);
   ctx.closePath();
-  ctx.fillStyle = fill;
-  ctx.fill();
-  // subtle outline
-  ctx.strokeStyle = 'rgba(0,0,0,.35)';
-  ctx.stroke();
+  ctx.fillStyle = fill; ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.stroke();
 }
-
 function drawPlayer(x,y){
-  // simple column block
-  const h = TILE_H; // visual height
-  // top diamond
+  const h = TILE_H;
   ctx.beginPath();
   ctx.moveTo(x, y - TILE_H/2 - h);
   ctx.lineTo(x + TILE_W/2, y - h);
   ctx.lineTo(x, y + TILE_H/2 - h);
   ctx.lineTo(x - TILE_W/2, y - h);
   ctx.closePath();
-  ctx.fillStyle = '#4cc9f0';
-  ctx.fill();
+  ctx.fillStyle = '#4cc9f0'; ctx.fill();
 
-  // right face
   ctx.beginPath();
   ctx.moveTo(x, y + TILE_H/2 - h);
   ctx.lineTo(x + TILE_W/2, y - h);
   ctx.lineTo(x + TILE_W/2, y);
   ctx.lineTo(x, y + TILE_H/2);
   ctx.closePath();
-  ctx.fillStyle = '#1f7fa0';
-  ctx.fill();
+  ctx.fillStyle = '#1f7fa0'; ctx.fill();
 
-  // left face
   ctx.beginPath();
   ctx.moveTo(x, y + TILE_H/2 - h);
   ctx.lineTo(x - TILE_W/2, y - h);
   ctx.lineTo(x - TILE_W/2, y);
   ctx.lineTo(x, y + TILE_H/2);
   ctx.closePath();
-  ctx.fillStyle = '#2a9bc0';
-  ctx.fill();
+  ctx.fillStyle = '#2a9bc0'; ctx.fill();
 }
 
-/*--------------------------
-  Main loop
----------------------------*/
 let last = 0;
 function loop(t=0){
   requestAnimationFrame(loop);
   const dt = Math.min(33, t - last || 16.7); last = t;
-
-  // tween position if moving
   if (player.t < 1){
     const dist = Math.hypot(player.ti - player.i, player.tj - player.j);
-    const k = (player.speed * dt) / Math.max(0.0001, dist); // normalize to 1 tile
+    const k = (player.speed * dt) / Math.max(0.0001, dist);
     player.t = Math.min(1, player.t + k);
-    if (player.t === 1){
-      player.i = player.ti; player.j = player.tj;
-      updateHud();
-    }
+    if (player.t === 1){ player.i = player.ti; player.j = player.tj; updateHud(); }
   }
-
   render();
 }
 loop();
 
 function render(){
   ctx.clearRect(0,0,cvs.clientWidth,cvs.clientHeight);
-
-  // background
-  ctx.fillStyle = '#101114';
-  ctx.fillRect(0,0,cvs.clientWidth,cvs.clientHeight);
-
-  // draw grid back-to-front (rows then cols) for simple depth
+  ctx.fillStyle = '#101114'; ctx.fillRect(0,0,cvs.clientWidth,cvs.clientHeight);
   for (let j=0;j<GRID.rows;j++){
     for (let i=0;i<GRID.cols;i++){
-      const even = ((i+j)&1)===0;
-      drawTile(i,j, even ? '#1a1c20' : '#17191c');
+      drawTile(i,j, ((i+j)&1)===0 ? '#1a1c20':'#17191c');
     }
   }
-
-  // compute player's interpolated screen position
   const pi = lerp(player.i, player.ti, player.t);
   const pj = lerp(player.j, player.tj, player.t);
   const pxy = gridToScreen(pi, pj);
-
-  // highlight current target tile (optional)
-  const {x:tx,y:ty} = gridToScreen(player.ti, player.tj);
   ctx.globalAlpha = 0.25;
   drawTile(player.ti, player.tj, '#4cc9f0');
   ctx.globalAlpha = 1;
-
-  // draw player
   drawPlayer(pxy.x, pxy.y);
 }
-
 function lerp(a,b,t){ return a + (b - a) * t; }
+function updateHud(){ posEl.textContent = `(${player.i}, ${player.j})`; }
 
-function updateHud(){
-  posEl.textContent = `(${player.i}, ${player.j})`;
-}
-
-/*--------------------------
-  Prevent double-tap zoom / overscroll quirks
----------------------------*/
 let lastTouch=0;
 addEventListener('touchend', e=>{
   const now = Date.now();

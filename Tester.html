@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>Prototype</title>
+<style>
+  html,body{margin:0;height:100%;background:#111;overscroll-behavior:contain}
+  canvas{display:block;width:100vw;height:100vh;touch-action:none}
+  .hud{position:fixed;inset:auto 0 0 0;display:flex;gap:12px;justify-content:center;
+       padding:10px env(safe-area-inset-right) calc(12px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
+       font:16px system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#fff}
+  button{padding:10px 14px;border:0;border-radius:12px;background:#2b2b2b;color:#fff}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="hud">
+  <button id="reset">↻ Reset</button>
+  <button id="pause">⏸︎ Pause</button>
+</div>
+<script>
+const cvs=document.getElementById('c'),ctx=cvs.getContext('2d');
+function fit(){const dpr=Math.max(1,Math.min(3,devicePixelRatio||1));
+  cvs.width=Math.floor(cvs.clientWidth*dpr);cvs.height=Math.floor(cvs.clientHeight*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);} addEventListener('resize',fit,{passive:true}); fit();
+let running=true; document.getElementById('pause').onclick=()=>{running=!running; event.target.textContent=running?'⏸︎ Pause':'▶︎ Resume';};
+document.getElementById('reset').onclick=()=>reset();
+let player, obst, score;
+function reset(){player={x:48,y:0,vy:0,s:26,ground:()=>cvs.clientHeight-80,on:true};
+  obst=[]; score=0;} reset();
+let spawn=0, speed=3.2, g=0.8, input=false; addEventListener('pointerdown',()=>input=true); addEventListener('pointerup',()=>input=false);
+function rnd(a,b){return Math.random()*(b-a)+a}
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}
+let last=0; function loop(t=0){requestAnimationFrame(loop); const dt=Math.min(33, t-last||16.7); last=t;
+  if(!running){draw(true);return}
+  spawn-=dt; if(spawn<=0){spawn=rnd(700,1200)/speed; const w=rnd(20,40),h=rnd(30,60); obst.push({x:cvs.clientWidth+w,y:player.ground()-h,w,h})}
+  if(input&&player.on){player.vy=-15; player.on=false}
+  player.vy+=g; player.y+=player.vy; if(player.y>player.ground()-player.s){player.y=player.ground()-player.s; player.vy=0; player.on=true}
+  for(let i=obst.length-1;i>=0;i--){const o=obst[i]; o.x-=speed;
+    if(o.x+o.w<0){obst.splice(i,1); score++; speed+=0.02}
+    else if(player.x < o.x+o.w && player.x+player.s > o.x && player.y < o.y+o.h && player.y+player.s > o.y){running=false}
+  }
+  draw(false)
+}
+function draw(paused){ctx.clearRect(0,0,cvs.clientWidth,cvs.clientHeight);
+  rect(0,0,cvs.clientWidth,cvs.clientHeight,'#111'); rect(0,player.ground(),cvs.clientWidth,4,'#3b3b3b');
+  ctx.fillStyle='#e85d04'; obst.forEach(o=>rect(o.x,o.y,o.w,o.h,ctx.fillStyle));
+  rect(player.x,player.y,player.s,player.s,'#4cc9f0');
+  ctx.fillStyle='#fff'; ctx.font='16px system-ui,-apple-system,Segoe UI,Roboto,sans-serif'; ctx.fillText('Score '+score,12,24);
+  if(!running){ctx.textAlign='center'; ctx.fillText('Game Over — tap ↻', cvs.clientWidth/2, cvs.clientHeight/2)}
+}
+loop();
+</script>
+</body>
+</html>

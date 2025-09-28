@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<title>Isometric Grid with HSL</title>
+<title>Isometric Grid — Springs, Dumps, Diffusion</title>
 <style>
   html,body{margin:0;height:100%;background:#ffffff;overscroll-behavior:contain}
   canvas{display:block;width:100vw;height:100vh;touch-action:none}
@@ -49,7 +49,10 @@
 <script>
 /* ====== Config ====== */
 const GRID = { cols: 10, rows: 10 };
-const STAT_RANGE = { min: -100, max: 100 };
+const SPRING_RATE = 3; // per second
+const DUMP_RATE   = 3; // per second
+const DIFFUSE_MS  = 1000; // update cadence
+const STATS = ['Temperature','Density','Brightness'];
 
 /* ====== Canvas setup ====== */
 const cvs = document.getElementById('game');
@@ -59,9 +62,7 @@ const pTempEl = document.getElementById('pTemp');
 const pDensityEl = document.getElementById('pDensity');
 const pBrightEl = document.getElementById('pBright');
 
-let TILE_W = 64;
-let TILE_H = TILE_W / 2;
-let ORIGIN = { x: 0, y: 0 };
+let TILE_W = 64, TILE_H = TILE_W/2, ORIGIN = { x: 0, y: 0 };
 
 function fit(){
   const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
@@ -70,31 +71,28 @@ function fit(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
 
   TILE_W = Math.max(44, Math.min(72, Math.floor(cvs.clientWidth / 9)));
-  TILE_H = TILE_W / 2;
-  ORIGIN.x = cvs.clientWidth / 2;
+  TILE_H = TILE_W/2;
+  ORIGIN.x = cvs.clientWidth/2;
   ORIGIN.y = 80;
 }
 addEventListener('resize', fit, {passive:true});
 fit();
 
 /* ====== Grid cells with stats ====== */
-function makeCell(){
-  return { Temperature: 0, Density: 0, Brightness: 0 };
-}
+function makeCell(){ return { Temperature:0, Density:0, Brightness:0 }; }
+function clampStat(v){ return Math.max(-100, Math.min(100, v|0)); }
+
 const cells = [];
 for (let j=0;j<GRID.rows;j++){
-  const row = [];
-  for (let i=0;i<GRID.cols;i++){
-    row.push(makeCell());
-  }
+  const row=[];
+  for (let i=0;i<GRID.cols;i++) row.push(makeCell());
   cells.push(row);
 }
 
 /* ====== Player with stats ====== */
 const player = { i:4, j:4, ti:4, tj:4, t:1, speed:8/1000,
-  Temperature: 0, Density: 0, Brightness: 0
+  Temperature:0, Density:0, Brightness:0
 };
-
 function updateHud(){
   posEl.textContent = `(${player.i}, ${player.j})`;
   pTempEl.textContent = player.Temperature;
@@ -110,6 +108,14 @@ function reset(){
   player.Temperature = 0;
   player.Density = 0;
   player.Brightness = 0;
+
+  // Re-seed grid to zeros
+  for (let j=0;j<GRID.rows;j++) for (let i=0;i<GRID.cols;i++)
+    cells[j][i] = makeCell();
+
+  // Re-place elements
+  placeElements();
+
   updateHud();
 }
 document.getElementById('reset').onclick = reset;
@@ -121,8 +127,7 @@ function gridToScreen(i,j){
   return { x: ORIGIN.x + x, y: ORIGIN.y + y };
 }
 function screenToGrid(x,y){
-  const sx = x - ORIGIN.x;
-  const sy = y - ORIGIN.y;
+  const sx = x - ORIGIN.x, sy = y - ORIGIN.y;
   const i = (sx/(TILE_W/2) + sy/(TILE_H/2)) / 2;
   const j = (sy/(TILE_H/2) - sx/(TILE_W/2)) / 2;
   return { i, j };
@@ -133,47 +138,46 @@ let start = null;
 const SWIPE_THRESHOLD = 28;
 
 addEventListener('pointerdown', e=>{
-  const r = cvs.getBoundingClientRect();
-  start = { x:e.clientX-r.left, y:e.clientY-r.top };
+  const r=cvs.getBoundingClientRect();
+  start={ x:e.clientX-r.left, y:e.clientY-r.top };
 },{passive:true});
 
 addEventListener('pointerup', e=>{
   if (player.t<1) return;
-  const r = cvs.getBoundingClientRect();
-  const end = { x:e.clientX-r.left, y:e.clientY-r.top };
+  const r=cvs.getBoundingClientRect();
+  const end={ x:e.clientX-r.left, y:e.clientY-r.top };
   if (!start) return;
-  const dx = end.x-start.x, dy=end.y-start.y;
-  const dist = Math.hypot(dx,dy);
+  const dx=end.x-start.x, dy=end.y-start.y, dist=Math.hypot(dx,dy);
   if (dist>=SWIPE_THRESHOLD){
-    const u = dx+dy, v=dy-dx;
-    if (Math.abs(u)>Math.abs(v)) step(sign(u),0);
-    else step(0,sign(v));
+    const u=dx+dy, v=dy-dx;
+    if (Math.abs(u)>Math.abs(v)) step(sign(u),0); else step(0,sign(v));
   } else {
     const g=screenToGrid(end.x,end.y);
     const di=g.i-player.i, dj=g.j-player.j;
-    if (Math.abs(di)>Math.abs(dj)) step(sign(di),0);
-    else step(0,sign(dj));
+    if (Math.abs(di)>Math.abs(dj)) step(sign(di),0); else step(0,sign(dj));
   }
   start=null;
 },{passive:true});
 
 function sign(v){ return v>0?1:v<0?-1:0; }
-function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function inside(i,j){ return i>=0 && j>=0 && i<GRID.cols && j<GRID.rows; }
 
 function step(si,sj){
   const ni=clamp(player.i+si,0,GRID.cols-1);
   const nj=clamp(player.j+sj,0,GRID.rows-1);
-  if (ni!==player.i||nj!==player.j){ player.ti=ni; player.tj=nj; player.t=0; }
+  if (ni!==player.i || nj!==player.j){ player.ti=ni; player.tj=nj; player.t=0; }
 }
 
-/* ====== Color calculation ====== */
+/* ====== Color logic (neutral gray fix) ====== */
 function cellColor(cell){
-  // Lightness: Brightness maps [-100,100] -> [0,100], 0 -> 50
   const L = 50 + (cell.Brightness/2);
-
-  // Map Density to angle: -100→270°, +100→90°
+  if (cell.Density===0 && cell.Temperature===0){
+    return `hsl(0,0%,${L}%)`; // gray
+  }
+  // Density: -100→270°, +100→90°
   const hueDensity = 180 - (cell.Density * 90/100);
-  // Map Temp to angle: -100→180°, +100→0°
+  // Temperature: -100→180°, +100→0°
   const hueTemp = 90 - (cell.Temperature * 90/100);
 
   const dVec = {
@@ -184,84 +188,191 @@ function cellColor(cell){
     x: Math.cos(hueTemp*Math.PI/180)*Math.abs(cell.Temperature),
     y: Math.sin(hueTemp*Math.PI/180)*Math.abs(cell.Temperature)
   };
-  const net={x:dVec.x+tVec.x,y:dVec.y+tVec.y};
-  let netHue=Math.atan2(net.y,net.x)*180/Math.PI;
-  if(netHue<0) netHue+=360;
+  const net = { x: dVec.x + tVec.x, y: dVec.y + tVec.y };
+  let netHue = Math.atan2(net.y, net.x) * 180/Math.PI; if (netHue<0) netHue+=360;
 
   return `hsl(${netHue.toFixed(1)},50%,${L.toFixed(1)}%)`;
 }
 
+/* ====== Elements: one spring & one dump ====== */
+const elements = []; // {type:'spring'|'dump', stat:'Temperature'|'Density'|'Brightness', i, j}
+function placeElements(){
+  elements.length = 0;
+  const allStats = STATS.slice();
+  // Random stat for spring and dump
+  const springStat = allStats[Math.floor(Math.random()*allStats.length)];
+  const dumpStat   = allStats[Math.floor(Math.random()*allStats.length)];
+
+  const pos1 = randCell();
+  let pos2 = randCell();
+  while (pos2.i===pos1.i && pos2.j===pos1.j){ pos2 = randCell(); }
+
+  elements.push({ type:'spring', stat: springStat, i: pos1.i, j: pos1.j });
+  elements.push({ type:'dump',   stat: dumpStat,   i: pos2.i, j: pos2.j });
+}
+function randCell(){ return { i: Math.floor(Math.random()*GRID.cols), j: Math.floor(Math.random()*GRID.rows) }; }
+
+placeElements();
+
+/* ====== Diffusion tick (every second) ====== */
+/*
+  For each cell C and each stat:
+    delta = Σ over 4-neighbors N of sign(N.stat - C.stat)  // each neighbor contributes -1, 0, or +1
+    next = clamp(C.stat + delta)
+  Then apply localized sources/sinks:
+    spring: +SPRING_RATE; dump: -DUMP_RATE on their chosen stat at their cell.
+  Apply all updates simultaneously.
+*/
+function tick(){
+  // Prepare next grid (deep copy)
+  const next = [];
+  for (let j=0;j<GRID.rows;j++){
+    const row=[];
+    for (let i=0;i<GRID.cols;i++){
+      row.push({ ...cells[j][i] });
+    }
+    next.push(row);
+  }
+
+  // Neighbor diffusion
+  const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+  for (let j=0;j<GRID.rows;j++){
+    for (let i=0;i<GRID.cols;i++){
+      const C = cells[j][i];
+      for (const k of STATS){
+        let delta = 0;
+        for (const [dx,dy] of dirs){
+          const ni=i+dx, nj=j+dy;
+          if (!inside(ni,nj)) continue;
+          const N = cells[nj][ni];
+          const d = Math.sign(N[k] - C[k]); // -1,0,+1
+          delta += d;
+        }
+        next[j][i][k] = clampStat(C[k] + delta);
+      }
+    }
+  }
+
+  // Apply spring/dump
+  for (const el of elements){
+    const cell = next[el.j][el.i];
+    if (el.type==='spring'){
+      cell[el.stat] = clampStat(cell[el.stat] + SPRING_RATE);
+    } else if (el.type==='dump'){
+      cell[el.stat] = clampStat(cell[el.stat] - DUMP_RATE);
+    }
+  }
+
+  // Commit
+  for (let j=0;j<GRID.rows;j++){
+    for (let i=0;i<GRID.cols;i++){
+      cells[j][i] = next[j][i];
+    }
+  }
+}
+setInterval(tick, DIFFUSE_MS);
+
 /* ====== Drawing ====== */
 function drawTile(i,j,cell){
   const {x,y}=gridToScreen(i,j);
+  // tile
   ctx.beginPath();
-  ctx.moveTo(x,y-TILE_H/2);
-  ctx.lineTo(x+TILE_W/2,y);
-  ctx.lineTo(x,y+TILE_H/2);
-  ctx.lineTo(x-TILE_W/2,y);
+  ctx.moveTo(x, y - TILE_H/2);
+  ctx.lineTo(x + TILE_W/2, y);
+  ctx.lineTo(x, y + TILE_H/2);
+  ctx.lineTo(x - TILE_W/2, y);
   ctx.closePath();
-  ctx.fillStyle=cellColor(cell);
+  ctx.fillStyle = cellColor(cell);
   ctx.fill();
   ctx.strokeStyle='rgba(0,0,0,.15)';
   ctx.stroke();
+
+  // element overlays
+  const here = elements.find(e => e.i===i && e.j===j);
+  if (here){
+    // small badge at tile top
+    const r = Math.max(6, TILE_W*0.12);
+    const topX = x, topY = y - TILE_H*0.55;
+    ctx.beginPath();
+    ctx.arc(topX, topY, r, 0, Math.PI*2);
+    ctx.fillStyle = (here.type==='spring') ? '#2ecc71' : '#e74c3c'; // spring green / dump red
+    ctx.fill();
+    // stat initial letter
+    ctx.fillStyle = '#fff';
+    ctx.font = `${Math.max(10, r)}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline='middle';
+    ctx.fillText(here.stat[0], topX, topY+0.5);
+  }
 }
 
 function drawPlayer(x,y){
   const h=TILE_H;
+  // top
   ctx.beginPath();
   ctx.moveTo(x,y-TILE_H/2-h);
   ctx.lineTo(x+TILE_W/2,y-h);
   ctx.lineTo(x,y+TILE_H/2-h);
   ctx.lineTo(x-TILE_W/2,y-h);
   ctx.closePath();
-  ctx.fillStyle='#2a7abf';ctx.fill();
+  ctx.fillStyle='#2a7abf'; ctx.fill();
+  // right
   ctx.beginPath();
   ctx.moveTo(x,y+TILE_H/2-h);
   ctx.lineTo(x+TILE_W/2,y-h);
   ctx.lineTo(x+TILE_W/2,y);
   ctx.lineTo(x,y+TILE_H/2);
   ctx.closePath();
-  ctx.fillStyle='#1f5f93';ctx.fill();
+  ctx.fillStyle='#1f5f93'; ctx.fill();
+  // left
   ctx.beginPath();
   ctx.moveTo(x,y+TILE_H/2-h);
   ctx.lineTo(x-TILE_W/2,y-h);
   ctx.lineTo(x-TILE_W/2,y);
   ctx.lineTo(x,y+TILE_H/2);
   ctx.closePath();
-  ctx.fillStyle='#2770aa';ctx.fill();
+  ctx.fillStyle='#2770aa'; ctx.fill();
 }
 
 function render(){
   ctx.clearRect(0,0,cvs.clientWidth,cvs.clientHeight);
-  for(let j=0;j<GRID.rows;j++){
-    for(let i=0;i<GRID.cols;i++){
+  for (let j=0;j<GRID.rows;j++){
+    for (let i=0;i<GRID.cols;i++){
       drawTile(i,j,cells[j][i]);
     }
   }
-  const pi=lerp(player.i,player.ti,player.t);
-  const pj=lerp(player.j,player.tj,player.t);
+  const pi=lerp(player.i,player.ti,player.t), pj=lerp(player.j,player.tj,player.t);
   const pxy=gridToScreen(pi,pj);
-  ctx.globalAlpha=0.25;
-  drawTile(player.ti,player.tj,cells[player.tj][player.ti]);
-  ctx.globalAlpha=1;
-  drawPlayer(pxy.x,pxy.y);
+
+  ctx.globalAlpha = 0.25;
+  drawTile(player.ti, player.tj, cells[player.tj][player.ti]);
+  ctx.globalAlpha = 1;
+
+  drawPlayer(pxy.x, pxy.y);
 }
-function lerp(a,b,t){return a+(b-a)*t;}
+function lerp(a,b,t){ return a + (b - a) * t; }
 
 /* ====== Loop ====== */
 let last=0;
 function loop(t=0){
   requestAnimationFrame(loop);
-  const dt=Math.min(33,t-last||16.7); last=t;
-  if(player.t<1){
-    const dist=Math.hypot(player.ti-player.i,player.tj-player.j);
-    const k=(player.speed*dt)/Math.max(0.0001,dist);
-    player.t=Math.min(1,player.t+k);
-    if(player.t===1){player.i=player.ti;player.j=player.tj;updateHud();}
+  const dt=Math.min(33, t-last || 16.7); last=t;
+  if (player.t<1){
+    const dist=Math.hypot(player.ti-player.i, player.tj-player.j);
+    const k=(player.speed*dt)/Math.max(0.0001, dist);
+    player.t=Math.min(1, player.t+k);
+    if (player.t===1){ player.i=player.ti; player.j=player.tj; updateHud(); }
   }
   render();
 }
 loop();
+
+/* ====== Touch niceties ====== */
+let lastTouch=0;
+addEventListener('touchend', e=>{
+  const now=Date.now();
+  if (now-lastTouch<300) e.preventDefault();
+  lastTouch=now;
+},{passive:false});
 </script>
 </body>
 </html>

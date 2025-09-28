@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<title>Iso Grid — Camera Move, Spring/Dump, Diffusion</title>
+<title>Iso Grid — Camera Move, Spring/Dump, Diffusion (Fix)</title>
 <style>
   html,body{margin:0;height:100%;background:#ffffff;overscroll-behavior:contain}
   canvas{display:block;width:100vw;height:100vh;touch-action:none}
@@ -18,10 +18,9 @@
     position:fixed; left:0; right:0; bottom:calc(8px + env(safe-area-inset-bottom));
     display:flex; flex-wrap:wrap; gap:8px 14px; justify-content:center; align-items:center;
     padding:10px 14px; font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:#222;
-    background:rgba(255,255,255,.7); backdrop-filter:saturate(1.2) blur(4px);
+    background:rgba(255,255,255,.8); backdrop-filter:saturate(1.2) blur(4px);
     border-radius:12px; margin:0 10px; box-shadow:0 2px 8px rgba(0,0,0,.06);
   }
-  .hud-bottom b{font-weight:600}
   .btns{position:fixed; left:0; right:0; bottom:calc(64px + env(safe-area-inset-bottom));
         display:flex; gap:12px; justify-content:center}
   button{padding:10px 14px; border:1px solid #e5e6ea; border-radius:12px; background:#fafbff; color:#222}
@@ -31,13 +30,13 @@
 <canvas id="game"></canvas>
 
 <div class="hud-top">
-  <div>Swipe to pan the grid • Player stays centered</div>
+  <div>Swipe to pan grid • Player centered</div>
   <div id="pos"></div>
 </div>
 
 <div class="btns"><button id="reset">↻ Reset</button></div>
 
-<div class="hud-bottom" id="stats">
+<div class="hud-bottom">
   <div><b>Player</b></div>
   <div>Temperature: <span id="pTemp">0</span></div>
   <div>Density: <span id="pDensity">0</span></div>
@@ -48,16 +47,16 @@
 /* ====== Config ====== */
 const GRID = { cols: 100, rows: 100 };
 const STATS = ['Temperature','Density','Brightness'];
-const SPRING_RATE = 3;         // + per tick
-const DUMP_RATE = SPRING_RATE; // - per tick (net zero)
-const DIFFUSE_MS = 1000;       // tick cadence
-const SWIPE_THRESHOLD = 28;    // CSS px
+const SPRING_RATE = 3;        // + per tick
+const DUMP_RATE   = SPRING_RATE; // - per tick (net zero)
+const DIFFUSE_MS  = 1000;
+const SWIPE_THRESHOLD = 24;   // a tad lower to be friendlier on phones
 
-/* ====== Canvas sizing ====== */
+/* ====== Canvas ====== */
 const cvs = document.getElementById('game');
 const ctx = cvs.getContext('2d');
-let TILE_W = 64, TILE_H = TILE_W/2;
-let ORIGIN = { x: 0, y: 0 };   // will be recomputed each frame (camera-centered)
+let TILE_W = 64, TILE_H = 32;
+let ORIGIN = { x: 0, y: 0 };
 
 function fit(){
   const dpr = Math.max(1, Math.min(3, devicePixelRatio || 1));
@@ -70,19 +69,19 @@ function fit(){
 }
 addEventListener('resize', fit, {passive:true}); fit();
 
-/* ====== Grid data ====== */
+/* ====== Grid & stats ====== */
 function makeCell(){ return { Temperature:0, Density:0, Brightness:0 }; }
 function clampStat(v){ return Math.max(-100, Math.min(100, v|0)); }
 const cells = Array.from({length: GRID.rows}, () =>
   Array.from({length: GRID.cols}, () => makeCell())
 );
 
-/* ====== Player stats (visual only; stays centered) ====== */
+/* ====== Player stats display ====== */
 const player = { Temperature:0, Density:0, Brightness:0 };
-const posEl = document.getElementById('pos');
 const pTempEl = document.getElementById('pTemp');
 const pDensityEl = document.getElementById('pDensity');
 const pBrightEl = document.getElementById('pBright');
+const posEl = document.getElementById('pos');
 function updateHud(){
   posEl.textContent = `focus: (${Math.round(cam.i)}, ${Math.round(cam.j)})`;
   pTempEl.textContent = player.Temperature;
@@ -91,8 +90,10 @@ function updateHud(){
 }
 updateHud();
 
-/* ====== Camera (which tile sits under the centered player) ====== */
-const cam = { i: 50, j: 50, ti: 50, tj: 50, t: 1, speed: 8/1000 }; // tiles/ms
+/* ====== Camera (keeps player centered) ====== */
+const cam = { i: 50, j: 50, ti: 50, tj: 50, t: 1, speed: 8/1000 };
+let ci = cam.i, cj = cam.j; // render-space interpolated camera; do not mutate cam.i/j during tween
+
 function inside(i,j){ return i>=0 && j>=0 && i<GRID.cols && j<GRID.rows; }
 function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
@@ -102,9 +103,8 @@ function randInt(n){ return Math.floor(Math.random()*n); }
 function randCell(){ return { i: randInt(GRID.cols), j: randInt(GRID.rows) }; }
 function placeElements(){
   elements.length = 0;
-  const stat = STATS[randInt(STATS.length)]; // both use the same stat → net zero on that stat globally
-  let a = randCell();
-  let b = randCell();
+  const stat = STATS[randInt(STATS.length)];
+  let a = randCell(), b = randCell();
   while (a.i===b.i && a.j===b.j) b = randCell();
   elements.push({ type:'spring', stat, i:a.i, j:a.j });
   elements.push({ type:'dump',   stat, i:b.i, j:b.j });
@@ -118,7 +118,7 @@ function gridToScreen(i,j){
   return { x: ORIGIN.x + x, y: ORIGIN.y + y };
 }
 
-/* ====== Input: swipe pans the grid (moves camera target) ====== */
+/* ====== Input: swipe to pan grid (move camera tile) ====== */
 let start = null;
 addEventListener('pointerdown', e=>{
   const r=cvs.getBoundingClientRect();
@@ -126,26 +126,24 @@ addEventListener('pointerdown', e=>{
 },{passive:true});
 
 addEventListener('pointerup', e=>{
-  if (cam.t < 1) return; // wait until camera finishes tweening
+  if (cam.t < 1) return;
   const r=cvs.getBoundingClientRect();
   const end={ x:e.clientX-r.left, y:e.clientY-r.top };
   if (!start) return;
   const dx=end.x-start.x, dy=end.y-start.y;
   const dist=Math.hypot(dx,dy);
   if (dist >= SWIPE_THRESHOLD){
-    // Map swipe to iso axes: u = dx+dy, v = dy-dx
     const u=dx+dy, v=dy-dx;
     let stepI=0, stepJ=0;
     if (Math.abs(u) > Math.abs(v)) stepI = Math.sign(u); else stepJ = Math.sign(v);
-    // Move the CAMERA focus (grid under the player), player stays centered.
     cam.ti = clamp(cam.i + stepI, 0, GRID.cols-1);
     cam.tj = clamp(cam.j + stepJ, 0, GRID.rows-1);
-    cam.t = 0; // start tween
+    cam.t = 0;
   }
   start=null;
 },{passive:true});
 
-/* ====== Diffusion tick (every second) with net-zero spring/dump ====== */
+/* ====== Diffusion tick (every second) ====== */
 const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
 function tick(){
   const next = cells.map(row => row.map(c => ({...c})));
@@ -158,41 +156,41 @@ function tick(){
           const ni=i+dx, nj=j+dy;
           if (!inside(ni,nj)) continue;
           const N = cells[nj][ni];
-          delta += Math.sign(N[k] - C[k]); // -1, 0, +1
+          delta += Math.sign(N[k] - C[k]);
         }
         next[j][i][k] = clampStat(C[k] + delta);
       }
     }
   }
-  // Apply spring (+) and dump (−) with equal magnitude on the same stat
+  // Net-zero sources/sinks on same stat
   for (const el of elements){
     const c = next[el.j][el.i];
-    if (el.type==='spring') c[el.stat] = clampStat(c[el.stat] + SPRING_RATE);
-    else                    c[el.stat] = clampStat(c[el.stat] - DUMP_RATE);
+    c[el.stat] = clampStat(c[el.stat] + (el.type==='spring' ? +SPRING_RATE : -DUMP_RATE));
   }
   // Commit
   for (let j=0;j<GRID.rows;j++) for (let i=0;i<GRID.cols;i++) cells[j][i] = next[j][i];
 }
 setInterval(tick, DIFFUSE_MS);
 
-/* ====== Color logic (neutral gray when Density=Temp=0) ====== */
+/* ====== Color logic (neutral gray when Density & Temp = 0) ====== */
 function cellColor(cell){
   const L = 50 + (cell.Brightness/2);
   if (cell.Density===0 && cell.Temperature===0) return `hsl(0,0%,${L}%)`;
   const hueDensity = 180 - (cell.Density * 90/100);
   const hueTemp    =  90 - (cell.Temperature * 90/100);
-  const d = { x: Math.cos(hueDensity*Math.PI/180)*Math.abs(cell.Density),
-              y: Math.sin(hueDensity*Math.PI/180)*Math.abs(cell.Density) };
-  const t = { x: Math.cos(hueTemp   *Math.PI/180)*Math.abs(cell.Temperature),
-              y: Math.sin(hueTemp   *Math.PI/180)*Math.abs(cell.Temperature) };
-  let netHue = Math.atan2(d.y+t.y, d.x+t.x) * 180/Math.PI; if (netHue<0) netHue += 360;
-  return `hsl(${netHue.toFixed(1)},50%,${L.toFixed(1)}%)`;
+  const dx = Math.cos(hueDensity*Math.PI/180)*Math.abs(cell.Density);
+  const dy = Math.sin(hueDensity*Math.PI/180)*Math.abs(cell.Density);
+  const tx = Math.cos(hueTemp   *Math.PI/180)*Math.abs(cell.Temperature);
+  const ty = Math.sin(hueTemp   *Math.PI/180)*Math.abs(cell.Temperature);
+  let hue = Math.atan2(dy+ty, dx+tx) * 180/Math.PI; if (hue<0) hue+=360;
+  return `hsl(${hue.toFixed(1)},50%,${L.toFixed(1)}%)`;
 }
 
-/* ====== Drawing helpers ====== */
+/* ====== Drawing ====== */
+function elementAt(i,j){ for (const e of elements) if (e.i===i && e.j===j) return e; return null; }
+
 function drawTile(i,j,cell){
   const {x,y}=gridToScreen(i,j);
-  // diamond
   ctx.beginPath();
   ctx.moveTo(x, y - TILE_H/2);
   ctx.lineTo(x + TILE_W/2, y);
@@ -201,13 +199,12 @@ function drawTile(i,j,cell){
   ctx.closePath();
   ctx.fillStyle = cellColor(cell);
   ctx.fill();
-  ctx.strokeStyle='rgba(0,0,0,.12)';
+  ctx.strokeStyle='rgba(0,0,0,.25)'; // stronger outline for visibility
   ctx.stroke();
 
-  // element badge: S (spring) / D (dump)
   const el = elementAt(i,j);
   if (el){
-    const r = Math.max(6, TILE_W*0.12);
+    const r = Math.max(7, TILE_W*0.14);
     const topX = x, topY = y - TILE_H*0.55;
     ctx.beginPath();
     ctx.arc(topX, topY, r, 0, Math.PI*2);
@@ -219,7 +216,6 @@ function drawTile(i,j,cell){
     ctx.fillText(el.type==='spring' ? 'S' : 'D', topX, topY+0.5);
   }
 }
-function elementAt(i,j){ for (const e of elements) if (e.i===i && e.j===j) return e; return null; }
 
 function drawPlayerAtCenter(){
   const cx = cvs.clientWidth/2, cy = cvs.clientHeight/2;
@@ -250,63 +246,63 @@ function drawPlayerAtCenter(){
   ctx.fillStyle='#2770aa'; ctx.fill();
 }
 
-/* ====== Culling: draw only tiles likely visible ====== */
+/* ====== Generous culling (always includes center tile) ====== */
 function visibleRanges(){
-  // Approximate how many iso steps we need to cover the screen from center
-  const spanI = Math.ceil((cvs.clientWidth / (TILE_W/2)) * 0.6 + (cvs.clientHeight / (TILE_H/2)) * 0.6);
-  const spanJ = spanI; // symmetric in our mapping
-  const i0 = Math.max(0, Math.floor(cam.i - spanI));
-  const i1 = Math.min(GRID.cols-1, Math.ceil(cam.i + spanI));
-  const j0 = Math.max(0, Math.floor(cam.j - spanJ));
-  const j1 = Math.min(GRID.rows-1, Math.ceil(cam.j + spanJ));
+  // generous span based on screen size; ensures enough tiles are drawn
+  const span = Math.ceil( (cvs.clientWidth + cvs.clientHeight) / Math.min(TILE_W, TILE_H) ) + 6;
+  const i0 = Math.max(0, Math.floor(ci - span));
+  const i1 = Math.min(GRID.cols-1, Math.ceil(ci + span));
+  const j0 = Math.max(0, Math.floor(cj - span));
+  const j1 = Math.min(GRID.rows-1, Math.ceil(cj + span));
   return {i0,i1,j0,j1};
 }
 
-/* ====== Render ====== */
 function render(){
   ctx.clearRect(0,0,cvs.clientWidth,cvs.clientHeight);
 
-  // Set ORIGIN so that the focused tile (cam.i, cam.j) is drawn at screen center
+  // Set ORIGIN so (ci,cj) sits at screen center
   const center = { x: cvs.clientWidth/2, y: cvs.clientHeight/2 };
-  // Solve gridToScreen(cam.i, cam.j) == center → ORIGIN = center - rawIso(cam)
-  const raw = { x: (cam.i - cam.j) * (TILE_W/2), y: (cam.i + cam.j) * (TILE_H/2) };
+  const raw = { x: (ci - cj) * (TILE_W/2), y: (ci + cj) * (TILE_H/2) };
   ORIGIN.x = center.x - raw.x;
   ORIGIN.y = center.y - raw.y;
 
-  // Draw tiles in back-to-front order for a simple correct overlap:
-  // iterate rows (j) outer, columns (i) inner; that’s adequate for flat tiles here.
   const {i0,i1,j0,j1} = visibleRanges();
+
+  // Back-to-front is fine for flat tiles in this view
   for (let j=j0; j<=j1; j++){
     for (let i=i0; i<=i1; i++){
       drawTile(i,j,cells[j][i]);
     }
   }
 
-  // Player block at screen center
+  // Guaranteed draw of the focus tile (in case of weird culling)
+  const fi = Math.round(ci), fj = Math.round(cj);
+  if (inside(fi,fj)) drawTile(fi,fj,cells[fj][fi]);
+
   drawPlayerAtCenter();
 }
 
-/* ====== Loop (camera tween) ====== */
+/* ====== Loop (camera tween without mutating base indices) ====== */
 let last=0;
 function loop(t=0){
   requestAnimationFrame(loop);
-  const dt = Math.min(33, t-last || 16.7); last = t;
+  const dt = Math.min(33, t - last || 16.7); last = t;
 
   if (cam.t < 1){
     const dist = Math.hypot(cam.ti - cam.i, cam.tj - cam.j);
     const k = (cam.speed * dt) / Math.max(0.0001, dist);
-    cam.t = Math.min(1, cam.t + k);
-    if (cam.t === 1){ cam.i = cam.ti; cam.j = cam.tj; }
-    else { // interpolate during tween for smooth scroll
-      cam.i = lerp(cam.i, cam.ti, k);
-      cam.j = lerp(cam.j, cam.tj, k);
-    }
-    updateHud();
+    const step = Math.min(1 - cam.t, k);
+    // interpolate render camera (ci,cj)
+    ci = cam.i + (cam.t + step) * (cam.ti - cam.i);
+    cj = cam.j + (cam.t + step) * (cam.tj - cam.j);
+    cam.t += step;
+    if (cam.t === 1){ cam.i = cam.ti; cam.j = cam.tj; ci = cam.i; cj = cam.j; }
+  } else {
+    ci = cam.i; cj = cam.j;
   }
 
   render();
 }
-function lerp(a,b,t){ return a + (b - a) * t; }
 loop();
 
 /* ====== Reset ====== */
@@ -318,7 +314,7 @@ document.getElementById('reset').onclick = ()=>{
   // recenter camera
   cam.i = cam.ti = Math.floor(GRID.cols/2);
   cam.j = cam.tj = Math.floor(GRID.rows/2);
-  cam.t = 1;
+  cam.t = 1; ci = cam.i; cj = cam.j;
   updateHud();
 };
 
@@ -330,8 +326,8 @@ addEventListener('touchend', e=>{
   lastTouch=now;
 },{passive:false});
 
-/* ====== Start diffusion ====== */
-setInterval(()=>tick(), DIFFUSE_MS);
+/* ====== Diffusion timer ====== */
+setInterval(()=>{ tick(); }, DIFFUSE_MS);
 </script>
 </body>
 </html>

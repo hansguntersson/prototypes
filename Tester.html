@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<title>Iso Grid — 60fps Diffusion, Cached Colors</title>
+<title>Iso Grid — 60fps Diffusion, Cached Colors, 10 Spring/Dump Pairs</title>
 <style>
   html,body{margin:0;height:100%;background:#ffffff;overscroll-behavior:contain}
   canvas{display:block;width:100vw;height:100vh;touch-action:none}
@@ -48,9 +48,10 @@
 /* ====== Config ====== */
 const GRID = { cols: 100, rows: 100 };
 const STATS = ['Temperature','Density','Brightness'];
-const SPRING_RATE = 1;  // per frame (smaller than before to avoid runaway)
+const SPRING_RATE = 1;  // per frame
 const DUMP_RATE   = SPRING_RATE;
 const SWIPE_THRESHOLD = 24;
+const PAIRS = 10;       // <<< ten spring/dump pairs
 
 /* ====== Canvas ====== */
 const cvs = document.getElementById('game');
@@ -82,17 +83,27 @@ const cam={i:50,j:50,ti:50,tj:50,t:1,speed:8/1000}; let ci=cam.i,cj=cam.j;
 function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
 function inside(i,j){return i>=0&&j>=0&&i<GRID.cols&&j<GRID.rows;}
 
-/* ====== Elements: spring & dump, same stat ====== */
-const elements=[];
+/* ====== Elements: 10 spring/dump pairs, same stat within a pair, no overlaps ====== */
+const elements=[]; // {type:'spring'|'dump', stat, i, j}
 function randInt(n){return Math.floor(Math.random()*n);}
-function randCell(){return {i:randInt(GRID.cols),j:randInt(GRID.rows)};}
+function randCell(){return {i:randInt(GRID.cols), j:randInt(GRID.rows)};}
 function placeElements(){
   elements.length=0;
-  const stat=STATS[randInt(STATS.length)];
-  let a=randCell(), b=randCell();
-  while(a.i===b.i&&a.j===b.j) b=randCell();
-  elements.push({type:'spring',stat,i:a.i,j:a.j});
-  elements.push({type:'dump',stat,i:b.i,j:b.j});
+  const used = new Set();
+  const key = (i,j)=>`${i},${j}`;
+  for(let p=0;p<PAIRS;p++){
+    const stat = STATS[randInt(STATS.length)];
+    // place spring
+    let s = randCell();
+    while(used.has(key(s.i,s.j))) s = randCell();
+    used.add(key(s.i,s.j));
+    // place dump (not overlapping spring or any other)
+    let d = randCell();
+    while(used.has(key(d.i,d.j))) d = randCell();
+    used.add(key(d.i,d.j));
+    elements.push({type:'spring',stat,i:s.i,j:s.j});
+    elements.push({type:'dump',stat,i:d.i,j:d.j});
+  }
 }
 placeElements(); updateHud();
 
@@ -139,12 +150,12 @@ function diffuseAndUpdate(){
       }
     }
   }
-  // sources/sinks
+  // apply all elements (net zero overall because each pair is + and - on the same stat)
   for(const el of elements){
     const c=next[el.j][el.i];
     c[el.stat]=clampStat(c[el.stat]+(el.type==='spring'?+SPRING_RATE:-DUMP_RATE));
   }
-  // commit and only recompute color if changed
+  // commit + color caching
   for(let j=0;j<GRID.rows;j++){
     for(let i=0;i<GRID.cols;i++){
       const old=cells[j][i], n=next[j][i];
@@ -196,7 +207,12 @@ function loop(now=performance.now()){
 loop();
 
 /* ====== Reset ====== */
-document.getElementById('reset').onclick=()=>{for(let j=0;j<GRID.rows;j++)for(let i=0;i<GRID.cols;i++)cells[j][i]=makeCell();placeElements();cam.i=cam.ti=Math.floor(GRID.cols/2);cam.j=cam.tj=Math.floor(GRID.rows/2);cam.t=1;ci=cam.i;cj=cam.j;updateHud();};
+document.getElementById('reset').onclick=()=>{
+  for(let j=0;j<GRID.rows;j++)for(let i=0;i<GRID.cols;i++)cells[j][i]=makeCell();
+  placeElements();
+  cam.i=cam.ti=Math.floor(GRID.cols/2); cam.j=cam.tj=Math.floor(GRID.rows/2); cam.t=1; ci=cam.i; cj=cam.j;
+  updateHud();
+};
 </script>
 </body>
 </html>

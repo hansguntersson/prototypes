@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<title>Iso Grid — 50x50, Scaled Spring/Dump Pairs</title>
+<title>Iso Grid — 20x20, Smooth Colors</title>
 <style>
   html,body{margin:0;height:100%;background:#ffffff;overscroll-behavior:contain}
   canvas{display:block;width:100vw;height:100vh;touch-action:none}
@@ -46,14 +46,15 @@
 
 <script>
 /* ====== Config ====== */
-const GRID = { cols: 50, rows: 50 }; // grid size
+const GRID = { cols: 20, rows: 20 };        // 20x20
 const STATS = ['Temperature','Density','Brightness'];
-const SPRING_RATE = 1;
-const DUMP_RATE   = SPRING_RATE;
-const SWIPE_THRESHOLD = 24;
+const SPRING_RATE = 1;                       // per-frame source
+const DUMP_RATE   = SPRING_RATE;             // equal & opposite
+const SWIPE_THRESHOLD = 24;                  // px
+const PAIRS = Math.max(1, Math.round(GRID.cols * GRID.rows * 0.001)); // ~0.1% of cells → 1 pair here
 
-// Scale number of spring/dump pairs based on grid size (≈0.001 pairs per cell)
-const PAIRS = Math.max(1, Math.round((GRID.cols * GRID.rows) * 0.001));
+// Color smoothing (display only)
+const COLOR_SMOOTH = 0.25; // 0..1; higher = faster catch-up, lower = smoother
 
 /* ====== Canvas ====== */
 const cvs = document.getElementById('game');
@@ -61,17 +62,24 @@ const ctx = cvs.getContext('2d', { alpha:false });
 let TILE_W = 64, TILE_H = 32;
 let ORIGIN = { x:0, y:0 };
 function fit(){
-  const dpr=Math.max(1,Math.min(3,devicePixelRatio||1));
-  cvs.width=Math.floor(cvs.clientWidth*dpr);
-  cvs.height=Math.floor(cvs.clientHeight*dpr);
+  const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+  cvs.width  = Math.floor(cvs.clientWidth  * dpr);
+  cvs.height = Math.floor(cvs.clientHeight * dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
-  TILE_W=Math.max(40,Math.min(72,Math.floor(cvs.clientWidth/9)));
-  TILE_H=TILE_W/2;
+  TILE_W = Math.max(40, Math.min(72, Math.floor(cvs.clientWidth/9)));
+  TILE_H = TILE_W/2;
 }
-addEventListener('resize',fit,{passive:true}); fit();
+addEventListener('resize', fit, {passive:true}); fit();
 
-/* ====== Grid & cells with cached colors ====== */
-function makeCell(){ return { Temperature:0, Density:0, Brightness:0, color:"hsl(0,0%,50%)" }; }
+/* ====== Grid & cells with cached + smoothed colors ====== */
+function makeCell(){
+  // store current displayed color (rgb), and a target to ease toward
+  return {
+    Temperature: 0, Density: 0, Brightness: 0,
+    color: {r:128,g:128,b:128},  // starts as gray (L=50%)
+    target:{r:128,g:128,b:128}
+  };
+}
 function clampStat(v){ return Math.max(-100, Math.min(100, v|0)); }
 const cells = Array.from({length:GRID.rows},()=>Array.from({length:GRID.cols},()=>makeCell()));
 
@@ -81,11 +89,11 @@ const pTempEl=document.getElementById('pTemp'), pDensityEl=document.getElementBy
 function updateHud(){ posEl.textContent=`focus: (${Math.round(cam.i)},${Math.round(cam.j)})`; pTempEl.textContent=player.Temperature; pDensityEl.textContent=player.Density; pBrightEl.textContent=player.Brightness; }
 
 /* ====== Camera ====== */
-const cam={i:25,j:25,ti:25,tj:25,t:1,speed:8/1000}; let ci=cam.i,cj=cam.j;
+const cam={i:10,j:10,ti:10,tj:10,t:1,speed:8/1000}; let ci=cam.i,cj=cam.j;
 function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
 function inside(i,j){return i>=0&&j>=0&&i<GRID.cols&&j<GRID.rows;}
 
-/* ====== Elements: N spring/dump pairs ====== */
+/* ====== Elements: spring/dump pairs (no overlaps) ====== */
 const elements=[];
 function randInt(n){return Math.floor(Math.random()*n);}
 function randCell(){return {i:randInt(GRID.cols), j:randInt(GRID.rows)};}
@@ -95,14 +103,10 @@ function placeElements(){
   const key = (i,j)=>`${i},${j}`;
   for(let p=0;p<PAIRS;p++){
     const stat = STATS[randInt(STATS.length)];
-    let s = randCell();
-    while(used.has(key(s.i,s.j))) s = randCell();
-    used.add(key(s.i,s.j));
-    let d = randCell();
-    while(used.has(key(d.i,d.j))) d = randCell();
-    used.add(key(d.i,d.j));
+    let s = randCell(); while(used.has(key(s.i,s.j))) s = randCell(); used.add(key(s.i,s.j));
+    let d = randCell(); while(used.has(key(d.i,d.j))) d = randCell(); used.add(key(d.i,d.j));
     elements.push({type:'spring',stat,i:s.i,j:s.j});
-    elements.push({type:'dump',stat,i:d.i,j:d.j});
+    elements.push({type:'dump',  stat,i:d.i,j:d.j});
   }
 }
 placeElements(); updateHud();
@@ -119,21 +123,38 @@ addEventListener('pointerup',e=>{
   start=null;
 },{passive:true});
 
-/* ====== Color cache update ====== */
-function computeColor(c){
-  const L=50+(c.Brightness/2);
-  if(c.Density===0&&c.Temperature===0){return `hsl(0,0%,${L}%)`;}
-  const hueDensity=180-(c.Density*90/100);
-  const hueTemp=90-(c.Temperature*90/100);
-  const dx=Math.cos(hueDensity*Math.PI/180)*Math.abs(c.Density);
-  const dy=Math.sin(hueDensity*Math.PI/180)*Math.abs(c.Density);
-  const tx=Math.cos(hueTemp*Math.PI/180)*Math.abs(c.Temperature);
-  const ty=Math.sin(hueTemp*Math.PI/180)*Math.abs(c.Temperature);
-  let hue=Math.atan2(dy+ty,dx+tx)*180/Math.PI;if(hue<0)hue+=360;
-  return `hsl(${hue.toFixed(1)},50%,${L.toFixed(1)}%)`;
+/* ====== HSL ➜ RGB helpers ====== */
+function hslToRgb(h, s, l){
+  // h: 0..360, s/l: 0..100
+  h = (h%360+360)%360; s/=100; l/=100;
+  const c = (1-Math.abs(2*l-1))*s;
+  const x = c*(1-Math.abs(((h/60)%2)-1));
+  const m = l - c/2;
+  let r=0,g=0,b=0;
+  if (h<60){ r=c; g=x; b=0; }
+  else if (h<120){ r=x; g=c; b=0; }
+  else if (h<180){ r=0; g=c; b=x; }
+  else if (h<240){ r=0; g=x; b=c; }
+  else if (h<300){ r=x; g=0; b=c; }
+  else { r=c; g=0; b=x; }
+  return { r:Math.round((r+m)*255), g:Math.round((g+m)*255), b:Math.round((b+m)*255) };
+}
+function computeTargetRGB(c){
+  const L = 50 + (c.Brightness/2);
+  if (c.Density===0 && c.Temperature===0){
+    return hslToRgb(0, 0, L); // gray
+  }
+  const hueDensity = 180 - (c.Density * 90/100);
+  const hueTemp    =  90 - (c.Temperature * 90/100);
+  const dx = Math.cos(hueDensity*Math.PI/180)*Math.abs(c.Density);
+  const dy = Math.sin(hueDensity*Math.PI/180)*Math.abs(c.Density);
+  const tx = Math.cos(hueTemp   *Math.PI/180)*Math.abs(c.Temperature);
+  const ty = Math.sin(hueTemp   *Math.PI/180)*Math.abs(c.Temperature);
+  let hue = Math.atan2(dy+ty, dx+tx) * 180/Math.PI; if (hue < 0) hue += 360;
+  return hslToRgb(hue, 50, L);
 }
 
-/* ====== Per-frame diffusion with caching ====== */
+/* ====== Per-frame diffusion, with color target updates ====== */
 const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
 function diffuseAndUpdate(){
   const next=cells.map(row=>row.map(c=>({...c})));
@@ -143,54 +164,112 @@ function diffuseAndUpdate(){
       for(const k of STATS){
         let delta=0;
         for(const [dx,dy] of dirs){
-          const ni=i+dx,nj=j+dy;if(!inside(ni,nj))continue;
-          const N=cells[nj][ni]; delta+=Math.sign(N[k]-C[k]);
+          const ni=i+dx,nj=j+dy; if(!inside(ni,nj)) continue;
+          const N=cells[nj][ni];
+          delta += Math.sign(N[k]-C[k]); // -1,0,+1 per neighbour
         }
         next[j][i][k]=clampStat(C[k]+delta);
       }
     }
   }
+  // Apply all springs/dumps (net zero across pairs)
   for(const el of elements){
     const c=next[el.j][el.i];
-    c[el.stat]=clampStat(c[el.stat]+(el.type==='spring'?+SPRING_RATE:-DUMP_RATE));
+    c[el.stat] = clampStat(c[el.stat] + (el.type==='spring' ? +SPRING_RATE : -DUMP_RATE));
   }
+  // Commit; only recompute target when any stat changed
   for(let j=0;j<GRID.rows;j++){
     for(let i=0;i<GRID.cols;i++){
       const old=cells[j][i], n=next[j][i];
-      if(old.Temperature!==n.Temperature||old.Density!==n.Density||old.Brightness!==n.Brightness){
-        n.color=computeColor(n);
+      if(old.Temperature!==n.Temperature || old.Density!==n.Density || old.Brightness!==n.Brightness){
+        n.target = computeTargetRGB(n);
       } else {
-        n.color=old.color;
+        n.target = old.target;
       }
+      // carry over current displayed color; it will ease toward n.target in stepColors()
+      n.color = old.color;
       cells[j][i]=n;
+    }
+  }
+}
+
+/* ====== Color easing (anti-flicker) ====== */
+function stepColors(){
+  // ease current displayed color toward target color (small EMA per frame)
+  for(let j=0;j<GRID.rows;j++){
+    for(let i=0;i<GRID.cols;i++){
+      const c = cells[j][i];
+      c.color.r += (c.target.r - c.color.r) * COLOR_SMOOTH;
+      c.color.g += (c.target.g - c.color.g) * COLOR_SMOOTH;
+      c.color.b += (c.target.b - c.color.b) * COLOR_SMOOTH;
     }
   }
 }
 
 /* ====== Drawing ====== */
 function elementAt(i,j){for(const e of elements) if(e.i===i&&e.j===j) return e; return null;}
+function rgbString({r,g,b}){ return `rgb(${r|0},${g|0},${b|0})`; }
+function gridToScreen(i,j){const x=(i-j)*(TILE_W/2),y=(i+j)*(TILE_H/2);return {x:ORIGIN.x+x,y:ORIGIN.y+y};}
+
 function drawTile(i,j,cell){
   const {x,y}=gridToScreen(i,j);
   ctx.beginPath();
-  ctx.moveTo(x,y-TILE_H/2);ctx.lineTo(x+TILE_W/2,y);ctx.lineTo(x,y+TILE_H/2);ctx.lineTo(x-TILE_W/2,y);ctx.closePath();
-  ctx.fillStyle=cell.color;ctx.fill();
-  ctx.strokeStyle='rgba(0,0,0,.22)';ctx.stroke();
-  const el=elementAt(i,j);if(el){const r=Math.max(7,TILE_W*0.14);const tx=x,ty=y-TILE_H*0.55;ctx.beginPath();ctx.arc(tx,ty,r,0,Math.PI*2);ctx.fillStyle=el.type==='spring'?'#2ecc71':'#e74c3c';ctx.fill();ctx.fillStyle='#fff';ctx.font=`${Math.max(10,r)}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(el.type==='spring'?'S':'D',tx,ty+0.5);}
+  ctx.moveTo(x, y - TILE_H/2);
+  ctx.lineTo(x + TILE_W/2, y);
+  ctx.lineTo(x, y + TILE_H/2);
+  ctx.lineTo(x - TILE_W/2, y);
+  ctx.closePath();
+  ctx.fillStyle = rgbString(cell.color);
+  ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.22)';
+  ctx.stroke();
+
+  const el = elementAt(i,j);
+  if (el){
+    const r = Math.max(7, TILE_W*0.14);
+    const tx = x, ty = y - TILE_H*0.55;
+    ctx.beginPath();
+    ctx.arc(tx,ty,r,0,Math.PI*2);
+    ctx.fillStyle = el.type==='spring' ? '#2ecc71' : '#e74c3c';
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = `${Math.max(10, r)}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(el.type==='spring' ? 'S' : 'D', tx, ty+0.5);
+  }
 }
-function gridToScreen(i,j){const x=(i-j)*(TILE_W/2),y=(i+j)*(TILE_H/2);return {x:ORIGIN.x+x,y:ORIGIN.y+y};}
-function drawPlayerAtCenter(){const cx=cvs.clientWidth/2,cy=cvs.clientHeight/2,h=TILE_H;ctx.beginPath();ctx.moveTo(cx,cy-TILE_H/2-h);ctx.lineTo(cx+TILE_W/2,cy-h);ctx.lineTo(cx,cy+TILE_H/2-h);ctx.lineTo(cx-TILE_W/2,cy-h);ctx.closePath();ctx.fillStyle='#2a7abf';ctx.fill();ctx.beginPath();ctx.moveTo(cx,cy+TILE_H/2-h);ctx.lineTo(cx+TILE_W/2,cy-h);ctx.lineTo(cx+TILE_W/2,cy);ctx.lineTo(cx,cy+TILE_H/2);ctx.closePath();ctx.fillStyle='#1f5f93';ctx.fill();ctx.beginPath();ctx.moveTo(cx,cy+TILE_H/2-h);ctx.lineTo(cx-TILE_W/2,cy-h);ctx.lineTo(cx-TILE_W/2,cy);ctx.lineTo(cx,cy+TILE_H/2);ctx.closePath();ctx.fillStyle='#2770aa';ctx.fill();}
+
+function drawPlayerAtCenter(){
+  const cx = cvs.clientWidth/2, cy = cvs.clientHeight/2, h=TILE_H;
+  ctx.beginPath(); ctx.moveTo(cx,cy-TILE_H/2-h); ctx.lineTo(cx+TILE_W/2,cy-h);
+  ctx.lineTo(cx,cy+TILE_H/2-h); ctx.lineTo(cx-TILE_W/2,cy-h); ctx.closePath(); ctx.fillStyle='#2a7abf'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(cx,cy+TILE_H/2-h); ctx.lineTo(cx+TILE_W/2,cy-h);
+  ctx.lineTo(cx+TILE_W/2,cy); ctx.lineTo(cx,cy+TILE_H/2); ctx.closePath(); ctx.fillStyle='#1f5f93'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(cx,cy+TILE_H/2-h); ctx.lineTo(cx-TILE_W/2,cy-h);
+  ctx.lineTo(cx-TILE_W/2,cy); ctx.lineTo(cx,cy+TILE_H/2); ctx.closePath(); ctx.fillStyle='#2770aa'; ctx.fill();
+}
 
 /* ====== Visible region ====== */
-function visibleRanges(){const span=Math.ceil((cvs.clientWidth+cvs.clientHeight)/Math.min(TILE_W,TILE_H))+6;const i0=Math.max(0,Math.floor(ci-span)),i1=Math.min(GRID.cols-1,Math.ceil(ci+span));const j0=Math.max(0,Math.floor(cj-span)),j1=Math.min(GRID.rows-1,Math.ceil(cj+span));return {i0,i1,j0,j1};}
+function visibleRanges(){
+  const span = Math.ceil((cvs.clientWidth+cvs.clientHeight)/Math.min(TILE_W,TILE_H)) + 6;
+  const i0 = Math.max(0, Math.floor(ci - span));
+  const i1 = Math.min(GRID.cols-1, Math.ceil(ci + span));
+  const j0 = Math.max(0, Math.floor(cj - span));
+  const j1 = Math.min(GRID.rows-1, Math.ceil(cj + span));
+  return {i0,i1,j0,j1};
+}
 
 /* ====== Render ====== */
 function render(){
+  // center (ci,cj) and snap origin to whole pixels to reduce shimmer
   const center={x:cvs.clientWidth/2,y:cvs.clientHeight/2};
   const raw={x:(ci-cj)*(TILE_W/2),y:(ci+cj)*(TILE_H/2)};
-  ORIGIN.x=center.x-raw.x;ORIGIN.y=center.y-raw.y;
+  ORIGIN.x=Math.round(center.x-raw.x);
+  ORIGIN.y=Math.round(center.y-raw.y);
+
   ctx.clearRect(0,0,cvs.clientWidth,cvs.clientHeight);
   const {i0,i1,j0,j1}=visibleRanges();
-  for(let j=j0;j<=j1;j++){for(let i=i0;i<=i1;i++){drawTile(i,j,cells[j][i]);}}
+  for(let j=j0;j<=j1;j++){ for(let i=i0;i<=i1;i++){ drawTile(i,j,cells[j][i]); } }
   drawPlayerAtCenter();
 }
 
@@ -198,9 +277,23 @@ function render(){
 let last=performance.now();
 function loop(now=performance.now()){
   requestAnimationFrame(loop);
-  const dt=Math.min(33,now-last);last=now;
-  if(cam.t<1){const dist=Math.hypot(cam.ti-cam.i,cam.tj-cam.j);const k=(cam.speed*dt)/Math.max(0.0001,dist);const step=Math.min(1-cam.t,k);ci=cam.i+(cam.t+step)*(cam.ti-cam.i);cj=cam.j+(cam.t+step)*(cam.tj-cam.j);cam.t+=step;if(cam.t===1){cam.i=cam.ti;cam.j=cam.tj;ci=cam.i;cj=cam.j;}updateHud();}else{ci=cam.i;cj=cam.j;}
-  diffuseAndUpdate(); render();
+  const dt=Math.min(33, now-last); last=now;
+
+  // camera tween
+  if(cam.t<1){
+    const dist=Math.hypot(cam.ti-cam.i,cam.tj-cam.j);
+    const k=(cam.speed*dt)/Math.max(0.0001,dist);
+    const step=Math.min(1-cam.t,k);
+    ci = cam.i + (cam.t+step) * (cam.ti - cam.i);
+    cj = cam.j + (cam.t+step) * (cam.tj - cam.j);
+    cam.t += step;
+    if(cam.t===1){ cam.i=cam.ti; cam.j=cam.tj; ci=cam.i; cj=cam.j; }
+    updateHud();
+  } else { ci=cam.i; cj=cam.j; }
+
+  diffuseAndUpdate();  // update stats + targets
+  stepColors();        // ease display color toward target (anti-flicker)
+  render();            // draw
 }
 loop();
 
@@ -211,6 +304,14 @@ document.getElementById('reset').onclick=()=>{
   cam.i=cam.ti=Math.floor(GRID.cols/2); cam.j=cam.tj=Math.floor(GRID.rows/2); cam.t=1; ci=cam.i; cj=cam.j;
   updateHud();
 };
+
+/* ====== Touch niceties ====== */
+let lastTouch=0;
+addEventListener('touchend', e=>{
+  const now=Date.now();
+  if (now-lastTouch<300) e.preventDefault();
+  lastTouch=now;
+},{passive:false});
 </script>
 </body>
 </html>

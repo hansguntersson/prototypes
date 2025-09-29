@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DevTycoon</title>
+  <meta name="description" content="DevTycoon - Coming soon">
+  <style>
+    :root {
+      color-scheme: light dark;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(1000px 600px at 50% -200px, rgba(100, 108, 255, 0.15), transparent),
+                  radial-gradient(800px 500px at 120% 20%, rgba(45, 212, 191, 0.15), transparent),
+                  radial-gradient(800px 500px at -20% 80%, rgba(255, 171, 0, 0.12), transparent);
+    }
+    main {
+      width: min(960px, 92vw);
+      background: color-mix(in oklab, Canvas 92%, Highlight 8%);
+      border: 1px solid color-mix(in oklab, Canvas, Highlight 40%);
+      border-radius: 16px;
+      padding: 28px 28px 32px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      backdrop-filter: blur(6px);
+    }
+    h1 {
+      font-size: clamp(1.8rem, 1.2rem + 2.2vw, 3rem);
+      margin: 0 0 12px;
+    }
+    p {
+      margin: 0 0 18px;
+      color: color-mix(in oklab, CanvasText, Canvas 25%);
+      max-width: 65ch;
+    }
+    .cta {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid color-mix(in oklab, Canvas, Highlight 40%);
+      background: color-mix(in oklab, Canvas, Highlight 6%);
+      color: inherit;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.06s ease;
+    }
+    .cta:hover { background: color-mix(in oklab, Canvas, Highlight 10%); }
+    .cta:active { transform: translateY(1px); }
+  </style>
+  <link rel="icon" href="data:,">
+  <meta name="theme-color" content="#0ea5e9">
+  <meta name="author" content="">
+</head>
+<body>
+  <main>
+    <h1>DevTycoon</h1>
+    <p>Welcome! This is the starting point for the DevTycoon project.</p>
+    <p>You can now begin building your app. Replace this content as needed.</p>
+    <a class="cta" href="#">Get Started</a>
+  </main>
+  <script>
+    // Placeholder script: ensures the file is wired for future JS.
+    (function initialize() {
+      const startedAt = new Date().toISOString();
+      console.info("DevTycoon loaded:", startedAt);
+    })();
+  </script>
+</body>
+</html>
+

@@ -3,902 +3,436 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v0.9.0</title>
+  <title>Courier v1.0.0</title>
   <style>
     :root{
       color-scheme: dark;
       --bg:#000;
       --fg:#fff;
       --border:#fff;
-
       --r:16px;
       --r2:12px;
-
       --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
     html,body{height:100%;}
     body{
       margin:0;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--sans);
-      font-size: 18px;
+      background:var(--bg);
+      color:var(--fg);
+      font-family:var(--sans);
+      font-size:18px;
     }
 
-    /* Extra bottom padding because the speed bar + cancel button are fixed */
     .safe{
-      padding: calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 190px);
-      max-width: 760px;
-      margin: 0 auto;
+      padding: calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 200px);
+      max-width:760px;
+      margin:0 auto;
     }
 
     .top{
       display:flex;
-      align-items:baseline;
       justify-content:space-between;
-      gap: 12px;
-      margin-bottom: 14px;
+      align-items:baseline;
+      margin-bottom:14px;
     }
-    .title{display:flex; align-items:baseline; gap:10px;}
-    h1{margin:0; font-size:22px; font-weight:900; letter-spacing:.2px;}
-    .ver{font-family:var(--mono); font-size:14px; font-weight:700; white-space:nowrap;}
+    h1{margin:0;font-size:22px;font-weight:900;}
+    .ver{font-family:var(--mono);font-size:14px;font-weight:700;}
 
-    /* KPI boxes: white fill + black text */
+    /* KPIs */
     .kpis{
       display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 18px;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:12px;
+      margin-bottom:18px;
     }
     .kpi{
-      background: var(--fg);
-      color: var(--bg);
-      border-radius: var(--r);
-      padding: 12px;
+      background:#fff;
+      color:#000;
+      border-radius:var(--r);
+      padding:12px;
     }
-    .kpi .label{font-family:var(--mono); font-size:14px; font-weight:900;}
-    .kpi .value{margin-top:8px; font-family:var(--mono); font-size:22px; font-weight:950; letter-spacing:.2px;}
+    .kpi .label{font-family:var(--mono);font-size:14px;font-weight:900;}
+    .kpi .value{margin-top:6px;font-family:var(--mono);font-size:22px;font-weight:950;}
 
     .screen{display:block;}
-    .hidden{display:none !important;}
+    .hidden{display:none!important;}
 
-    .row{
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap: 12px;
+    .btn,.btnOutline{
+      width:100%;
+      border-radius:14px;
+      padding:18px 12px;
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:.2px;
+      margin-top:12px;
     }
-    .mono{font-family: var(--mono);}
-    .small{font-size:14px; font-family: var(--mono);}
-
-    .spacer{height:12px;}
-    .spacerL{height:18px;}
-    .spacerXL{height:26px;}
-    .spacerXXL{height:34px;}
-
-    /* Consistent job title size across screens */
-    .jobTitle{
-      font-weight: 950;
-      font-size: 22px;
-      letter-spacing: .2px;
-    }
-
-    /* Primary buttons: filled */
     .btn{
-      width:100%;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 12px;
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing:.2px;
-      background: var(--fg);
-      color: var(--bg);
-      touch-action: manipulation;
-      margin-top: 12px;
+      background:#fff;
+      color:#000;
+      border:1px solid #fff;
     }
-    .btn:active{transform: translateY(1px);}
-    .btn[disabled]{opacity:.45;}
-
-    /* Secondary button: outline */
     .btnOutline{
-      width:100%;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 12px;
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing:.2px;
-      background: var(--bg);
-      color: var(--fg);
-      touch-action: manipulation;
-      margin-top: 12px;
+      background:#000;
+      color:#fff;
+      border:1px solid #fff;
     }
-    .btnOutline:active{transform: translateY(1px);}
-    .btnOutline[disabled]{opacity:.45;}
+    .btn[disabled],.btnOutline[disabled]{opacity:.4;}
 
-    /* Refresh text action */
-    .textAction{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      padding: 10px 0;
-      margin-top: 12px;
-      font-family: var(--mono);
-      font-size: 16px;
-      font-weight: 900;
-      user-select:none;
-      -webkit-user-select:none;
-      touch-action: manipulation;
-    }
-    .textAction:active{transform: translateY(1px);}
-    .icon{width:18px; height:18px; display:inline-block;}
-    .icon svg{width:18px;height:18px; display:block;}
-
-    /* Hub (4 buttons) */
+    /* HUB */
     .hubGrid{
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:20px;
     }
-    .hubGrid .btn{ margin-top: 0; }
+    .hubGrid .btn,.hubGrid .btnOutline{
+      padding:28px 12px;
+      font-size:20px;
+    }
 
-    /* Job list */
-    .jobs{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin-top: 12px;
+    /* JOB BOARD */
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:12px;
     }
+    .jobs{display:grid;gap:12px;margin-top:12px;}
     .job{
-      border: 1px solid var(--border);
-      border-radius: var(--r2);
-      padding: 12px;
+      border:1px solid #fff;
+      border-radius:var(--r2);
+      padding:12px;
     }
-
-    /* 3-column meta row in each job card (no containers) */
+    .jobTitle{font-size:22px;font-weight:950;}
     .metaCols{
       display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:12px;
+      margin-top:10px;
     }
-    .metaCol{ text-align:left; }
-    .metaCol.center{text-align:center;}
-    .metaCol.right{text-align:right;}
-    .metaLabel{
-      font-family: var(--mono);
-      font-size: 14px;
-      font-weight: 800;
-    }
-    .metaValue{
-      margin-top: 6px;
-      font-family: var(--mono);
-      font-size: 20px;
-      font-weight: 950;
-      letter-spacing: .2px;
-      white-space: nowrap;
-    }
+    .metaLabel{font-family:var(--mono);font-size:14px;font-weight:800;}
+    .metaValue{font-family:var(--mono);font-size:20px;font-weight:950;margin-top:4px;}
 
-    /* Live job container around stats (below title) */
+    /* LIVE JOB */
     .liveBox{
-      border: 1px solid var(--border);
-      border-radius: var(--r2);
-      padding: 12px;
-      margin-top: 12px;
+      border:1px solid #fff;
+      border-radius:var(--r2);
+      padding:12px;
+      margin-top:12px;
     }
     .liveCols{
       display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:12px;
     }
-    .liveCol{ text-align:left; }
-    .liveCol.center{ text-align:center; }
-    .liveCol.right{ text-align:right; }
-    .liveLabel{
-      font-family: var(--mono);
-      font-size: 14px;
-      font-weight: 800;
-    }
-    .liveValue{
-      margin-top: 6px;
-      font-family: var(--mono);
-      font-size: 22px;
-      font-weight: 950;
-      letter-spacing: .2px;
-      white-space: nowrap;
-    }
-
-    /* Bars */
+    .progressLabel{font-family:var(--mono);font-size:16px;font-weight:900;}
+    .progressPct{font-family:var(--mono);font-size:22px;font-weight:950;}
     .bar{
-      height: 16px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
+      height:16px;
+      border:1px solid #fff;
+      border-radius:999px;
       overflow:hidden;
-      background: var(--bg);
+      margin-top:6px;
     }
-    .fill{
-      height:100%;
-      width:0%;
-      background: var(--fg);
-      transition: width .10s linear;
-    }
+    .fill{height:100%;width:0;background:#fff;}
 
-    /* Progress emphasis */
-    .progressPct{
-      font-family: var(--mono);
-      font-size: 22px;
-      font-weight: 950;
-      letter-spacing: .2px;
-    }
-    .progressLabel{
-      font-family: var(--mono);
-      font-size: 16px;
-      font-weight: 900;
-    }
-
-    /* Fixed cancel button: just above speed bar */
+    /* FIXED CONTROLS */
     .cancelBar{
-      position: fixed;
-      left:0; right:0;
-      bottom: calc(env(safe-area-inset-bottom) + 92px); /* just above speed */
-      padding: 10px 14px;
-      background: var(--bg);
-      border-top: 1px solid var(--border);
+      position:fixed;
+      left:0;right:0;
+      bottom:calc(env(safe-area-inset-bottom) + 110px);
+      padding:10px 14px;
+      background:#000;
     }
-    .cancelWrap{max-width:760px; margin:0 auto;}
-    .cancelWrap .btnOutline{margin-top:0;}
+    .cancelWrap{max-width:760px;margin:0 auto;}
 
-    /* Speed bar fixed at bottom */
     .speedbar{
       position:fixed;
-      left:0; right:0;
+      left:0;right:0;
       bottom:0;
-      padding: 10px 14px calc(env(safe-area-inset-bottom) + 10px);
-      background: var(--bg);
-      border-top: 1px solid var(--border);
+      padding:10px 14px calc(env(safe-area-inset-bottom) + 10px);
+      background:#000;
+      border-top:1px solid #fff;
     }
-    .speedwrap{max-width:760px; margin:0 auto;}
-    .speedhead{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:10px;
-    }
+    .speedwrap{max-width:760px;margin:0 auto;}
+    .speedhead{display:flex;justify-content:space-between;margin-bottom:8px;}
     .seg{
       display:grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
+      grid-template-columns:repeat(5,1fr);
+      gap:8px;
     }
     .seg button{
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 0;
-      font-size: 16px;
-      font-weight: 900;
-      background: var(--bg);
-      color: var(--fg);
-      touch-action: manipulation;
+      padding:14px 0;
+      border-radius:14px;
+      border:1px solid #fff;
+      background:#000;
+      color:#fff;
+      font-size:16px;
+      font-weight:900;
     }
-    .seg button.active{
-      background: var(--fg);
-      color: var(--bg);
-    }
-    .seg button:active{transform: translateY(1px);}
+    .seg button.active{background:#fff;color:#000;}
     .seg button[disabled]{opacity:.35;}
 
-    /* Result screen list */
+    /* RESULT */
     .resultBox{
-      border: 1px solid var(--border);
-      border-radius: var(--r2);
-      padding: 12px;
-      margin-top: 12px;
+      border:1px solid #fff;
+      border-radius:var(--r2);
+      padding:12px;
+      margin-top:12px;
     }
-    .vlist{display:grid; gap: 8px;}
-    .vrow{
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap: 12px;
-      font-family: var(--mono);
-      font-size: 15px;
-      font-weight: 800;
-    }
-    .vrow .val{
-      font-weight: 950;
-      font-size: 16px;
-      white-space: nowrap;
-    }
-    .vrow.total{
-      margin-top: 6px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-      font-size: 16px;
-    }
-    .vrow.total .val{ font-size: 18px; }
+    .vlist{display:grid;gap:8px;}
+    .vrow{display:flex;justify-content:space-between;font-family:var(--mono);font-weight:800;}
+    .vrow.total{border-top:1px solid #fff;padding-top:10px;margin-top:6px;}
   </style>
 </head>
 
 <body>
-  <div class="safe">
-    <div class="top">
-      <div class="title">
-        <h1>Courier</h1>
-        <div class="ver" id="verTop">v0.9.0</div>
-      </div>
-      <div class="ver" id="verMini">build v0.9.0</div>
-    </div>
+<div class="safe">
+  <div class="top">
+    <h1>Courier</h1>
+    <div class="ver" id="ver">v1.0.0</div>
+  </div>
 
-    <!-- Always visible: Cash / Time / Energy -->
-    <div class="kpis">
-      <div class="kpi">
-        <div class="label">Cash</div>
-        <div class="value" id="cash">£0</div>
-      </div>
-      <div class="kpi">
-        <div class="label">Time</div>
-        <div class="value" id="clock">15:00</div>
-      </div>
-      <div class="kpi">
-        <div class="label">Energy</div>
-        <div class="value" id="energyTop">100%</div>
-      </div>
-    </div>
+  <div class="kpis">
+    <div class="kpi"><div class="label">Cash</div><div class="value" id="cash">£0</div></div>
+    <div class="kpi"><div class="label">Time</div><div class="value" id="clock">15:00</div></div>
+    <div class="kpi"><div class="label">Energy</div><div class="value" id="energy">100%</div></div>
+  </div>
 
-    <!-- HUB -->
-    <div class="screen" id="hubScreen">
-      <div class="row">
-        <div class="mono" style="font-weight:900;">Menu</div>
-        <div class="small mono" id="hubHint"></div>
-      </div>
-
-      <div class="hubGrid">
-        <button class="btn" id="hubJobs">Jobs</button>
-        <button class="btnOutline" id="hubShop">Shop</button>
-        <button class="btnOutline" id="hubKit">Kit</button>
-        <button class="btnOutline" id="hubBag">Bag</button>
-      </div>
-    </div>
-
-    <!-- BOARD -->
-    <div class="screen hidden" id="boardScreen">
-      <div class="row">
-        <button class="btnOutline" id="backToHub" style="width:auto; padding:10px 12px; margin-top:0;">Back</button>
-        <div class="mono" style="font-weight:900;">Job board</div>
-        <div class="small" id="boardMeta"></div>
-      </div>
-
-      <div class="jobs" id="jobs"></div>
-
-      <div class="textAction" id="refreshAction" role="button" aria-label="Refresh jobs">
-        <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12a9 9 0 1 1-3-6.7"/>
-            <path d="M21 3v7h-7"/>
-          </svg>
-        </span>
-        <span>Refresh jobs</span>
-      </div>
-    </div>
-
-    <!-- JOB -->
-    <div class="screen hidden" id="jobScreen">
-      <div class="row">
-        <div class="jobTitle" id="jobName">—</div>
-        <button class="btnOutline" id="jobBackToBoard" style="width:auto; padding:10px 12px; margin-top:0;">Back</button>
-      </div>
-
-      <div class="liveBox">
-        <div class="liveCols">
-          <div class="liveCol">
-            <div class="liveLabel">Deadline</div>
-            <div class="liveValue" id="deadline">—</div>
-          </div>
-          <div class="liveCol center">
-            <div class="liveLabel">Remaining</div>
-            <div class="liveValue" id="timeLeft">—</div>
-          </div>
-          <div class="liveCol right">
-            <div class="liveLabel">Pay</div>
-            <div class="liveValue" id="jobPay">—</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="spacerXL"></div>
-
-      <div class="row">
-        <div class="progressLabel">Progress</div>
-        <div class="progressPct" id="pct">0%</div>
-      </div>
-
-      <div class="spacer"></div>
-      <div class="bar"><div class="fill" id="fill"></div></div>
-
-      <div class="spacerXL"></div>
-    </div>
-
-    <!-- RESULT -->
-    <div class="screen hidden" id="resultScreen">
-      <div class="row">
-        <div class="jobTitle" id="resultTitle">Job complete</div>
-        <div class="small mono" id="resultSub"></div>
-      </div>
-
-      <div class="resultBox">
-        <div class="vlist" id="resultList"></div>
-      </div>
-
-      <div class="spacerXXL"></div> <!-- extra spacing above button per feedback -->
-      <button class="btn" id="backBtn">Back to job board</button>
+  <!-- HUB -->
+  <div class="screen" id="hub">
+    <div class="hubGrid">
+      <button class="btn" id="goJobs">Jobs</button>
+      <button class="btnOutline">Shop</button>
+      <button class="btnOutline">Kit</button>
+      <button class="btnOutline">Bag</button>
     </div>
   </div>
 
-  <!-- Cancel (only in job) -->
-  <div class="cancelBar hidden" id="cancelBar">
-    <div class="cancelWrap">
-      <button class="btnOutline" id="cancelBtn">Cancel job</button>
+  <!-- JOB BOARD -->
+  <div class="screen hidden" id="board">
+    <div class="row">
+      <div class="jobTitle">Job board</div>
+      <button class="btnOutline" id="backHub" style="width:auto">Back</button>
     </div>
+    <div class="jobs" id="jobs"></div>
   </div>
 
-  <!-- Speed control (only in job) -->
-  <div class="speedbar hidden" id="speedBar">
-    <div class="speedwrap">
-      <div class="speedhead">
-        <div class="mono" style="font-weight:900;">Speed</div>
-        <div class="small mono" id="speedLabel">3 • average</div>
+  <!-- LIVE JOB -->
+  <div class="screen hidden" id="job">
+    <div class="jobTitle" id="jobName">—</div>
+    <div class="liveBox">
+      <div class="liveCols">
+        <div><div class="metaLabel">Deadline</div><div class="metaValue" id="deadline">—</div></div>
+        <div><div class="metaLabel">Remaining</div><div class="metaValue" id="remaining">—</div></div>
+        <div><div class="metaLabel">Pay</div><div class="metaValue" id="pay">—</div></div>
       </div>
-      <div class="seg" id="speedSeg"></div>
     </div>
+    <div style="height:20px"></div>
+    <div class="row">
+      <div class="progressLabel">Progress</div>
+      <div class="progressPct" id="pct">0%</div>
+    </div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
   </div>
+
+  <!-- RESULT -->
+  <div class="screen hidden" id="result">
+    <div class="jobTitle" id="resultTitle">Job complete</div>
+    <div class="resultBox">
+      <div class="vlist" id="resultList"></div>
+    </div>
+    <div style="height:30px"></div>
+    <button class="btn" id="backBoard">Back to job board</button>
+  </div>
+</div>
+
+<div class="cancelBar hidden" id="cancelBar">
+  <div class="cancelWrap">
+    <button class="btnOutline" id="cancel">Cancel job</button>
+  </div>
+</div>
+
+<div class="speedbar hidden" id="speedBar">
+  <div class="speedwrap">
+    <div class="speedhead">
+      <div class="metaLabel">Speed</div>
+      <div class="metaLabel" id="speedLabel">3 • average</div>
+    </div>
+    <div class="seg" id="speedSeg"></div>
+  </div>
+</div>
 
 <script>
-/* v0.9.0
-  Applied:
-  - Time remaining + time taken are shown in game minutes (not seconds)
-  - Cancel job fixed bar sits just above speed bar (no overlap)
-  - Extra spacing above "Back to job board" on result screen
-  - Added hub page with Jobs/Shop/Kit/Bag (only Jobs navigates)
-  - Added back navigation from board -> hub; job -> board
-  - Energy-based speed gating + board lockout at 0 energy
-*/
+const VERSION="1.0.0";
 
-const VERSION = "0.9.0";
-
-const GAME = {
-  jobsShown: 3,
-
-  speed: {
-    1: { name:"very slow", mult: 0.55 },
-    2: { name:"slow",      mult: 0.80 },
-    3: { name:"average",   mult: 1.00 },
-    4: { name:"fast",      mult: 1.25 },
-    5: { name:"very fast", mult: 1.55 }
-  },
-
-  avgMph: 8.0,
-  minJobMinutesClamp: 8,
-
-  earlyBonusPct: 0.10,
-  latePenaltyPct: 0.20,
-
-  // Energy burn: mult^2
-  baseEnergyBurnPerSec: 0.65,
-
-  jobTypes: [
-    { id:"food",   name:"Hot food drop",  dist: 2.0 },
-    { id:"parcel", name:"Parcel run",     dist: 3.5 },
-    { id:"groc",   name:"Groceries",      dist: 4.2 },
-    { id:"frag",   name:"Fragile item",   dist: 5.0 },
-    { id:"rush",   name:"Rush SLA",       dist: 6.0 }
-  ],
-
-  clockStartMinutes: 15 * 60
+const SPEEDS={
+  1:{name:"very slow",mult:0.55},
+  2:{name:"slow",mult:0.8},
+  3:{name:"average",mult:1},
+  4:{name:"fast",mult:1.25},
+  5:{name:"very fast",mult:1.55}
 };
 
-const state = {
-  cash: 0,
-  clockMins: GAME.clockStartMinutes,
-  energy: 100,
+const JOBS=[
+  {name:"Hot food drop",dist:2},
+  {name:"Parcel run",dist:3.5},
+  {name:"Groceries",dist:4.2},
+  {name:"Fragile item",dist:5},
+  {name:"Rush SLA",dist:6}
+];
 
-  mode: "hub", // hub | board | job | result
-  offers: [],
-  speed: 3,
-
-  job: null,
-  running: false,
-  lastTick: 0,
-  elapsedSec: 0,
-  durationMin: 0,
-  progress: 0,
-  startEnergy: 100,
-  raf: 0,
-
-  lastResult: null
+const state={
+  cash:0,
+  time:15*60,
+  energy:100,
+  speed:3,
+  mode:"hub",
+  offers:[],
+  job:null,
+  elapsed:0,
+  hiddenDuration:0,
+  raf:0
 };
 
-const $ = (id)=>document.getElementById(id);
-const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+const $=id=>document.getElementById(id);
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 
-function fmtClock(mins){
-  const m = ((Math.floor(mins) % (24*60)) + (24*60)) % (24*60);
-  const hh = String(Math.floor(m / 60)).padStart(2,"0");
-  const mm = String(m % 60).padStart(2,"0");
-  return `${hh}:${mm}`;
-}
+function fmtClock(m){return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");}
 
 function renderTop(){
-  $("cash").textContent = "£" + state.cash.toFixed(0);
-  $("clock").textContent = fmtClock(state.clockMins);
-  $("energyTop").textContent = `${Math.round(clamp(state.energy,0,100))}%`;
-  $("hubHint").textContent = (state.energy <= 0) ? "No energy" : "";
+  $("cash").textContent="£"+state.cash;
+  $("clock").textContent=fmtClock(state.time);
+  $("energy").textContent=Math.round(state.energy)+"%";
 }
 
 function setMode(m){
-  state.mode = m;
-  $("hubScreen").classList.toggle("hidden", m !== "hub");
-  $("boardScreen").classList.toggle("hidden", m !== "board");
-  $("jobScreen").classList.toggle("hidden", m !== "job");
-  $("resultScreen").classList.toggle("hidden", m !== "result");
-
-  const inJob = (m === "job");
-  $("speedBar").classList.toggle("hidden", !inJob);
-  $("cancelBar").classList.toggle("hidden", !inJob);
-
-  renderTop();
+  state.mode=m;
+  ["hub","board","job","result"].forEach(s=>$(s).classList.toggle("hidden",s!==m));
+  $("speedBar").classList.toggle("hidden",m!=="job");
+  $("cancelBar").classList.toggle("hidden",m!=="job");
 }
 
-function durationFromDistanceMiles(miles){
-  const minutes = (miles / GAME.avgMph) * 60;
-  return Math.max(GAME.minJobMinutesClamp, Math.round(minutes));
-}
-
-function basePayFromDistanceMiles(miles){
-  const raw = miles * 12;
-  const wobble = (Math.random() * 8) - 4;
-  return Math.max(8, Math.round(raw + wobble));
-}
-
-function generateOffers(){
-  const pool = GAME.jobTypes.slice();
-  for (let i=pool.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [pool[i],pool[j]] = [pool[j],pool[i]];
-  }
-  const pick = pool.slice(0, GAME.jobsShown);
-
-  state.offers = pick.map((t, idx) => {
-    const durationMin = durationFromDistanceMiles(t.dist);
-    const deadlineMins = state.clockMins + durationMin;
-    const pay = basePayFromDistanceMiles(t.dist);
-    return {
-      offerId: `${t.id}_${Date.now()}_${idx}`,
-      name: t.name,
-      dist: t.dist,
-      durationMin,
-      deadlineMins,
-      pay
+function genJobs(){
+  state.offers=[...JOBS].sort(()=>Math.random()-.5).slice(0,3).map(j=>{
+    const avg=(j.dist/8)*60;
+    const slow=avg/SPEEDS[1].mult;
+    const fast=avg/SPEEDS[5].mult;
+    const hidden=fast+(slow-fast)*(.15+Math.random()*.7);
+    return{
+      ...j,
+      hidden:Math.round(hidden),
+      pay:Math.round(j.dist*12+Math.random()*6),
+      deadline:state.time+Math.round(avg)
     };
   });
-
-  $("boardMeta").textContent = "";
 }
 
-function renderOffers(){
-  const wrap = $("jobs");
-  wrap.innerHTML = "";
-
-  const noEnergy = state.energy <= 0;
-
-  for (const o of state.offers){
-    const div = document.createElement("div");
-    div.className = "job";
-
-    const disabled = noEnergy;
-    const btnLabel = disabled ? "Unavailable" : "Select job";
-
-    div.innerHTML = `
-      <div class="jobTitle">${escapeHtml(o.name)}</div>
-
+function renderJobs(){
+  const wrap=$("jobs");wrap.innerHTML="";
+  state.offers.forEach((o,i)=>{
+    const d=document.createElement("div");
+    d.className="job";
+    d.innerHTML=`
+      <div class="jobTitle">${o.name}</div>
       <div class="metaCols">
-        <div class="metaCol">
-          <div class="metaLabel">Distance</div>
-          <div class="metaValue">${o.dist.toFixed(1)} mi</div>
-        </div>
-
-        <div class="metaCol center">
-          <div class="metaLabel">Deadline</div>
-          <div class="metaValue">${fmtClock(o.deadlineMins)}</div>
-        </div>
-
-        <div class="metaCol right">
-          <div class="metaLabel">Pay</div>
-          <div class="metaValue">£${o.pay}</div>
-        </div>
+        <div><div class="metaLabel">Distance</div><div class="metaValue">${o.dist} mi</div></div>
+        <div><div class="metaLabel">Deadline</div><div class="metaValue">${fmtClock(o.deadline)}</div></div>
+        <div><div class="metaLabel">Pay</div><div class="metaValue">£${o.pay}</div></div>
       </div>
-
-      <button class="btn" ${disabled ? "disabled" : ""} data-pick="${o.offerId}">
-        ${btnLabel}
-      </button>
-    `;
-
-    const b = div.querySelector("button");
-    if (!disabled){
-      b.addEventListener("click", ()=>startJob(o.offerId));
-    }
-    wrap.appendChild(div);
-  }
+      <button class="btn">Select job</button>`;
+    d.querySelector("button").onclick=()=>startJob(o);
+    wrap.appendChild(d);
+  });
 }
 
-/* Speed gating rules:
-   - <=25%: speed 5 unavailable; if at 5 drop to 4
-   - <=20%: speed 4 unavailable; if at 4 drop to 3
-   - <=5% : only speed 1 available; if >1 drop to 1
-   - ==0% : still only speed 1
-*/
-function maxAllowedSpeedForEnergy(e){
-  if (e <= 5) return 1;
-  if (e <= 20) return 3; // 4+ blocked
-  if (e <= 25) return 4; // 5 blocked
+function maxSpeed(){
+  if(state.energy<=5) return 1;
+  if(state.energy<=20) return 3;
+  if(state.energy<=25) return 4;
   return 5;
 }
 
-function enforceSpeedGates(){
-  const maxS = maxAllowedSpeedForEnergy(state.energy);
-  if (state.speed > maxS){
-    state.speed = maxS;
-    syncSpeedUI();
-  }
-
-  // Disable/enable buttons
-  $("speedSeg").querySelectorAll("button").forEach(btn=>{
-    const s = Number(btn.dataset.speed);
-    btn.disabled = (s > maxS);
-  });
-}
-
-function buildSpeedUI(){
-  const seg = $("speedSeg");
-  seg.innerHTML = "";
-  for (let i=1;i<=5;i++){
-    const b = document.createElement("button");
-    b.type = "button";
-    b.textContent = String(i);
-    b.dataset.speed = String(i);
-    b.addEventListener("click", ()=>setSpeed(i));
+function buildSpeed(){
+  const seg=$("speedSeg");seg.innerHTML="";
+  for(let i=1;i<=5;i++){
+    const b=document.createElement("button");
+    b.textContent=i;
+    b.onclick=()=>{state.speed=Math.min(i,maxSpeed());syncSpeed();};
     seg.appendChild(b);
   }
-  syncSpeedUI();
-  enforceSpeedGates();
+  syncSpeed();
 }
 
-function setSpeed(s){
-  const maxS = maxAllowedSpeedForEnergy(state.energy);
-  const target = clamp(s,1,5);
-  state.speed = Math.min(target, maxS);
-  syncSpeedUI();
-  enforceSpeedGates();
-}
-
-function syncSpeedUI(){
-  const label = GAME.speed[state.speed];
-  $("speedLabel").textContent = `${state.speed} • ${label.name}`;
-  $("speedSeg").querySelectorAll("button").forEach(b=>{
-    b.classList.toggle("active", Number(b.dataset.speed) === state.speed);
+function syncSpeed(){
+  const max=maxSpeed();
+  if(state.speed>max) state.speed=max;
+  [...$("speedSeg").children].forEach((b,i)=>{
+    b.classList.toggle("active",i+1===state.speed);
+    b.disabled=i+1>max;
   });
+  $("speedLabel").textContent=state.speed+" • "+SPEEDS[state.speed].name;
 }
 
-function toGameMinutesLabelFromSeconds(sec){
-  // prototype mapping: 1 real second == 1 game minute, but show as minutes
-  return `${Math.max(0, Math.ceil(sec))}m`;
-}
-
-function startJob(offerId){
-  const offer = state.offers.find(x => x.offerId === offerId);
-  if (!offer) return;
-
-  cancelAnimationFrame(state.raf);
-
-  state.job = offer;
-  state.running = true;
-  state.lastTick = performance.now();
-  state.elapsedSec = 0;
-  state.durationMin = offer.durationMin;
-  state.progress = 0;
-  state.startEnergy = state.energy;
-
-  $("jobName").textContent = offer.name;
-  $("deadline").textContent = fmtClock(offer.deadlineMins);
-  $("timeLeft").textContent = `${offer.durationMin}m`;
-  $("jobPay").textContent = `£${offer.pay}`;
-  $("pct").textContent = "0%";
-  $("fill").style.width = "0%";
-
-  enforceSpeedGates();
+function startJob(o){
+  state.job=o;
+  state.elapsed=0;
+  state.hiddenDuration=o.hidden;
+  $("jobName").textContent=o.name;
+  $("deadline").textContent=fmtClock(o.deadline);
+  $("pay").textContent="£"+o.pay;
   setMode("job");
   tick();
 }
 
 function tick(){
-  if (!state.running) return;
-
-  const now = performance.now();
-  const dt = (now - state.lastTick) / 1000;
-  state.lastTick = now;
-
-  // Time advances only in job. Prototype: 1 game minute == 1 real second.
-  state.clockMins += dt;
-
-  // Energy burn
-  const mult = GAME.speed[state.speed].mult;
-  const burn = GAME.baseEnergyBurnPerSec * (mult * mult) * dt;
-  state.energy = clamp(state.energy - burn, 0, 100);
-
-  // Enforce gates dynamically (auto drop speed if thresholds crossed)
-  enforceSpeedGates();
-
-  state.elapsedSec += dt;
-
-  // Progress
-  const baseRate = 1 / state.durationMin;
-  state.progress = clamp(state.progress + (baseRate * mult * dt), 0, 1);
-
+  state.raf=requestAnimationFrame(tick);
+  const mult=SPEEDS[state.speed].mult;
+  state.elapsed+=1/60;
+  state.time+=1/60;
+  state.energy=clamp(state.energy-0.65*mult*mult/60,0,100);
+  syncSpeed();
+  const remain=Math.max(0,Math.ceil(state.hiddenDuration-state.elapsed));
+  $("remaining").textContent=remain+"m";
+  const p=clamp(state.elapsed/state.hiddenDuration,0,1);
+  $("pct").textContent=Math.floor(p*100)+"%";
+  $("fill").style.width=p*100+"%";
   renderTop();
-
-  const remainingSec = state.durationMin - state.elapsedSec;
-  $("timeLeft").textContent = toGameMinutesLabelFromSeconds(remainingSec);
-  $("pct").textContent = `${Math.floor(state.progress * 100)}%`;
-  $("fill").style.width = `${state.progress * 100}%`;
-
-  if (state.progress >= 1){
-    finishJob("complete", remainingSec);
-    return;
-  }
-  if (remainingSec <= 0){
-    finishJob("late", remainingSec);
-    return;
-  }
-
-  state.raf = requestAnimationFrame(tick);
+  if(p>=1){finish();}
 }
 
-function buildResultList({timeTakenMin, energyUsed, basePay, tipOrPenalty, totalPay}){
-  const list = $("resultList");
-  list.innerHTML = "";
-
-  const rows = [
-    ["Time taken", `${timeTakenMin}m`],
-    ["Energy used", `${Math.round(energyUsed)}%`],
-    ["Pay", `£${basePay}`],
-    ["Tip / penalty", `${tipOrPenalty >= 0 ? "+" : "-"}£${Math.abs(tipOrPenalty)}`],
-    ["Total pay", `£${totalPay}`],
-  ];
-
-  for (let i=0;i<rows.length;i++){
-    const [k,v] = rows[i];
-    const row = document.createElement("div");
-    row.className = "vrow" + (i===rows.length-1 ? " total" : "");
-    row.innerHTML = `<span>${k}</span><span class="val">${v}</span>`;
-    list.appendChild(row);
-  }
-}
-
-function finishJob(outcome, remainingSec){
-  state.running = false;
+function finish(){
   cancelAnimationFrame(state.raf);
-
-  const job = state.job;
-
-  const timeTakenMin = Math.max(1, Math.ceil(state.elapsedSec)); // 1s == 1m
-  const energyUsed = clamp(state.startEnergy - state.energy, 0, 100);
-
-  let basePay = job.pay;
-  let tip = 0;
-  let penalty = 0;
-
-  if (outcome === "complete"){
-    if (remainingSec > 0.999) tip = Math.round(basePay * GAME.earlyBonusPct);
-  } else if (outcome === "late"){
-    penalty = Math.round(basePay * GAME.latePenaltyPct);
-  }
-
-  const tipOrPenalty = tip - penalty;
-  const totalPay = clamp(basePay + tipOrPenalty, 0, 999999);
-
-  state.cash += totalPay;
-
-  $("resultTitle").textContent = (outcome === "late") ? "Job complete (late)" : "Job complete";
-  $("resultSub").textContent = job.name;
-  buildResultList({ timeTakenMin, energyUsed, basePay, tipOrPenalty, totalPay });
-
-  state.job = null;
+  const early=state.elapsed<state.hiddenDuration;
+  const tip=early?Math.round(state.job.pay*.1):0;
+  const total=state.job.pay+tip;
+  state.cash+=total;
+  $("resultTitle").textContent="Job complete";
+  $("resultList").innerHTML=`
+    <div class="vrow"><span>Time taken</span><span>${Math.ceil(state.elapsed)}m</span></div>
+    <div class="vrow"><span>Energy used</span><span>${Math.round(100-state.energy)}%</span></div>
+    <div class="vrow"><span>Pay</span><span>£${state.job.pay}</span></div>
+    <div class="vrow"><span>Tip / penalty</span><span>£${tip}</span></div>
+    <div class="vrow total"><span>Total</span><span>£${total}</span></div>`;
   setMode("result");
 }
 
-function cancelJob(){
-  if (!state.job) return;
-
-  state.running = false;
+$("cancel").onclick=()=>{
   cancelAnimationFrame(state.raf);
-
-  const timeTakenMin = Math.max(1, Math.ceil(state.elapsedSec));
-  const energyUsed = clamp(state.startEnergy - state.energy, 0, 100);
-
-  $("resultTitle").textContent = "Job cancelled";
-  $("resultSub").textContent = state.job.name;
-  buildResultList({
-    timeTakenMin,
-    energyUsed,
-    basePay: 0,
-    tipOrPenalty: 0,
-    totalPay: 0
-  });
-
-  state.job = null;
+  $("resultTitle").textContent="Job cancelled";
+  $("resultList").innerHTML=`
+    <div class="vrow"><span>Time taken</span><span>${Math.ceil(state.elapsed)}m</span></div>
+    <div class="vrow"><span>Energy used</span><span>${Math.round(100-state.energy)}%</span></div>
+    <div class="vrow total"><span>Total</span><span>£0</span></div>`;
   setMode("result");
-}
+};
 
-function backToBoard(){
-  generateOffers();
-  renderOffers();
-  setMode("board");
-}
+$("goJobs").onclick=()=>{genJobs();renderJobs();setMode("board");};
+$("backHub").onclick=()=>setMode("hub");
+$("backBoard").onclick=()=>{genJobs();renderJobs();setMode("board");};
 
-function backToHub(){
-  setMode("hub");
-}
-
-function escapeHtml(s){
-  return String(s)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-// Wiring - hub
-$("hubJobs").addEventListener("click", ()=>{
-  generateOffers();
-  renderOffers();
-  setMode("board");
-});
-$("hubShop").addEventListener("click", ()=>{});
-$("hubKit").addEventListener("click", ()=>{});
-$("hubBag").addEventListener("click", ()=>{});
-
-// Back buttons
-$("backToHub").addEventListener("click", backToHub);
-$("jobBackToBoard").addEventListener("click", ()=>{
-  // Don't allow leaving mid-job (keeps loop tight). Could be changed later.
-  // For now, treat as cancel.
-  cancelJob();
-});
-
-// Board actions
-$("refreshAction").addEventListener("click", ()=>{
-  generateOffers();
-  renderOffers();
-  // silent refresh
-});
-
-// Job actions
-$("cancelBtn").addEventListener("click", cancelJob);
-
-// Result actions
-$("backBtn").addEventListener("click", backToBoard);
-
-// Version
-$("verTop").textContent = "v" + VERSION;
-$("verMini").textContent = "build v" + VERSION;
-document.title = `Courier v${VERSION}`;
-
-// Init
-buildSpeedUI();
+buildSpeed();
 renderTop();
 setMode("hub");
 </script>

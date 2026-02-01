@@ -3,19 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v0.3.0</title>
+  <title>Courier v0.4.0</title>
   <style>
     /* Matte black + pure white only */
     :root{
       color-scheme: dark;
       --bg:#000;
       --fg:#fff;
-      --muted:#fff; /* keep pure white for now */
       --border:#fff;
 
       --r:16px;
       --r2:12px;
-      --shadow:none;
 
       --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
@@ -26,16 +24,16 @@
       background: var(--bg);
       color: var(--fg);
       font-family: var(--sans);
-      font-size: 18px; /* bigger */
+      font-size: 18px;
     }
 
     .safe{
-      padding: calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 96px);
+      padding: calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 110px);
       max-width: 760px;
       margin: 0 auto;
     }
 
-    /* Top line: minimal */
+    /* Minimal top */
     .top{
       display:flex;
       align-items:baseline;
@@ -61,12 +59,34 @@
       white-space: nowrap;
     }
 
-    /* Minimal containers: only one main panel per screen */
-    .panel{
+    /* Top three boxes */
+    .kpis{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .kpi{
       border: 1px solid var(--border);
       border-radius: var(--r);
-      padding: 14px;
+      padding: 12px;
     }
+    .kpi .label{
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .kpi .value{
+      margin-top: 8px;
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 950;
+      letter-spacing: .2px;
+    }
+
+    /* No outer container: screens are just blocks */
+    .screen{display:block;}
+    .hidden{display:none !important;}
 
     .row{
       display:flex;
@@ -74,13 +94,12 @@
       justify-content:space-between;
       gap: 12px;
     }
-    .mono{font-family:var(--mono);}
-    .small{font-size:14px; font-family:var(--mono);}
-    .big{font-size:26px; font-weight:900; font-family:var(--mono);}
-
+    .mono{font-family: var(--mono);}
+    .small{font-size:14px; font-family: var(--mono);}
+    .big{font-size:26px; font-weight:900; font-family: var(--mono);}
     .spacer{height:12px;}
 
-    /* Job list */
+    /* Job list + cards */
     .jobs{
       display:grid;
       grid-template-columns: 1fr;
@@ -101,7 +120,7 @@
       white-space: pre-wrap;
     }
 
-    /* Buttons: filled, obvious */
+    /* Buttons: filled, unmistakable */
     .btn{
       width:100%;
       border: 1px solid var(--border);
@@ -117,13 +136,12 @@
     .btn:active{transform: translateY(1px);}
     .btn[disabled]{opacity:.5;}
 
-    /* Progress */
+    /* Bars */
     .bar{
       height: 16px;
       border: 1px solid var(--border);
       border-radius: 999px;
       overflow:hidden;
-      margin-top: 10px;
       background: var(--bg);
     }
     .fill{
@@ -174,13 +192,11 @@
     }
     .seg button:active{transform: translateY(1px);}
 
-    .hidden{display:none !important;}
-
     .toast{
       position:fixed;
       left:50%;
       transform: translateX(-50%);
-      bottom: calc(env(safe-area-inset-bottom) + 110px);
+      bottom: calc(env(safe-area-inset-bottom) + 122px);
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 10px 12px;
@@ -202,18 +218,29 @@
     <div class="top">
       <div class="title">
         <h1>Courier</h1>
-        <div class="ver" id="verTop">v0.3.0</div>
+        <div class="ver" id="verTop">v0.4.0</div>
       </div>
-      <div class="ver" id="verMini">build v0.3.0</div>
+      <div class="ver" id="verMini">build v0.4.0</div>
     </div>
 
-    <!-- BOARD -->
-    <div class="panel" id="boardPanel">
-      <div class="row">
-        <div class="big mono" id="cash">£0</div>
-        <div class="big mono" id="clock">15:00</div>
+    <!-- Always visible: Cash / Time / Day -->
+    <div class="kpis">
+      <div class="kpi">
+        <div class="label">Cash</div>
+        <div class="value" id="cash">£0</div>
       </div>
-      <div class="spacer"></div>
+      <div class="kpi">
+        <div class="label">Time</div>
+        <div class="value" id="clock">15:00</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Day</div>
+        <div class="value" id="day">1</div>
+      </div>
+    </div>
+
+    <!-- BOARD (no outer container) -->
+    <div class="screen" id="boardScreen">
       <div class="row">
         <div class="mono" style="font-weight:900;">Job board</div>
         <div class="small" id="boardMeta">—</div>
@@ -226,11 +253,12 @@
     </div>
 
     <!-- JOB -->
-    <div class="panel hidden" id="jobPanel">
+    <div class="screen hidden" id="jobScreen">
       <div class="row">
         <div class="mono" style="font-weight:900;" id="jobName">—</div>
         <div class="small" id="jobPay">—</div>
       </div>
+
       <div class="spacer"></div>
 
       <div class="row">
@@ -254,14 +282,23 @@
       <div class="bar"><div class="fill" id="fill"></div></div>
 
       <div class="spacer"></div>
+
+      <!-- Energy (requested): above speed bar -->
+      <div class="row">
+        <div class="small">Energy</div>
+        <div class="small mono" id="energyPct">100%</div>
+      </div>
+      <div class="bar"><div class="fill" id="energyFill"></div></div>
+
+      <div class="spacer"></div>
       <button class="btn" id="cancelBtn">Cancel job</button>
     </div>
 
     <!-- RESULT -->
-    <div class="panel hidden" id="resultPanel">
+    <div class="screen hidden" id="resultScreen">
       <div class="row">
         <div class="mono" style="font-weight:900;" id="resultTitle">—</div>
-        <div class="small" id="resultWhen">—</div>
+        <div class="small" id="resultTag">—</div>
       </div>
       <div class="spacer"></div>
       <div class="big mono" id="resultCashLine">—</div>
@@ -286,26 +323,21 @@
   <div class="toast" id="toast">OK</div>
 
 <script>
-/* v0.3.0
-  Implemented:
-  - Matte black background, pure white text + outlines
-  - Fewer containers: one panel per screen
-  - Filled buttons (white fill, black text) vs containers (black fill, white outline)
-  - Removed "day" entirely
-  - Clock freezes on board; clock advances during job
-  - Jobs show deadline as a clock time (HH:MM) and show pay
-  - Completion adds cash:
-      - early => small tip bonus
-      - late  => penalty
-  - No events. No discrete steps. Just speed-controlled live progress.
+/* v0.4.0
+  Applied changes from feedback:
+  - Removed outer screen containers (no big panels)
+  - Cash/Time/Day always visible in three labelled boxes
+  - Time persists and advances during jobs; next jobs use the new time as the baseline
+  - Energy meter on job screen; faster burns disproportionately more, slower burns disproportionately less
+  - Kept matte black + pure white only; buttons are filled white for click clarity
 */
 
-const VERSION = "0.3.0";
+const VERSION = "0.4.0";
 
 const GAME = {
   jobsShown: 3,
 
-  // Speed multipliers relative to average speed (3).
+  // Progress speed multipliers vs average (3).
   speed: {
     1: { name:"very slow", mult: 0.55 },
     2: { name:"slow",      mult: 0.80 },
@@ -314,19 +346,19 @@ const GAME = {
     5: { name:"very fast", mult: 1.55 }
   },
 
-  // Baseline duration from distance (hidden). Minutes are displayed via clock,
-  // but prototype time scale: 1 game minute == 1 real second.
+  // Baseline time derived from distance (hidden).
+  // Prototype time scale: 1 game minute == 1 real second.
   avgMph: 8.0,
   minJobMinutesClamp: 8,
 
-  // Money model
-  // - base pay derives from distance, with a small randomisation
-  // - early bonus: +10% of base pay (rounded)
-  // - late penalty: -20% of base pay (rounded, floor at 0)
+  // Cash model
   earlyBonusPct: 0.10,
   latePenaltyPct: 0.20,
 
-  // Job types: distance only
+  // Energy model (session-level, persists across jobs for now)
+  // Burn per real second at average speed. Disproportion: multiplied by mult^2.
+  baseEnergyBurnPerSec: 0.65,
+
   jobTypes: [
     { id:"food",   name:"Hot food drop",  dist: 2.0 },
     { id:"parcel", name:"Parcel run",     dist: 3.5 },
@@ -335,12 +367,13 @@ const GAME = {
     { id:"rush",   name:"Rush SLA",       dist: 6.0 }
   ],
 
-  // Session clock start
   clockStartMinutes: 15 * 60 // 15:00
 };
 
 const state = {
   cash: 0,
+  day: 1,
+
   // minutes since midnight; only advances while in job
   clockMins: GAME.clockStartMinutes,
 
@@ -348,13 +381,16 @@ const state = {
   offers: [],
   speed: 3,
 
+  // energy: 0..100 (persists across jobs for now)
+  energy: 100,
+
   // active job
   job: null,
   running: false,
   lastTick: 0,
-  elapsedSec: 0,       // real seconds since job start
-  durationMin: 0,      // baseline minutes (also equals seconds at avg speed due to scaling)
-  progress: 0,         // 0..1
+  elapsedSec: 0,   // real seconds since job start
+  durationMin: 0,  // baseline minutes (also equals seconds at avg speed due to scaling)
+  progress: 0,
   raf: 0
 };
 
@@ -366,7 +402,7 @@ function toast(msg){
   t.textContent = msg;
   t.classList.add("show");
   clearTimeout(toast._to);
-  toast._to = setTimeout(()=>t.classList.remove("show"), 1000);
+  toast._to = setTimeout(()=>t.classList.remove("show"), 900);
 }
 
 function fmtClock(mins){
@@ -376,18 +412,28 @@ function fmtClock(mins){
   return `${hh}:${mm}`;
 }
 
-function renderTopStats(){
+function normalizeClock(){
+  // Advance day on midnight rollover (clockMins can drift above 24h if you keep doing jobs)
+  while (state.clockMins >= 24*60){
+    state.clockMins -= 24*60;
+    state.day += 1;
+  }
+}
+
+function renderTop(){
+  normalizeClock();
   $("cash").textContent = "£" + state.cash.toFixed(0);
   $("clock").textContent = fmtClock(state.clockMins);
+  $("day").textContent = String(state.day);
 }
 
 function setMode(m){
   state.mode = m;
-  $("boardPanel").classList.toggle("hidden", m !== "board");
-  $("jobPanel").classList.toggle("hidden", m !== "job");
-  $("resultPanel").classList.toggle("hidden", m !== "result");
+  $("boardScreen").classList.toggle("hidden", m !== "board");
+  $("jobScreen").classList.toggle("hidden", m !== "job");
+  $("resultScreen").classList.toggle("hidden", m !== "result");
   $("speedBar").classList.toggle("hidden", m !== "job");
-  renderTopStats();
+  renderTop();
 }
 
 function durationFromDistanceMiles(miles){
@@ -396,7 +442,6 @@ function durationFromDistanceMiles(miles){
 }
 
 function basePayFromDistanceMiles(miles){
-  // Simple: ~£12 per mile with a small random wobble
   const raw = miles * 12;
   const wobble = (Math.random() * 8) - 4; // -4..+4
   return Math.max(8, Math.round(raw + wobble));
@@ -412,7 +457,7 @@ function generateOffers(){
 
   state.offers = pick.map((t, idx) => {
     const durationMin = durationFromDistanceMiles(t.dist);
-    const deadlineMins = state.clockMins + durationMin; // baseline for now
+    const deadlineMins = state.clockMins + durationMin; // baseline derived for now
     const pay = basePayFromDistanceMiles(t.dist);
     return {
       offerId: `${t.id}_${Date.now()}_${idx}`,
@@ -473,6 +518,12 @@ function syncSpeedUI(){
   });
 }
 
+function renderEnergy(){
+  const pct = clamp(state.energy, 0, 100);
+  $("energyPct").textContent = `${Math.round(pct)}%`;
+  $("energyFill").style.width = `${pct}%`;
+}
+
 function startJob(offerId){
   const offer = state.offers.find(x => x.offerId === offerId);
   if (!offer) return;
@@ -493,6 +544,8 @@ function startJob(offerId){
   $("pct").textContent = "0%";
   $("fill").style.width = "0%";
 
+  renderEnergy();
+
   setMode("job");
   toast("Job started");
   tick();
@@ -505,18 +558,23 @@ function tick(){
   const dt = (now - state.lastTick) / 1000;
   state.lastTick = now;
 
-  // Clock advances only during job (prototype scale: 1 game minute == 1 real second)
+  // Clock advances only during job. 1 game minute == 1 real second.
   state.clockMins += dt;
+
+  // Energy burn: disproportionate penalty for faster (mult^2), reward for slower
+  const mult = GAME.speed[state.speed].mult;
+  const burn = GAME.baseEnergyBurnPerSec * (mult * mult) * dt;
+  state.energy = clamp(state.energy - burn, 0, 100);
 
   state.elapsedSec += dt;
 
-  // Progress: at speed 3, you finish at durationMin seconds (because min==sec scale)
-  const mult = GAME.speed[state.speed].mult;
+  // Progress: at speed 3 (mult=1) you finish at durationMin seconds.
   const baseRate = 1 / state.durationMin;
   state.progress = clamp(state.progress + (baseRate * mult * dt), 0, 1);
 
   // Render
-  renderTopStats();
+  renderTop();
+  renderEnergy();
 
   const remaining = state.durationMin - state.elapsedSec;
   $("timeLeft").textContent = `${Math.max(0, Math.ceil(remaining))}s`;
@@ -543,16 +601,12 @@ function finishJob(completed, remainingSec){
   cancelAnimationFrame(state.raf);
 
   const job = state.job;
-  const onTime = completed && remainingSec >= 0.0001;
 
-  // If completed before deadline => bonus tip; if late => penalty; if completed exactly at 0 => no bonus.
   let bonus = 0;
   let penalty = 0;
 
   if (completed){
-    if (remainingSec > 0.999){ // meaningfully early
-      bonus = Math.round(job.pay * GAME.earlyBonusPct);
-    }
+    if (remainingSec > 0.999) bonus = Math.round(job.pay * GAME.earlyBonusPct);
   } else {
     penalty = Math.round(job.pay * GAME.latePenaltyPct);
   }
@@ -560,14 +614,16 @@ function finishJob(completed, remainingSec){
   const earned = clamp(job.pay + bonus - penalty, 0, 999999);
   state.cash += earned;
 
-  $("resultTitle").textContent = completed ? (onTime ? "Delivered" : "Delivered") : "Late";
-  $("resultWhen").textContent = completed ? (onTime ? "on time" : "late") : "missed";
+  $("resultTitle").textContent = completed ? "Delivered" : "Late";
+  $("resultTag").textContent = completed ? (bonus ? "bonus" : "on time") : "penalty";
   $("resultCashLine").textContent = `+£${earned}`;
   $("resultBreakdown").textContent =
     `pay £${job.pay}` +
     (bonus ? `\nbonus £${bonus}` : "") +
     (penalty ? `\npenalty -£${penalty}` : "") +
-    `\ntotal cash £${state.cash.toFixed(0)}`;
+    `\ntotal cash £${state.cash.toFixed(0)}` +
+    `\nenergy ${Math.round(state.energy)}%` +
+    `\ntime ${fmtClock(state.clockMins)}`;
 
   toast(completed ? (bonus ? "Bonus" : "Complete") : "Penalty");
   setMode("result");
@@ -579,10 +635,14 @@ function cancelJob(){
   state.job = null;
   setMode("board");
   toast("Cancelled");
+  // time remains where it is; board freezes it.
+  generateOffers();
+  renderOffers();
 }
 
 function backToBoard(){
   state.job = null;
+  // time remains at finish time; new offers based on current clock
   generateOffers();
   renderOffers();
   setMode("board");
@@ -609,7 +669,7 @@ document.title = `Courier v${VERSION}`;
 
 // Init
 buildSpeedUI();
-renderTopStats();
+renderTop();
 generateOffers();
 renderOffers();
 setMode("board");

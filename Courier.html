@@ -3,15 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier Prototype</title>
+  <title>Courier</title>
   <style>
     :root{
       color-scheme: dark;
       --bg:#07080c;
       --panel:#0f111a;
-      --panel2:#0b0d14;
-      --stroke:#1f2240;
-      --stroke2:#272a4f;
+      --stroke:#20234a;
+      --stroke2:#2a2e5d;
       --text:#e8e8ef;
       --muted:#a6a7bf;
       --good:#34d399;
@@ -29,10 +28,11 @@
     body{
       margin:0;
       font-family:var(--sans);
-      background: radial-gradient(1100px 700px at 50% -10%, rgba(59,130,246,.18), transparent 55%),
-                  radial-gradient(900px 600px at 10% 35%, rgba(56,189,248,.10), transparent 60%),
-                  radial-gradient(900px 600px at 90% 35%, rgba(236,72,153,.08), transparent 60%),
-                  var(--bg);
+      background:
+        radial-gradient(1100px 700px at 50% -10%, rgba(59,130,246,.18), transparent 55%),
+        radial-gradient(900px 600px at 10% 35%, rgba(56,189,248,.10), transparent 60%),
+        radial-gradient(900px 600px at 90% 35%, rgba(236,72,153,.08), transparent 60%),
+        var(--bg);
       color:var(--text);
     }
     .safe{
@@ -40,13 +40,12 @@
       max-width:720px;
       margin:0 auto;
     }
-    .topbar{
+    .top{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       margin-bottom:10px;
     }
-    .title{display:flex; flex-direction:column; gap:2px;}
-    .title h1{margin:0; font-size:18px; letter-spacing:.2px;}
-    .title .sub{font-size:12px; color:var(--muted);}
+    h1{margin:0; font-size:18px; letter-spacing:.2px;}
+    .sub{font-size:12px; color:var(--muted); margin-top:2px;}
     .pill{
       display:flex; align-items:center; gap:8px;
       padding:8px 10px;
@@ -55,9 +54,14 @@
       border-radius:999px;
       box-shadow: var(--shadow);
       user-select:none; -webkit-user-select:none;
+      font-weight:850;
+      font-size:12px;
     }
-    .pill b{font-weight:700}
-    .dot{width:8px; height:8px; border-radius:999px; background:var(--good); box-shadow:0 0 0 4px rgba(52,211,153,.12);}
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background:var(--good);
+      box-shadow:0 0 0 4px rgba(52,211,153,.12);
+    }
     .grid{display:grid; grid-template-columns:1fr; gap:10px;}
     .card{
       background: linear-gradient(180deg, rgba(15,17,26,.92), rgba(11,13,20,.88));
@@ -66,7 +70,6 @@
       padding:var(--pad);
       box-shadow: var(--shadow);
     }
-
     .kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
     .kpi{
       border:1px solid var(--stroke2);
@@ -74,27 +77,15 @@
       padding:10px 10px 9px;
       background: rgba(7,8,12,.35);
     }
-    .kpi .label{font-size:11px; color:var(--muted); letter-spacing:.3px; text-transform:uppercase;}
-    .kpi .value{margin-top:6px; font-size:18px; font-weight:800;}
+    .kpi .label{
+      font-size:11px; color:var(--muted);
+      letter-spacing:.3px; text-transform:uppercase;
+    }
+    .kpi .value{margin-top:6px; font-size:18px; font-weight:950;}
 
-    .row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:10px 0 8px;}
+    .row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:10px 0 0;}
     .muted{color:var(--muted); font-size:12px;}
-    .strong{font-weight:700; font-size:12px;}
-
-    .bar{
-      height:12px;
-      border:1px solid var(--stroke2);
-      border-radius:999px;
-      background: rgba(7,8,12,.5);
-      overflow:hidden;
-    }
-    .fill{
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, rgba(56,189,248,.95), rgba(59,130,246,.95));
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
-      transition: width .18s ease;
-    }
+    .strong{font-weight:900; font-size:12px;}
 
     .jobs{display:grid; grid-template-columns:1fr; gap:10px; margin-top:10px;}
     .job{
@@ -104,10 +95,9 @@
       padding:12px;
     }
     .jobTop{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
-    .jobName{font-weight:850; letter-spacing:.2px;}
-    .jobMeta{font-family:var(--mono); font-size:12px; color:rgba(232,232,239,.92); white-space:pre-wrap; margin-top:8px; line-height:1.35;}
+    .jobName{font-weight:950; letter-spacing:.2px;}
     .badge{
-      font-size:11px; font-weight:800;
+      font-size:11px; font-weight:950;
       padding:6px 9px;
       border-radius:999px;
       border:1px solid var(--stroke2);
@@ -119,7 +109,15 @@
     .badge.warn{border-color: rgba(251,191,36,.35); color: rgba(253,230,138,.95);}
     .badge.bad{border-color: rgba(251,113,133,.35); color: rgba(253,164,175,.95);}
 
-    .btnRow{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:12px;}
+    .meta{
+      margin-top:8px;
+      font-family:var(--mono);
+      font-size:12px;
+      line-height:1.35;
+      white-space:pre-wrap;
+      color: rgba(232,232,239,.92);
+    }
+
     .btn{
       border:1px solid var(--stroke2);
       background: rgba(23,24,38,.85);
@@ -127,20 +125,54 @@
       border-radius:14px;
       padding:12px 10px;
       font-size:13px;
-      font-weight:800;
+      font-weight:950;
       letter-spacing:.2px;
       text-align:center;
       user-select:none; -webkit-user-select:none;
       touch-action: manipulation;
+      width:100%;
     }
     .btn:active{transform: translateY(1px);}
     .btn[disabled]{opacity:.45; filter:saturate(.7);}
-    .btn .hint{display:block; margin-top:4px; font-size:11px; font-weight:650; color:var(--muted);}
+    .hint{display:block; margin-top:4px; font-size:11px; font-weight:750; color:var(--muted);}
 
-    .eventHead{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px;}
-    .eventTitle{font-weight:900; font-size:14px; letter-spacing:.2px;}
-    .tag{font-size:11px; font-weight:850; padding:6px 9px; border-radius:999px; border:1px solid var(--stroke2); background: rgba(7,8,12,.35); color:var(--muted); white-space:nowrap;}
-    .eventBody{font-family:var(--mono); font-size:12.5px; line-height:1.35; white-space:pre-wrap; color: rgba(232,232,239,.92);}
+    .btnRow2{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;}
+    .btnRow3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:12px;}
+
+    .bar{
+      height:12px;
+      border:1px solid var(--stroke2);
+      border-radius:999px;
+      background: rgba(7,8,12,.5);
+      overflow:hidden;
+      margin-top:10px;
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(56,189,248,.95), rgba(59,130,246,.95));
+      transition: width .18s ease;
+    }
+
+    .feedTitle{font-weight:950; font-size:14px; letter-spacing:.2px;}
+    .tag{
+      font-size:11px; font-weight:950;
+      padding:6px 9px;
+      border-radius:999px;
+      border:1px solid var(--stroke2);
+      background: rgba(7,8,12,.35);
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .feedHead{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+    .feedBody{
+      margin-top:10px;
+      font-family:var(--mono);
+      font-size:12.5px;
+      line-height:1.35;
+      white-space:pre-wrap;
+      color: rgba(232,232,239,.92);
+    }
     .deltaRow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
     .delta{
       padding:7px 9px; border-radius:12px;
@@ -171,92 +203,436 @@
       transition: opacity .2s ease, transform .2s ease;
     }
     .toast.show{opacity:1; transform:translateX(-50%) translateY(-2px);}
-
-    .hr{height:1px; background:rgba(39,42,79,.7); margin:10px 0;}
   </style>
 </head>
 
 <body>
   <div class="safe">
-    <div class="topbar">
-      <div class="title">
+    <div class="top">
+      <div>
         <h1>Courier</h1>
-        <div class="sub" id="subtitle">Select job → do job → complete → repeat</div>
+        <div class="sub">Select job → do job → complete → repeat</div>
       </div>
-      <div class="pill" title="State">
-        <span class="dot" id="stateDot"></span>
-        <span><b id="stateText">Choosing</b></span>
+      <div class="pill" title="Game state">
+        <span class="dot" id="dot"></span>
+        <span id="mode">Choosing</span>
       </div>
     </div>
 
     <div class="grid">
       <div class="card">
         <div class="kpis">
-          <div class="kpi">
-            <div class="label">Cash</div>
-            <div class="value" id="cash">£0</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Reputation</div>
-            <div class="value" id="rep">0</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Fatigue</div>
-            <div class="value" id="fatigue">0</div>
-          </div>
+          <div class="kpi"><div class="label">Cash</div><div class="value" id="cash">£0</div></div>
+          <div class="kpi"><div class="label">Reputation</div><div class="value" id="rep">0</div></div>
+          <div class="kpi"><div class="label">Fatigue</div><div class="value" id="fatigue">0</div></div>
         </div>
-
         <div class="row">
-          <div class="muted" id="dayText">Day: 1</div>
-          <div class="strong" id="jobHint">Pick a job</div>
+          <div class="muted" id="day">Day 1</div>
+          <div class="strong" id="hint">Pick a job</div>
         </div>
       </div>
 
-      <div class="card" id="jobsCard">
-        <div class="row" style="margin-top:0;">
+      <!-- Job board -->
+      <div class="card" id="boardCard">
+        <div class="row" style="margin:0;">
           <div class="strong">Job board</div>
-          <div class="muted" id="refreshText">3 available</div>
+          <div class="muted" id="boardMeta">3 available</div>
         </div>
         <div class="jobs" id="jobs"></div>
 
-        <div class="hr"></div>
-        <div class="btnRow">
-          <button class="btn" id="btnRefresh">
-            Refresh
-            <span class="hint">new offers</span>
-          </button>
-          <button class="btn" id="btnRest">
-            Rest
-            <span class="hint">reduce fatigue</span>
-          </button>
-          <button class="btn" id="btnReset">
-            Reset
-            <span class="hint">wipe save</span>
-          </button>
+        <div class="btnRow3">
+          <button class="btn" id="refresh"><span>Refresh</span><span class="hint">new offers</span></button>
+          <button class="btn" id="rest"><span>Rest</span><span class="hint">-fatigue</span></button>
+          <button class="btn" id="reset"><span>Reset</span><span class="hint">wipe</span></button>
         </div>
       </div>
 
+      <!-- Job view -->
       <div class="card" id="jobCard" style="display:none;">
-        <div class="row" style="margin-top:0;">
+        <div class="row" style="margin:0;">
           <div class="strong">Current job</div>
-          <div class="muted" id="currentJobTag">—</div>
+          <div class="muted" id="jobMeta">—</div>
         </div>
 
-        <div class="row" style="margin:8px 0 8px;">
-          <div class="muted" id="currentJobTitle">—</div>
-          <div class="strong" id="paceText">Pace: Normal</div>
-        </div>
-        <div class="bar"><div class="fill" id="progressFill"></div></div>
-        <div class="row" style="margin:10px 0 0;">
-          <div class="muted" id="progressText">0 / 5 steps</div>
-          <div class="muted" id="riskText">Risk: Low</div>
+        <div class="bar"><div class="fill" id="fill"></div></div>
+        <div class="row" style="margin-top:10px;">
+          <div class="muted" id="progress">0 / 0 steps</div>
+          <div class="muted" id="completeHint">Do steps</div>
         </div>
 
-        <div class="btnRow">
-          <button class="btn" id="btnStepNormal">
-            Step
-            <span class="hint">steady</span>
-          </button>
-          <button class="btn" id="btnStepFast">
-            Push
-            <span class="hint">faster + risky
+        <div class="btnRow2">
+          <button class="btn" id="step">Do step<span class="hint">progress</span></button>
+          <button class="btn" id="complete" disabled>Complete<span class="hint">payout</span></button>
+        </div>
+
+        <div class="btnRow2">
+          <button class="btn" id="abandon">Abandon<span class="hint">rep hit</span></button>
+          <button class="btn" id="back" disabled>Back to board<span class="hint">after complete</span></button>
+        </div>
+      </div>
+
+      <!-- Feed -->
+      <div class="card">
+        <div class="feedHead">
+          <div>
+            <div class="feedTitle" id="feedTitle">Feed</div>
+            <div class="muted" id="feedMeta">—</div>
+          </div>
+          <div class="tag" id="feedTag">—</div>
+        </div>
+        <div class="feedBody" id="feedBody">Pick a job.</div>
+        <div class="deltaRow" id="deltas"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">OK</div>
+
+<script>
+/*
+  Focus: ONLY the loop
+    choose job -> do steps -> complete -> choose again
+  No routing UI, no complex events, no pace. Keep it clean.
+*/
+const GAME = {
+  fatigueCap: 100,
+  jobsShown: 3,
+  restRecover: 18,
+  jobTypes: [
+    { id:"food",    name:"Hot food drop",   pay: 22, steps: 3, rep: 1, risk: 1 },
+    { id:"parcel",  name:"Parcel run",      pay: 34, steps: 4, rep: 1, risk: 2 },
+    { id:"grocery", name:"Grocery haul",    pay: 42, steps: 5, rep: 2, risk: 3 },
+    { id:"fragile", name:"Fragile item",    pay: 52, steps: 5, rep: 2, risk: 4 },
+    { id:"rush",    name:"Rush SLA job",    pay: 60, steps: 6, rep: 3, risk: 5 }
+  ]
+};
+
+const state = {
+  day: 1,
+  cash: 0,
+  rep: 0,
+  fatigue: 0,
+
+  mode: "choosing",     // choosing | doing | done
+  offers: [],
+  job: null,
+  stepsDone: 0
+};
+
+const $ = (id) => document.getElementById(id);
+const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast._to);
+  toast._to = setTimeout(()=>t.classList.remove("show"), 1100);
+}
+
+function setMode(m){
+  state.mode = m;
+  $("mode").textContent = m === "choosing" ? "Choosing" : (m === "doing" ? "Doing" : "Ready");
+  const dot = $("dot");
+  if (m === "choosing"){
+    dot.style.background = "var(--good)";
+    dot.style.boxShadow = "0 0 0 4px rgba(52,211,153,.12)";
+  } else if (m === "doing"){
+    dot.style.background = "var(--blue)";
+    dot.style.boxShadow = "0 0 0 4px rgba(56,189,248,.12)";
+  } else {
+    dot.style.background = "var(--warn)";
+    dot.style.boxShadow = "0 0 0 4px rgba(251,191,36,.14)";
+  }
+}
+
+function renderHeader(){
+  $("cash").textContent = "£" + state.cash.toFixed(0);
+  $("rep").textContent = String(state.rep);
+  $("fatigue").textContent = String(state.fatigue);
+  $("day").textContent = `Day ${state.day}`;
+  $("hint").textContent =
+    state.mode === "choosing" ? "Pick a job" :
+    state.mode === "doing" ? "Do steps" : "Complete job";
+}
+
+function badgeClass(risk){
+  if (risk <= 2) return "good";
+  if (risk <= 4) return "warn";
+  return "bad";
+}
+
+function generateOffers(){
+  const pool = GAME.jobTypes.slice();
+  for (let i=pool.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]] = [pool[j],pool[i]];
+  }
+  const pick = pool.slice(0, GAME.jobsShown);
+
+  // light day scaling
+  const dayMul = 1 + Math.min(0.30, (state.day - 1) * 0.03);
+
+  state.offers = pick.map((t, idx) => ({
+    offerId: `${t.id}_${Date.now()}_${idx}`,
+    typeId: t.id,
+    name: t.name,
+    pay: Math.round(t.pay * dayMul),
+    steps: t.steps + (state.day >= 6 && Math.random() < 0.25 ? 1 : 0),
+    rep: t.rep,
+    risk: t.risk
+  }));
+}
+
+function renderBoard(){
+  const board = $("boardCard");
+  const jobCard = $("jobCard");
+
+  if (state.mode === "choosing"){
+    board.style.display = "";
+    jobCard.style.display = "none";
+  } else {
+    board.style.display = "none";
+    jobCard.style.display = "";
+  }
+
+  $("boardMeta").textContent = `${state.offers.length} available`;
+  const wrap = $("jobs");
+  wrap.innerHTML = "";
+
+  for (const o of state.offers){
+    const div = document.createElement("div");
+    div.className = "job";
+    div.innerHTML = `
+      <div class="jobTop">
+        <div class="jobName">${escapeHtml(o.name)}</div>
+        <div class="badge ${badgeClass(o.risk)}">risk ${o.risk}/5</div>
+      </div>
+      <div class="meta">pay: £${o.pay}
+steps: ${o.steps}
+rep: +${o.rep}</div>
+      <div style="height:10px"></div>
+      <button class="btn" data-pick="${o.offerId}">Select<span class="hint">start job</span></button>
+    `;
+    div.querySelector("button[data-pick]").addEventListener("click", () => selectJob(o.offerId));
+    wrap.appendChild(div);
+  }
+}
+
+function renderJob(){
+  if (!state.job) return;
+  const j = state.job;
+  $("jobMeta").textContent = `${j.name} • £${j.pay} • steps ${j.steps} • rep +${j.rep} • risk ${j.risk}/5`;
+
+  const pct = (state.stepsDone / j.steps) * 100;
+  $("fill").style.width = `${pct}%`;
+  $("progress").textContent = `${state.stepsDone} / ${j.steps} steps`;
+
+  const done = state.stepsDone >= j.steps;
+  $("completeHint").textContent = done ? "Ready to complete" : "Do steps";
+  $("step").disabled = done || state.mode !== "doing";
+  $("complete").disabled = !done || state.mode !== "done";
+  $("abandon").disabled = (state.mode === "choosing");
+  $("back").disabled = !(state.mode === "done");
+}
+
+function feed(title, tag, body, deltas){
+  $("feedTitle").textContent = title;
+  $("feedTag").textContent = tag || "—";
+  $("feedBody").textContent = body || "—";
+  $("feedMeta").textContent = `Day ${state.day} • cash £${state.cash.toFixed(0)} • rep ${state.rep} • fatigue ${state.fatigue}`;
+
+  const d = $("deltas");
+  d.innerHTML = "";
+  if (!deltas) return;
+
+  const parts = [];
+  if (deltas.cash) parts.push({k:"cash", v:(deltas.cash<0?"-":"+") + "£" + Math.abs(deltas.cash)});
+  if (deltas.rep) parts.push({k:"rep", v:(deltas.rep<0?"":"+") + deltas.rep});
+  if (deltas.fatigue) parts.push({k:"fatigue", v:(deltas.fatigue<0?"":"+") + deltas.fatigue});
+
+  for (const p of parts){
+    const el = document.createElement("div");
+    let cls = "delta warn";
+    if (p.k === "cash" || p.k === "rep") cls = p.v.startsWith("-") ? "delta bad" : "delta good";
+    if (p.k === "fatigue") cls = p.v.startsWith("-") ? "delta good" : "delta warn";
+    el.className = cls;
+    el.textContent = `${p.k} ${p.v}`;
+    d.appendChild(el);
+  }
+}
+
+function selectJob(offerId){
+  const o = state.offers.find(x => x.offerId === offerId);
+  if (!o) return;
+
+  state.job = o;
+  state.stepsDone = 0;
+  setMode("doing");
+
+  feed("Job selected", "Start",
+`You accepted: ${o.name}
+Do ${o.steps} steps, then complete for payout.`,
+  null);
+
+  toast("Started");
+  renderAll();
+}
+
+function doStep(){
+  if (state.mode !== "doing" || !state.job) return;
+  const j = state.job;
+  if (state.stepsDone >= j.steps) return;
+
+  state.stepsDone += 1;
+
+  // Minimal consequences: fatigue climbs slightly by job risk.
+  const fatigueGain = 2 + j.risk; // 3..7
+  state.fatigue = clamp(state.fatigue + fatigueGain, 0, GAME.fatigueCap);
+
+  feed("Step complete", "Do",
+`Progressed ${j.name}.
+${state.stepsDone}/${j.steps} steps done.`,
+    { fatigue: fatigueGain }
+  );
+
+  if (state.stepsDone >= j.steps){
+    setMode("done");
+    feed("Ready to complete", "Complete",
+`Steps finished.
+Tap Complete to get paid.`,
+      null
+    );
+    toast("Ready");
+  } else {
+    toast("+1 step");
+  }
+
+  renderAll();
+}
+
+function completeJob(){
+  if (state.mode !== "done" || !state.job) return;
+  const j = state.job;
+
+  // Simple fatigue penalty if too tired; keeps loop honest.
+  const penalty = state.fatigue >= 80 ? Math.round(j.pay * 0.15) : 0;
+  const payout = j.pay - penalty;
+
+  state.cash += payout;
+  state.rep += j.rep;
+
+  feed("Job complete", "Payout",
+`Payout: £${payout}${penalty ? ` (fatigue penalty -£${penalty})` : ""}
+Rep: +${j.rep}
+Tap Back to return to the job board.`,
+    { cash: payout, rep: j.rep }
+  );
+
+  toast("Paid");
+  renderAll();
+}
+
+function backToBoard(){
+  if (state.mode !== "done") return;
+
+  state.day += 1;
+  state.job = null;
+  state.stepsDone = 0;
+
+  generateOffers();
+  setMode("choosing");
+
+  feed("Job board", "Choosing", "Pick a job.", null);
+  toast("Board");
+  renderAll();
+}
+
+function abandonJob(){
+  if (state.mode === "choosing" || !state.job) return;
+
+  const hit = Math.max(1, Math.round(state.job.risk / 2));
+  state.rep -= hit;
+
+  feed("Abandoned", "Quit",
+`You abandoned the job.
+Rep -${hit}.
+Back to the board.`,
+    { rep: -hit }
+  );
+
+  state.job = null;
+  state.stepsDone = 0;
+  generateOffers();
+  setMode("choosing");
+  toast("Quit");
+  renderAll();
+}
+
+function rest(){
+  if (state.mode !== "choosing") return;
+  const recover = Math.min(GAME.restRecover, state.fatigue);
+  state.fatigue = clamp(state.fatigue - recover, 0, GAME.fatigueCap);
+  feed("Rest", "Recovery", `Fatigue -${recover}.`, { fatigue: -recover });
+  toast("Recovered");
+  renderAll();
+}
+
+function refresh(){
+  if (state.mode !== "choosing") return;
+  generateOffers();
+  feed("Refreshed", "Offers", "New jobs posted.", null);
+  toast("Refreshed");
+  renderAll();
+}
+
+function hardReset(){
+  state.day = 1;
+  state.cash = 0;
+  state.rep = 0;
+  state.fatigue = 0;
+  state.mode = "choosing";
+  state.offers = [];
+  state.job = null;
+  state.stepsDone = 0;
+
+  generateOffers();
+  setMode("choosing");
+  feed("Job board", "Choosing", "Pick a job.", null);
+  toast("Reset");
+  renderAll();
+}
+
+function renderAll(){
+  renderHeader();
+  renderBoard();
+  renderJob();
+}
+
+function escapeHtml(s){
+  return String(s)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+// Wire UI
+$("step").addEventListener("click", doStep);
+$("complete").addEventListener("click", completeJob);
+$("back").addEventListener("click", backToBoard);
+$("abandon").addEventListener("click", abandonJob);
+
+$("refresh").addEventListener("click", refresh);
+$("rest").addEventListener("click", rest);
+$("reset").addEventListener("click", hardReset);
+
+// Init
+generateOffers();
+setMode("choosing");
+feed("Job board", "Choosing", "Pick a job.", null);
+renderAll();
+</script>
+</body>
+</html>

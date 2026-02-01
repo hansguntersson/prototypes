@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v0.7.0</title>
+  <title>Courier v0.8.0</title>
   <style>
     :root{
       color-scheme: dark;
@@ -26,8 +26,9 @@
       font-size: 18px;
     }
 
+    /* Extra bottom padding because the speed bar is fixed */
     .safe{
-      padding: calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 122px);
+      padding: calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 140px);
       max-width: 760px;
       margin: 0 auto;
     }
@@ -39,25 +40,11 @@
       gap: 12px;
       margin-bottom: 14px;
     }
-    .title{
-      display:flex;
-      align-items:baseline;
-      gap: 10px;
-    }
-    h1{
-      margin:0;
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: .2px;
-    }
-    .ver{
-      font-family: var(--mono);
-      font-size: 14px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
+    .title{display:flex; align-items:baseline; gap:10px;}
+    h1{margin:0; font-size:22px; font-weight:900; letter-spacing:.2px;}
+    .ver{font-family:var(--mono); font-size:14px; font-weight:700; white-space:nowrap;}
 
-    /* Top three boxes */
+    /* KPI boxes: white fill + black text */
     .kpis{
       display:grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -65,29 +52,20 @@
       margin-bottom: 18px;
     }
     .kpi{
-      border: 1px solid var(--border);
+      background: var(--fg);
+      color: var(--bg);
       border-radius: var(--r);
       padding: 12px;
     }
-    .kpi .label{
-      font-family: var(--mono);
-      font-size: 14px;
-      font-weight: 800;
-    }
-    .kpi .value{
-      margin-top: 8px;
-      font-family: var(--mono);
-      font-size: 22px;
-      font-weight: 950;
-      letter-spacing: .2px;
-    }
+    .kpi .label{font-family:var(--mono); font-size:14px; font-weight:900;}
+    .kpi .value{margin-top:8px; font-family:var(--mono); font-size:22px; font-weight:950; letter-spacing:.2px;}
 
     .screen{display:block;}
     .hidden{display:none !important;}
 
     .row{
       display:flex;
-      align-items:center;
+      align-items:baseline;
       justify-content:space-between;
       gap: 12px;
     }
@@ -98,6 +76,13 @@
     .spacer{height:12px;}
     .spacerL{height:18px;}
     .spacerXL{height:26px;}
+
+    /* Consistent job title size across screens */
+    .jobTitle{
+      font-weight: 950;
+      font-size: 22px;
+      letter-spacing: .2px;
+    }
 
     /* Job list */
     .jobs{
@@ -110,11 +95,6 @@
       border: 1px solid var(--border);
       border-radius: var(--r2);
       padding: 12px;
-    }
-    .jobName{
-      font-weight: 950;
-      font-size: 22px; /* bigger headline per feedback */
-      letter-spacing: .2px;
     }
 
     /* 3-column meta row in each job card (no containers) */
@@ -157,6 +137,22 @@
     }
     .btn:active{transform: translateY(1px);}
     .btn[disabled]{opacity:.5;}
+
+    /* Secondary button: outline */
+    .btnOutline{
+      width:100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 12px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing:.2px;
+      background: var(--bg);
+      color: var(--fg);
+      touch-action: manipulation;
+      margin-top: 12px;
+    }
+    .btnOutline:active{transform: translateY(1px);}
 
     /* Refresh text action */
     .textAction{
@@ -205,13 +201,17 @@
       font-weight: 900;
     }
 
-    /* Live job 3-column stats */
+    /* Live job container around stats (below title) */
+    .liveBox{
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 12px;
+      margin-top: 12px;
+    }
     .liveCols{
       display:grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 12px;
-      margin-top: 16px;
-      margin-bottom: 16px;
     }
     .liveCol{ text-align:left; }
     .liveCol.center{ text-align:center; }
@@ -230,7 +230,7 @@
       white-space: nowrap;
     }
 
-    /* Bottom speed selector */
+    /* Speed bar fixed */
     .speedbar{
       position:fixed;
       left:0; right:0;
@@ -268,39 +268,14 @@
     }
     .seg button:active{transform: translateY(1px);}
 
-    /* Cancel job button sits above speed bar (no overlap) */
-    .jobBottom{
-      position: fixed;
-      left:0; right:0;
-      bottom: calc(env(safe-area-inset-bottom) + 78px);
-      padding: 10px 14px;
-      background: transparent;
-      pointer-events: none;
-    }
-    .jobBottomInner{
-      max-width:760px;
-      margin:0 auto;
-      pointer-events: auto;
-    }
-    .jobBottomInner .btn{ margin-top: 0; }
-
-    /* Inline "delivered" breakdown (not a popup/screen) */
-    .delivered{
+    /* Result screen list */
+    .resultBox{
       border: 1px solid var(--border);
       border-radius: var(--r2);
       padding: 12px;
-      margin-top: 14px;
+      margin-top: 12px;
     }
-    .deliveredTitle{
-      font-family: var(--mono);
-      font-weight: 950;
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-    .vlist{
-      display:grid;
-      gap: 8px;
-    }
+    .vlist{display:grid; gap: 8px;}
     .vrow{
       display:flex;
       align-items:baseline;
@@ -322,11 +297,6 @@
       font-size: 16px;
     }
     .vrow.total .val{ font-size: 18px; }
-
-    .miniBtnRow{
-      margin-top: 12px;
-    }
-
   </style>
 </head>
 
@@ -335,9 +305,9 @@
     <div class="top">
       <div class="title">
         <h1>Courier</h1>
-        <div class="ver" id="verTop">v0.7.0</div>
+        <div class="ver" id="verTop">v0.8.0</div>
       </div>
-      <div class="ver" id="verMini">build v0.7.0</div>
+      <div class="ver" id="verMini">build v0.8.0</div>
     </div>
 
     <!-- Always visible: Cash / Time / Energy -->
@@ -365,13 +335,6 @@
 
       <div class="jobs" id="jobs"></div>
 
-      <!-- Inline delivery breakdown (shows after finishing a job; no popup) -->
-      <div class="delivered hidden" id="deliveredBlock">
-        <div class="deliveredTitle" id="deliveredTitle">Delivered</div>
-        <div class="vlist" id="deliveredList"></div>
-      </div>
-
-      <!-- Refresh text action (silent) -->
       <div class="textAction" id="refreshAction" role="button" aria-label="Refresh jobs">
         <span class="icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -385,24 +348,23 @@
 
     <!-- JOB -->
     <div class="screen hidden" id="jobScreen">
-      <div class="row">
-        <div class="mono" style="font-weight:900;" id="jobName">—</div>
-        <div class="small mono" id="jobId"></div>
-      </div>
+      <div class="jobTitle" id="jobName">—</div>
 
-      <!-- Deadline / Remaining / Pay in 3 columns -->
-      <div class="liveCols">
-        <div class="liveCol">
-          <div class="liveLabel">Deadline</div>
-          <div class="liveValue" id="deadline">—</div>
-        </div>
-        <div class="liveCol center">
-          <div class="liveLabel">Remaining</div>
-          <div class="liveValue" id="timeLeft">—</div>
-        </div>
-        <div class="liveCol right">
-          <div class="liveLabel">Pay</div>
-          <div class="liveValue" id="jobPay">—</div>
+      <!-- Container around live stats -->
+      <div class="liveBox">
+        <div class="liveCols">
+          <div class="liveCol">
+            <div class="liveLabel">Deadline</div>
+            <div class="liveValue" id="deadline">—</div>
+          </div>
+          <div class="liveCol center">
+            <div class="liveLabel">Remaining</div>
+            <div class="liveValue" id="timeLeft">—</div>
+          </div>
+          <div class="liveCol right">
+            <div class="liveLabel">Pay</div>
+            <div class="liveValue" id="jobPay">—</div>
+          </div>
         </div>
       </div>
 
@@ -417,13 +379,19 @@
       <div class="bar"><div class="fill" id="fill"></div></div>
 
       <div class="spacerXL"></div>
-    </div>
-  </div>
 
-  <!-- Cancel job sits above speed bar (no overlap). No energy bar here. -->
-  <div class="jobBottom hidden" id="jobBottom">
-    <div class="jobBottomInner">
-      <button class="btn" id="cancelBtn">Cancel job</button>
+      <button class="btnOutline" id="cancelBtn">Cancel job</button>
+    </div>
+
+    <!-- RESULT -->
+    <div class="screen hidden" id="resultScreen">
+      <div class="jobTitle" id="resultTitle">Job complete</div>
+
+      <div class="resultBox">
+        <div class="vlist" id="resultList"></div>
+      </div>
+
+      <button class="btn" id="backBtn">Back to job board</button>
     </div>
   </div>
 
@@ -439,19 +407,17 @@
   </div>
 
 <script>
-/* v0.7.0
-  Applied changes:
-  - Removed in-job energy bar (energy stays only in top KPI)
-  - Fixed cancel overlap: cancel is the only bottom block above speed
-  - Removed "(3 available)" count (boardMeta blank)
-  - No completion popup/screen; delivery result is shown inline on job board
-  - No refresh toast/popup; refresh is silent
-  - Job title larger on select screen
-  - Live job: Deadline / Remaining / Pay in 3 columns
-  - Delivered list is vertical: time taken, energy used, pay, tip/penalty, total pay
+/* v0.8.0
+  Applied from latest feedback:
+  - KPI boxes are white filled with black text
+  - Live job stats now sit in a single container under the job title
+  - Job title size consistent across screens (job select, live job, result)
+  - Removed the #food/#parcel secondary identifier
+  - Restored a dedicated result screen (job complete / job cancelled) with vertical list
+  - No fading "complete" / refresh toasts (none)
 */
 
-const VERSION = "0.7.0";
+const VERSION = "0.8.0";
 
 const GAME = {
   jobsShown: 3,
@@ -470,7 +436,6 @@ const GAME = {
   earlyBonusPct: 0.10,
   latePenaltyPct: 0.20,
 
-  // Energy burn: disproportionate speed cost via mult^2.
   baseEnergyBurnPerSec: 0.65,
 
   jobTypes: [
@@ -489,7 +454,7 @@ const state = {
   clockMins: GAME.clockStartMinutes,
   energy: 100,
 
-  mode: "board",
+  mode: "board", // board | job | result
   offers: [],
   speed: 3,
 
@@ -500,9 +465,7 @@ const state = {
   durationMin: 0,
   progress: 0,
   startEnergy: 100,
-  raf: 0,
-
-  lastDelivery: null
+  raf: 0
 };
 
 const $ = (id)=>document.getElementById(id);
@@ -525,8 +488,8 @@ function setMode(m){
   state.mode = m;
   $("boardScreen").classList.toggle("hidden", m !== "board");
   $("jobScreen").classList.toggle("hidden", m !== "job");
+  $("resultScreen").classList.toggle("hidden", m !== "result");
   $("speedBar").classList.toggle("hidden", m !== "job");
-  $("jobBottom").classList.toggle("hidden", m !== "job");
   renderTop();
 }
 
@@ -563,7 +526,7 @@ function generateOffers(){
     };
   });
 
-  // Per feedback: no "(3 available)" counter.
+  // Per earlier feedback: no availability counter text.
   $("boardMeta").textContent = "";
 }
 
@@ -574,7 +537,7 @@ function renderOffers(){
     const div = document.createElement("div");
     div.className = "job";
     div.innerHTML = `
-      <div class="jobName">${escapeHtml(o.name)}</div>
+      <div class="jobTitle">${escapeHtml(o.name)}</div>
 
       <div class="metaCols">
         <div class="metaCol">
@@ -627,39 +590,6 @@ function syncSpeedUI(){
   });
 }
 
-function showDeliveredInline(delivery){
-  state.lastDelivery = delivery;
-
-  const block = $("deliveredBlock");
-  const list = $("deliveredList");
-  const title = $("deliveredTitle");
-
-  title.textContent = delivery.success ? "Delivered" : "Late";
-  list.innerHTML = "";
-
-  const rows = [
-    ["Time taken", `${Math.ceil(delivery.timeTakenSec)}s`],
-    ["Energy used", `${Math.round(delivery.energyUsed)}%`],
-    ["Pay", `£${delivery.basePay}`],
-    ["Tip / penalty", `${delivery.tipOrPenalty >= 0 ? "+" : "-"}£${Math.abs(delivery.tipOrPenalty)}`],
-    ["Total pay", `£${delivery.totalPay}`],
-  ];
-
-  for (let i=0;i<rows.length;i++){
-    const [k,v] = rows[i];
-    const row = document.createElement("div");
-    row.className = "vrow" + (i===rows.length-1 ? " total" : "");
-    row.innerHTML = `<span>${k}</span><span class="val">${v}</span>`;
-    list.appendChild(row);
-  }
-
-  block.classList.remove("hidden");
-}
-
-function hideDeliveredInline(){
-  $("deliveredBlock").classList.add("hidden");
-}
-
 function startJob(offerId){
   const offer = state.offers.find(x => x.offerId === offerId);
   if (!offer) return;
@@ -675,15 +605,12 @@ function startJob(offerId){
   state.startEnergy = state.energy;
 
   $("jobName").textContent = offer.name;
-  $("jobId").textContent = `#${offer.offerId.split("_")[0]}`;
   $("deadline").textContent = fmtClock(offer.deadlineMins);
   $("timeLeft").textContent = `${offer.durationMin}s`;
   $("jobPay").textContent = `£${offer.pay}`;
-
   $("pct").textContent = "0%";
   $("fill").style.width = "0%";
 
-  hideDeliveredInline();
   setMode("job");
   tick();
 }
@@ -709,7 +636,6 @@ function tick(){
   const baseRate = 1 / state.durationMin;
   state.progress = clamp(state.progress + (baseRate * mult * dt), 0, 1);
 
-  // Render
   renderTop();
 
   const remaining = state.durationMin - state.elapsedSec;
@@ -718,68 +644,96 @@ function tick(){
   $("fill").style.width = `${state.progress * 100}%`;
 
   if (state.progress >= 1){
-    finishJob(true, remaining);
+    finishJob("complete", remaining);
     return;
   }
   if (remaining <= 0){
-    finishJob(false, remaining);
+    finishJob("late", remaining);
     return;
   }
 
   state.raf = requestAnimationFrame(tick);
 }
 
-function finishJob(completed, remainingSec){
+function buildResultList({timeTakenSec, energyUsed, basePay, tipOrPenalty, totalPay}){
+  const list = $("resultList");
+  list.innerHTML = "";
+
+  const rows = [
+    ["Time taken", `${Math.ceil(timeTakenSec)}s`],
+    ["Energy used", `${Math.round(energyUsed)}%`],
+    ["Pay", `£${basePay}`],
+    ["Tip / penalty", `${tipOrPenalty >= 0 ? "+" : "-"}£${Math.abs(tipOrPenalty)}`],
+    ["Total pay", `£${totalPay}`],
+  ];
+
+  for (let i=0;i<rows.length;i++){
+    const [k,v] = rows[i];
+    const row = document.createElement("div");
+    row.className = "vrow" + (i===rows.length-1 ? " total" : "");
+    row.innerHTML = `<span>${k}</span><span class="val">${v}</span>`;
+    list.appendChild(row);
+  }
+}
+
+function finishJob(outcome, remainingSec){
   state.running = false;
   cancelAnimationFrame(state.raf);
 
   const job = state.job;
 
+  const timeTakenSec = state.elapsedSec;
+  const energyUsed = clamp(state.startEnergy - state.energy, 0, 100);
+
+  let basePay = job.pay;
   let tip = 0;
   let penalty = 0;
 
-  if (completed){
-    if (remainingSec > 0.999) tip = Math.round(job.pay * GAME.earlyBonusPct);
-  } else {
-    penalty = Math.round(job.pay * GAME.latePenaltyPct);
+  if (outcome === "complete"){
+    if (remainingSec > 0.999) tip = Math.round(basePay * GAME.earlyBonusPct);
+  } else if (outcome === "late"){
+    penalty = Math.round(basePay * GAME.latePenaltyPct);
   }
 
   const tipOrPenalty = tip - penalty;
-  const totalPay = clamp(job.pay + tipOrPenalty, 0, 999999);
+  const totalPay = clamp(basePay + tipOrPenalty, 0, 999999);
+
+  state.cash += totalPay;
+
+  $("resultTitle").textContent = (outcome === "late") ? "Job complete (late)" : "Job complete";
+  buildResultList({ timeTakenSec, energyUsed, basePay, tipOrPenalty, totalPay });
+
+  state.job = null;
+  setMode("result");
+}
+
+function cancelJob(){
+  if (!state.job) return;
+
+  state.running = false;
+  cancelAnimationFrame(state.raf);
+
+  const job = state.job;
 
   const timeTakenSec = state.elapsedSec;
   const energyUsed = clamp(state.startEnergy - state.energy, 0, 100);
 
-  state.cash += totalPay;
+  // Cancel: no earnings; still consumes time/energy
+  const basePay = 0;
+  const tipOrPenalty = 0;
+  const totalPay = 0;
 
-  // Return to board with inline breakdown (no popup).
-  setMode("board");
-  generateOffers();
-  renderOffers();
-  renderTop();
+  $("resultTitle").textContent = "Job cancelled";
+  buildResultList({ timeTakenSec, energyUsed, basePay, tipOrPenalty, totalPay });
 
-  showDeliveredInline({
-    success: completed,
-    timeTakenSec,
-    energyUsed,
-    basePay: job.pay,
-    tipOrPenalty,
-    totalPay
-  });
-
-  // Clear active job
   state.job = null;
+  setMode("result");
 }
 
-function cancelJob(){
-  state.running = false;
-  cancelAnimationFrame(state.raf);
-  state.job = null;
-
-  setMode("board");
+function backToBoard(){
   generateOffers();
   renderOffers();
-  renderTop();
+  setMode("board");
 }
 
 function escapeHtml(s){
@@ -795,9 +749,10 @@ function escapeHtml(s){
 $("refreshAction").addEventListener("click", ()=>{
   generateOffers();
   renderOffers();
-  // Per feedback: no refresh popup/toast.
+  // silent refresh
 });
 $("cancelBtn").addEventListener("click", cancelJob);
+$("backBtn").addEventListener("click", backToBoard);
 
 // Version
 $("verTop").textContent = "v" + VERSION;

@@ -1,1 +1,740 @@
-Test
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Courier Prototype</title>
+  <style>
+    :root{
+      color-scheme: dark;
+      --bg: #07080c;
+      --panel: #0f111a;
+      --panel2:#0b0d14;
+      --stroke:#1f2240;
+      --stroke2:#272a4f;
+      --text:#e8e8ef;
+      --muted:#a6a7bf;
+      --good:#38bdf8;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --ok:#34d399;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --r: 16px;
+      --r2: 12px;
+      --pad: 14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family: var(--sans);
+      background: radial-gradient(1200px 800px at 50% -10%, rgba(59,130,246,.18), transparent 55%),
+                  radial-gradient(900px 600px at 10% 30%, rgba(56,189,248,.10), transparent 60%),
+                  radial-gradient(900px 600px at 90% 30%, rgba(236,72,153,.08), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+    }
+
+    .safe{
+      padding: calc(env(safe-area-inset-top) + 10px) 12px calc(env(safe-area-inset-bottom) + 12px);
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .title{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .title h1{
+      margin:0;
+      font-size: 18px;
+      letter-spacing:.2px;
+    }
+    .title .sub{
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .pill{
+      display:flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border:1px solid var(--stroke);
+      background: rgba(15,17,26,.65);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      user-select:none;
+      -webkit-user-select:none;
+    }
+    .pill b{font-weight:650}
+    .pill .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--ok);
+      box-shadow: 0 0 0 4px rgba(52,211,153,.12);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(15,17,26,.92), rgba(11,13,20,.88));
+      border:1px solid var(--stroke);
+      border-radius: var(--r);
+      padding: var(--pad);
+      box-shadow: var(--shadow);
+    }
+
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .kpi{
+      border:1px solid var(--stroke2);
+      border-radius: var(--r2);
+      padding: 10px 10px 9px;
+      background: rgba(7,8,12,.35);
+    }
+    .kpi .label{
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing:.3px;
+      text-transform: uppercase;
+    }
+    .kpi .value{
+      margin-top: 6px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin: 10px 0 8px;
+    }
+    .row .muted{color:var(--muted); font-size: 12px;}
+    .row .strong{font-weight: 650; font-size: 12px;}
+
+    .bar{
+      height: 12px;
+      border:1px solid var(--stroke2);
+      border-radius: 999px;
+      background: rgba(7,8,12,.5);
+      overflow:hidden;
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(56,189,248,.95), rgba(59,130,246,.95));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+      transition: width .18s ease;
+    }
+
+    .actions{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .btn{
+      border:1px solid var(--stroke2);
+      background: rgba(23,24,38,.85);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing:.2px;
+      text-align:center;
+      user-select:none;
+      -webkit-user-select:none;
+      touch-action: manipulation;
+    }
+    .btn:active{transform: translateY(1px);}
+    .btn[disabled]{opacity:.45; filter:saturate(.7);}
+
+    .btn .hint{
+      display:block;
+      margin-top: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+
+    .eventHead{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+      margin-bottom: 10px;
+    }
+    .eventTitle{
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing:.2px;
+    }
+    .tag{
+      font-size: 11px;
+      font-weight: 750;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border:1px solid var(--stroke2);
+      background: rgba(7,8,12,.35);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .eventBody{
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.35;
+      white-space: pre-wrap;
+      color: rgba(232,232,239,.92);
+    }
+
+    .deltaRow{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .delta{
+      padding: 7px 9px;
+      border-radius: 12px;
+      border:1px solid var(--stroke2);
+      background: rgba(7,8,12,.35);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .delta.good{border-color: rgba(52,211,153,.35); color: rgba(167,243,208,.95);}
+    .delta.bad{border-color: rgba(251,113,133,.35); color: rgba(253,164,175,.95);}
+    .delta.warn{border-color: rgba(251,191,36,.35); color: rgba(253,230,138,.95);}
+
+    .footerActions{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .small{
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.25;
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(env(safe-area-inset-bottom) + 14px);
+      background: rgba(15,17,26,.92);
+      border:1px solid var(--stroke);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      max-width: 90vw;
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    a{color:inherit}
+  </style>
+</head>
+
+<body>
+  <div class="safe">
+    <div class="topbar">
+      <div class="title">
+        <h1>Courier</h1>
+        <div class="sub" id="subtitle">Event-driven run prototype • mobile-first</div>
+      </div>
+      <div class="pill" id="statusPill" title="Run status">
+        <span class="dot" id="statusDot"></span>
+        <span><b id="statusText">Idle</b></span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="kpis">
+          <div class="kpi">
+            <div class="label">Cash</div>
+            <div class="value" id="cash">£0</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Reputation</div>
+            <div class="value" id="rep">0</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Fatigue</div>
+            <div class="value" id="fatigue">0</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="muted" id="routeText">Route: 0 / 10 stops</div>
+          <div class="strong" id="paceText">Pace: Normal</div>
+        </div>
+        <div class="bar"><div class="fill" id="routeFill"></div></div>
+
+        <div class="row" style="margin-top:10px;">
+          <div class="muted" id="timeText">Shift: 00:00</div>
+          <div class="muted" id="riskText">Risk: Low</div>
+        </div>
+        <div class="bar"><div class="fill" id="riskFill"></div></div>
+
+        <div class="actions">
+          <button class="btn" id="btnNormal">
+            Normal
+            <span class="hint">steady + safe</span>
+          </button>
+          <button class="btn" id="btnFast">
+            Push
+            <span class="hint">faster + risky</span>
+          </button>
+          <button class="btn" id="btnRest">
+            Rest
+            <span class="hint">recover fatigue</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="eventHead">
+          <div>
+            <div class="eventTitle" id="eventTitle">Latest event</div>
+            <div class="small" id="eventMeta">Tap Normal or Push to start a shift.</div>
+          </div>
+          <div class="tag" id="eventTag">—</div>
+        </div>
+        <div class="eventBody" id="eventBody">No events yet.</div>
+        <div class="deltaRow" id="deltaRow" aria-label="deltas"></div>
+      </div>
+
+      <div class="card">
+        <div class="small">
+          Prototype loop: each stop pays a base amount; pace controls fatigue gain and event rate; fatigue increases risk and can trigger penalties.
+          This is intentionally “UI-consistent, data-driven” so you can later split content into <span style="font-family:var(--mono)">game.json</span>.
+        </div>
+        <div class="footerActions">
+          <button class="btn" id="btnNewRun">New run</button>
+          <button class="btn" id="btnReset">Hard reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">OK</div>
+
+<script>
+/*
+  Data-driven core: everything gameplay-ish lives in GAME.
+  Later: move GAME.content + GAME.events to game.json and fetch().
+*/
+const GAME = {
+  config: {
+    stopsPerRun: 10,
+    basePayPerStop: 28,
+    fatigueCap: 100,
+    restFatigueRecover: 18,
+    restMinutes: 6,
+    stopMinutes: 5
+  },
+
+  pace: {
+    normal: { fatiguePerStop: 6, eventChance: 0.32, repDelta: 0, timeMultiplier: 1.0 },
+    fast:   { fatiguePerStop: 10, eventChance: 0.55, repDelta: -1, timeMultiplier: 0.85 }
+  },
+
+  // Risk is derived. Thresholds decide labels + visuals.
+  risk: {
+    // fatigue >= threshold -> label
+    thresholds: [
+      { at: 0,  label: "Low" },
+      { at: 35, label: "Medium" },
+      { at: 65, label: "High" },
+      { at: 85, label: "Critical" }
+    ]
+  },
+
+  // Events are weighted. Each has:
+  // id, tag, weight, when(state), text(state), effect(state)->deltas
+  events: [
+    {
+      id: "clear_stretch",
+      tag: "Flow",
+      weight: 40,
+      when: s => true,
+      text: s => "Clear stretch. Green lights. You stay in rhythm.",
+      effect: s => ({ cash: 0, rep: 0, fatigue: 0 })
+    },
+    {
+      id: "nice_tip",
+      tag: "Tip",
+      weight: 18,
+      when: s => true,
+      text: s => "Customer tips you for being quick and polite.",
+      effect: s => ({ cash: 6, rep: 1, fatigue: 0 })
+    },
+    {
+      id: "door_code",
+      tag: "Delay",
+      weight: 12,
+      when: s => true,
+      text: s => "Wrong buzzer. Wrong door code. You loop the block.",
+      effect: s => ({ cash: 0, rep: -1, fatigue: 4 })
+    },
+    {
+      id: "lift_out",
+      tag: "Stairs",
+      weight: 10,
+      when: s => true,
+      text: s => "Lift’s out. You take the stairs. Again.",
+      effect: s => ({ cash: 0, rep: 0, fatigue: 6 })
+    },
+    {
+      id: "shortcut",
+      tag: "Win",
+      weight: 6,
+      when: s => s.lastPace === "fast",
+      text: s => "You cut through an estate and save minutes.",
+      effect: s => ({ cash: 0, rep: 1, fatigue: 0 })
+    },
+    {
+      id: "speed_camera",
+      tag: "Fine",
+      weight: 7,
+      when: s => s.lastPace === "fast",
+      text: s => "Speed camera flash. That’ll be a fine.",
+      effect: s => ({ cash: -35, rep: -2, fatigue: 2 })
+    },
+    {
+      id: "near_miss",
+      tag: "Risk",
+      weight: 7,
+      when: s => s.fatigue >= 50,
+      text: s => "Near miss at a junction. You feel it in your chest.",
+      effect: s => ({ cash: 0, rep: -1, fatigue: 8 })
+    },
+    {
+      id: "parcel_damage",
+      tag: "Claim",
+      weight: 5,
+      when: s => s.lastPace === "fast" && s.fatigue >= 40,
+      text: s => "You fumble a parcel rushing the stairs. Damage claim incoming.",
+      effect: s => ({ cash: -20, rep: -3, fatigue: 3 })
+    },
+    {
+      id: "late_flag",
+      tag: "SLA",
+      weight: 6,
+      when: s => s.minutes >= 35 && s.stopsDone < (GAME.config.stopsPerRun - 1),
+      text: s => "Dispatch pings you: “ETA?” You’re running late.",
+      effect: s => ({ cash: 0, rep: -2, fatigue: 2 })
+    },
+    {
+      id: "fatigue_crash",
+      tag: "Crash",
+      weight: 3,
+      when: s => s.fatigue >= 85,
+      text: s => "You misjudge a turn and clip a bollard. Lost time. Lost money.",
+      effect: s => ({ cash: -60, rep: -4, fatigue: 6 })
+    }
+  ]
+};
+
+const state = {
+  running: false,
+  stopsDone: 0,
+  cash: 0,
+  rep: 0,
+  fatigue: 0,
+  minutes: 0,
+  lastPace: "normal",
+  lastEventId: null
+};
+
+const $ = (id) => document.getElementById(id);
+
+function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+function formatMoney(n){
+  const sign = n < 0 ? "-" : "";
+  return sign + "£" + Math.abs(n).toFixed(0);
+}
+
+function riskFromFatigue(f){
+  // 0..100 -> 0..100, but ease it slightly.
+  const eased = Math.pow(clamp(f,0,100)/100, 0.85) * 100;
+  const thresholds = GAME.risk.thresholds.slice().sort((a,b)=>a.at-b.at);
+  let label = thresholds[0].label;
+  for (const t of thresholds){ if (eased >= t.at) label = t.label; }
+  return { value: eased, label };
+}
+
+function weightedPick(items, weightFn){
+  let total = 0;
+  const weights = items.map(it => {
+    const w = Math.max(0, weightFn(it) || 0);
+    total += w;
+    return w;
+  });
+  if (total <= 0) return null;
+  let r = Math.random() * total;
+  for (let i=0; i<items.length; i++){
+    r -= weights[i];
+    if (r <= 0) return items[i];
+  }
+  return items[items.length - 1];
+}
+
+function setStatus(text, kind){
+  $("statusText").textContent = text;
+  const dot = $("statusDot");
+  dot.style.background = kind === "bad" ? "var(--bad)" :
+                         kind === "warn" ? "var(--warn)" :
+                         kind === "good" ? "var(--ok)" : "var(--ok)";
+  dot.style.boxShadow = kind === "bad" ? "0 0 0 4px rgba(251,113,133,.14)" :
+                      kind === "warn" ? "0 0 0 4px rgba(251,191,36,.14)" :
+                                        "0 0 0 4px rgba(52,211,153,.12)";
+}
+
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast._to);
+  toast._to = setTimeout(()=>t.classList.remove("show"), 1250);
+}
+
+function render(){
+  $("cash").textContent = "£" + state.cash.toFixed(0);
+  $("rep").textContent = String(state.rep);
+  $("fatigue").textContent = String(state.fatigue);
+
+  $("routeText").textContent = `Route: ${state.stopsDone} / ${GAME.config.stopsPerRun} stops`;
+  $("routeFill").style.width = `${(state.stopsDone / GAME.config.stopsPerRun) * 100}%`;
+
+  const paceLabel = state.lastPace === "fast" ? "Push" : "Normal";
+  $("paceText").textContent = `Pace: ${paceLabel}`;
+
+  const mins = state.minutes;
+  const mm = String(Math.floor(mins/60)).padStart(2,"0");
+  const ss = String(mins%60).padStart(2,"0");
+  $("timeText").textContent = `Shift: ${mm}:${ss}`;
+
+  const r = riskFromFatigue(state.fatigue);
+  $("riskText").textContent = `Risk: ${r.label}`;
+  $("riskFill").style.width = `${r.value}%`;
+
+  // Visual status
+  if (!state.running) setStatus("Idle", "good");
+  else if (r.label === "Critical") setStatus("Critical", "bad");
+  else if (r.label === "High") setStatus("High", "warn");
+  else setStatus("Running", "good");
+
+  const done = state.running && state.stopsDone >= GAME.config.stopsPerRun;
+  $("btnNormal").disabled = done || !state.running;
+  $("btnFast").disabled = done || !state.running;
+  $("btnRest").disabled = !state.running || done;
+
+  $("btnNewRun").disabled = state.running && !done ? true : false;
+}
+
+function showEvent({ title, tag, body, deltas }){
+  $("eventTitle").textContent = title;
+  $("eventTag").textContent = tag || "—";
+  $("eventBody").textContent = body;
+
+  const row = $("deltaRow");
+  row.innerHTML = "";
+  const parts = [];
+
+  if (deltas && (deltas.cash||deltas.rep||deltas.fatigue||deltas.minutes)){
+    if (deltas.cash) parts.push({ k:"cash", v: formatMoney(deltas.cash) });
+    if (deltas.rep) parts.push({ k:"rep", v: (deltas.rep>0?"+":"") + deltas.rep });
+    if (deltas.fatigue) parts.push({ k:"fatigue", v: (deltas.fatigue>0?"+":"") + deltas.fatigue });
+    if (deltas.minutes) parts.push({ k:"time", v: "+" + deltas.minutes + "m" });
+  }
+
+  for (const p of parts){
+    const el = document.createElement("div");
+    el.className = "delta " + (p.k==="cash" ? (String(p.v).startsWith("-") ? "bad" : "good")
+                           : p.k==="rep" ? (String(p.v).startsWith("-") ? "bad" : "good")
+                           : p.k==="fatigue" ? (String(p.v).startsWith("-") ? "good" : "warn")
+                           : "warn");
+    el.textContent = `${p.k} ${p.v}`;
+    row.appendChild(el);
+  }
+
+  $("eventMeta").textContent =
+    `${state.running ? "Shift live" : "Not running"} • stop ${state.stopsDone}/${GAME.config.stopsPerRun} • fatigue ${state.fatigue}/${GAME.config.fatigueCap}`;
+}
+
+function applyDeltas(d){
+  if (!d) return;
+  state.cash += (d.cash || 0);
+  state.rep += (d.rep || 0);
+  state.fatigue = clamp(state.fatigue + (d.fatigue || 0), 0, GAME.config.fatigueCap);
+  if (d.minutes) state.minutes += d.minutes;
+}
+
+function maybeEvent(paceKey){
+  const p = GAME.pace[paceKey];
+  const chance = p.eventChance;
+
+  if (Math.random() > chance){
+    return { id: "no_event", tag: "Delivery", text: "Delivery completed. No surprises.", effect: () => ({}) };
+  }
+
+  const candidates = GAME.events.filter(e => {
+    try { return e.when(state); } catch { return false; }
+  });
+
+  return weightedPick(candidates, e => e.weight) || { id: "no_event", tag: "Delivery", text: "Delivery completed.", effect: () => ({}) };
+}
+
+function doStop(paceKey){
+  state.lastPace = paceKey;
+
+  const p = GAME.pace[paceKey];
+
+  // baseline stop
+  const base = {
+    cash: GAME.config.basePayPerStop,
+    rep: p.repDelta,
+    fatigue: p.fatiguePerStop,
+    minutes: Math.round(GAME.config.stopMinutes * p.timeMultiplier)
+  };
+  applyDeltas(base);
+
+  // event
+  const ev = maybeEvent(paceKey);
+  const extra = ev.effect(state) || {};
+  applyDeltas(extra);
+
+  state.stopsDone += 1;
+
+  const title = ev.id === "no_event" ? "Stop complete" : "Event";
+  const tag = ev.tag || "—";
+  const body = ev.id === "no_event"
+    ? `Delivered.\nBase pay £${GAME.config.basePayPerStop}.`
+    : ev.text(state);
+
+  showEvent({
+    title,
+    tag,
+    body,
+    deltas: {
+      cash: (base.cash || 0) + (extra.cash || 0),
+      rep: (base.rep || 0) + (extra.rep || 0),
+      fatigue: (base.fatigue || 0) + (extra.fatigue || 0),
+      minutes: (base.minutes || 0) + (extra.minutes || 0)
+    }
+  });
+
+  // end of run summary
+  if (state.stopsDone >= GAME.config.stopsPerRun){
+    state.running = true; // keep "running" for summary, then lock actions
+    const r = riskFromFatigue(state.fatigue);
+    const summary =
+      `Run complete.\n` +
+      `Stops: ${GAME.config.stopsPerRun}\n` +
+      `Cash: £${state.cash.toFixed(0)}\n` +
+      `Reputation: ${state.rep}\n` +
+      `Fatigue: ${state.fatigue} (${r.label} risk)\n` +
+      `Time: ${Math.floor(state.minutes/60)}h ${state.minutes%60}m`;
+    showEvent({ title: "Run summary", tag: "Summary", body: summary, deltas: {} });
+    toast("Run complete");
+  }
+
+  render();
+}
+
+function doRest(){
+  if (!state.running) return;
+  const before = state.fatigue;
+  const recover = Math.min(GAME.config.restFatigueRecover, state.fatigue);
+  state.fatigue = clamp(state.fatigue - recover, 0, GAME.config.fatigueCap);
+  state.minutes += GAME.config.restMinutes;
+
+  showEvent({
+    title: "Rest",
+    tag: "Recovery",
+    body: `You stop for water and a breather.\nFatigue drops from ${before} → ${state.fatigue}.`,
+    deltas: { fatigue: -recover, minutes: GAME.config.restMinutes }
+  });
+
+  toast("Recovered");
+  render();
+}
+
+function newRun(){
+  state.running = true;
+  state.stopsDone = 0;
+  state.cash = 0;
+  state.rep = 0;
+  state.fatigue = 0;
+  state.minutes = 0;
+  state.lastPace = "normal";
+  state.lastEventId = null;
+
+  showEvent({
+    title: "Shift started",
+    tag: "Start",
+    body: "Choose your pace each stop.\nNormal is safer. Push is faster, riskier, and hurts reputation.",
+    deltas: {}
+  });
+
+  toast("Shift started");
+  render();
+}
+
+function hardReset(){
+  state.running = false;
+  state.stopsDone = 0;
+  state.cash = 0;
+  state.rep = 0;
+  state.fatigue = 0;
+  state.minutes = 0;
+  state.lastPace = "normal";
+  state.lastEventId = null;
+
+  $("eventMeta").textContent = "Tap Normal or Push to start a shift.";
+  $("eventTitle").textContent = "Latest event";
+  $("eventTag").textContent = "—";
+  $("eventBody").textContent = "No events yet.";
+  $("deltaRow").innerHTML = "";
+
+  toast("Reset");
+  render();
+}
+
+$("btnNormal").addEventListener("click", () => doStop("normal"));
+$("btnFast").addEventListener("click", () => doStop("fast"));
+$("btnRest").addEventListener("click", doRest);
+$("btnNewRun").addEventListener("click", newRun);
+$("btnReset").addEventListener("click", hardReset);
+
+// Start idle
+render();
+</script>
+</body>
+</html>

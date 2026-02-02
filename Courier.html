@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.4</title>
+  <title>Courier v1.0.5</title>
   <style>
     :root{
       color-scheme: dark;
@@ -37,7 +37,7 @@
       margin-bottom:14px;
     }
     h1{margin:0;font-size:22px;font-weight:900;}
-    .ver{font-family:var(--mono);font-size:14px;font-weight:700;}
+    .time{font-family:var(--mono);font-size:14px;font-weight:800;}
 
     /* KPIs */
     .kpis{
@@ -81,7 +81,7 @@
     .btn[disabled],.btnOutline[disabled]{opacity:.4;}
 
     .btnSmall{
-      padding:8px 12px; /* reduced vertical padding by ~2px */
+      padding:8px 12px;
       font-size:16px;
       margin-top:0;
     }
@@ -170,7 +170,7 @@
     .cancelBar{
       position:fixed;
       left:0;right:0;
-      bottom:calc(env(safe-area-inset-bottom) + 110px);
+      bottom:calc(env(safe-area-inset-bottom) + 150px);
       padding:10px 14px;
       background:#000;
     }
@@ -205,7 +205,9 @@
     .seg button.active{background:#fff;color:#000;}
     .seg button[disabled]{opacity:.35;}
 
-    /* ENERGY MODAL */
+    .snackBtn{margin-top:14px;}
+
+    /* MODAL */
     .modal{
       position:fixed;
       inset:0;
@@ -219,7 +221,7 @@
       border:1px solid #fff;
       border-radius:var(--r2);
       padding:14px;
-      max-width:320px;
+      max-width:340px;
       width:100%;
       background:#000;
     }
@@ -240,13 +242,13 @@
 <body>
 <div class="safe">
   <div class="top">
-    <h1>Courier</h1>
-    <div class="ver" id="ver">v1.0.4</div>
+    <h1>Courier (v1.0.5)</h1>
+    <div class="time" id="clock">15:00</div>
   </div>
 
   <div class="kpis">
+    <div class="kpi"><div class="label">Day</div><div class="value" id="day">1</div></div>
     <div class="kpi"><div class="label">Cash</div><div class="value" id="cash">£0</div></div>
-    <div class="kpi"><div class="label">Time</div><div class="value" id="clock">15:00</div></div>
     <div class="kpi"><div class="label">Energy</div><div class="value" id="energy">100%</div></div>
   </div>
 
@@ -254,10 +256,21 @@
   <div class="screen" id="hub">
     <div class="hubGrid">
       <button class="btn" id="goJobs">Jobs</button>
-      <button class="btnOutline" disabled>Shop</button>
+      <button class="btnOutline" id="goShop">Shop</button>
       <button class="btnOutline" disabled>Kit</button>
       <button class="btnOutline" disabled>Bag</button>
     </div>
+    <button class="btnOutline" id="endDay">End day</button>
+  </div>
+
+  <!-- SHOP -->
+  <div class="screen hidden" id="shop">
+    <div class="row">
+      <div class="jobTitle">Shop</div>
+      <button class="btnOutline btnSmall" id="backHub2" style="width:auto">Back</button>
+    </div>
+    <button class="btn" id="buyDrink">Energy drink (<span id="drinkCount"></span>/5)</button>
+    <button class="btn" id="buySnack">Snack (<span id="snackCount"></span>/5)</button>
   </div>
 
   <!-- JOB BOARD -->
@@ -280,6 +293,7 @@
         <div><div class="metaLabel">Pay</div><div class="metaValue" id="pay">—</div></div>
       </div>
     </div>
+
     <div style="height:20px"></div>
     <div class="row">
       <div class="progressLabel">Progress</div>
@@ -291,16 +305,26 @@
       <div id="mph">0 mph</div>
       <div id="milesLeft">0.0 mi</div>
     </div>
+
+    <button class="btn snackBtn" id="openConsumables">Snacks / Energy</button>
   </div>
 
   <!-- RESULT -->
   <div class="screen hidden" id="result">
-    <div class="jobTitle" id="resultTitle">Job complete</div>
+    <div class="jobTitle" id="resultTitle">—</div>
     <div class="resultBox">
       <div class="vlist" id="resultList"></div>
     </div>
-    <div style="height:30px"></div>
     <button class="btn" id="backBoard">Back to job board</button>
+  </div>
+
+  <!-- END DAY -->
+  <div class="screen hidden" id="end">
+    <div class="jobTitle">End of day</div>
+    <div class="resultBox">
+      <div class="vlist" id="endList"></div>
+    </div>
+    <button class="btn" id="confirmEnd">Start next day</button>
   </div>
 </div>
 
@@ -322,67 +346,40 @@
 
 <div class="modal" id="energyModal">
   <div class="modalBox">
-    <button class="btn" id="drink">Energy drink (+20%)</button>
-    <button class="btnOutline" id="snack">Snack (slow)</button>
+    <button class="btn" id="drink">Energy drink (+20%, −10% later) (<span id="drinkLeft"></span>)</button>
+    <button class="btnOutline" id="snack">Snack (+ over time) (<span id="snackLeft"></span>)</button>
     <button class="btnOutline" id="closeEnergy">Cancel</button>
   </div>
 </div>
 
 <script>
-const VERSION="1.0.4";
+const VERSION="1.0.5";
 
-const SPEEDS={
-  1:{name:"very slow",mult:0.55},
-  2:{name:"slow",mult:0.8},
-  3:{name:"average",mult:1},
-  4:{name:"fast",mult:1.25},
-  5:{name:"very fast",mult:1.55}
-};
-
-const JOBS=[
-  {name:"Hot food drop",dist:2},
-  {name:"Parcel run",dist:3.5},
-  {name:"Groceries",dist:4.2},
-  {name:"Fragile item",dist:5},
-  {name:"Rush SLA",dist:6}
-];
+const SPEEDS={1:{name:"very slow",mult:.55},2:{name:"slow",mult:.8},3:{name:"average",mult:1},4:{name:"fast",mult:1.25},5:{name:"very fast",mult:1.55}};
+const JOBS=[{name:"Hot food drop",dist:2},{name:"Parcel run",dist:3.5},{name:"Groceries",dist:4.2},{name:"Fragile item",dist:5},{name:"Rush SLA",dist:6}];
 
 const state={
-  cash:0,
-  time:15*60,
-  energy:100,
-  speed:3,
-  mode:"hub",
-  offers:[],
-  job:null,
-  elapsed:0,
-  hiddenDuration:0,
-  startEnergy:100,
-  lastTs:0,
-  raf:0
+  day:1,cash:0,time:15*60,energy:100,speed:3,
+  snacks:2,drinks:2,
+  jobsDone:0,dayEarnings:0,
+  job:null,offers:[],elapsed:0,hiddenDuration:0,startEnergy:100,
+  snackTimer:null,drinkCrash:null,lastTs:0,raf:0
 };
-
-let jobsInitialised=false;
 
 const $=id=>document.getElementById(id);
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 
-function fmtClock(mins){
-  const total=Math.floor(mins);
-  const hh=Math.floor(total/60);
-  const mm=total%60;
-  return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");
-}
+function fmtClock(m){const t=Math.floor(m),h=Math.floor(t/60),mm=t%60;return String(h).padStart(2,"0")+":"+String(mm).padStart(2,"0");}
 
 function renderTop(){
   $("cash").textContent="£"+state.cash;
   $("clock").textContent=fmtClock(state.time);
   $("energy").textContent=Math.round(state.energy)+"%";
+  $("day").textContent=state.day;
 }
 
 function setMode(m){
-  state.mode=m;
-  ["hub","board","job","result"].forEach(s=>$(s).classList.toggle("hidden",s!==m));
+  ["hub","shop","board","job","result","end"].forEach(s=>$(s).classList.toggle("hidden",s!==m));
   $("speedBar").classList.toggle("hidden",m!=="job");
   $("cancelBar").classList.toggle("hidden",m!=="job");
 }
@@ -390,36 +387,24 @@ function setMode(m){
 function genJobs(){
   state.offers=[...JOBS].sort(()=>Math.random()-.5).slice(0,3).map(j=>{
     const avg=(j.dist/8)*60;
-    const slow=avg/SPEEDS[1].mult;
-    const fast=avg/SPEEDS[5].mult;
+    const slow=avg/SPEEDS[1].mult,fast=avg/SPEEDS[5].mult;
     const hidden=fast+(slow-fast)*(.15+Math.random()*.7);
-    return{
-      ...j,
-      hidden:Math.round(hidden),
-      pay:Math.round(j.dist*12+Math.random()*6),
-      deadline:state.time+Math.round(avg)
-    };
+    return{...j,hidden:Math.round(hidden),pay:Math.round(j.dist*12+Math.random()*6),deadline:state.time+Math.round(avg)};
   });
 }
 
 function renderJobs(){
   const wrap=$("jobs");wrap.innerHTML="";
-  const noEnergy=state.energy<=0;
   state.offers.forEach(o=>{
-    const d=document.createElement("div");
-    d.className="job";
-    d.innerHTML=`
-      <div class="jobTitle">${o.name}</div>
+    const d=document.createElement("div");d.className="job";
+    d.innerHTML=`<div class="jobTitle">${o.name}</div>
       <div class="metaCols">
         <div><div class="metaLabel">Distance</div><div class="metaValue">${o.dist} mi</div></div>
         <div><div class="metaLabel">Deadline</div><div class="metaValue">${fmtClock(o.deadline)}</div></div>
         <div><div class="metaLabel">Pay</div><div class="metaValue">£${o.pay}</div></div>
       </div>
-      <button class="btn" ${noEnergy?"disabled":""}>${noEnergy?"Unavailable":"Select job"}</button>
-    `;
-    if(!noEnergy){
-      d.querySelector("button").onclick=()=>startJob(o);
-    }
+      <button class="btn">Select job</button>`;
+    d.querySelector("button").onclick=()=>startJob(o);
     wrap.appendChild(d);
   });
 }
@@ -455,43 +440,38 @@ function syncSpeed(){
 }
 
 function startJob(o){
-  state.job=o;
-  state.elapsed=0;
-  state.hiddenDuration=o.hidden;
-  state.startEnergy=state.energy;
+  state.job=o;state.elapsed=0;state.hiddenDuration=o.hidden;state.startEnergy=state.energy;
   $("jobName").textContent=o.name;
   $("deadline").textContent=fmtClock(o.deadline);
   $("pay").textContent="£"+o.pay;
   $("remaining").textContent=o.hidden+"m";
-  $("pct").textContent="0%";
-  $("fill").style.width="0%";
-  syncSpeed();
-  setMode("job");
+  $("pct").textContent="0%";$("fill").style.width="0%";
+  setMode("job");syncSpeed();
   state.lastTs=performance.now();
   state.raf=requestAnimationFrame(tick);
 }
 
+function applyPendingEffects(){
+  if(state.snackTimer){state.energy=clamp(state.energy+state.snackTimer.remaining,0,100);clearInterval(state.snackTimer.id);}
+  if(state.drinkCrash){state.energy=clamp(state.energy-10,0,100);}
+}
+
 function tick(ts){
   state.raf=requestAnimationFrame(tick);
-  const dtSec=(ts-state.lastTs)/1000;
-  state.lastTs=ts;
-  const dtMin=dtSec;
+  const dt=(ts-state.lastTs)/1000;state.lastTs=ts;
   const mult=SPEEDS[state.speed].mult;
-  state.elapsed+=dtMin;
-  state.time+=dtMin;
-  state.energy=clamp(state.energy-(0.65*mult*mult*dtMin),0,100);
+  state.elapsed+=dt;state.time+=dt;
+  state.energy=clamp(state.energy-(0.65*mult*mult*dt),0,100);
   syncSpeed();
 
-  const remain=Math.max(0,Math.ceil(state.hiddenDuration-state.elapsed));
-  $("remaining").textContent=remain+"m";
   const p=clamp(state.elapsed/state.hiddenDuration,0,1);
   $("pct").textContent=Math.floor(p*100)+"%";
   $("fill").style.width=(p*100)+"%";
-
-  const milesDone=(state.job.dist*p);
-  $("milesDone").textContent=milesDone.toFixed(1)+" mi";
-  $("milesLeft").textContent=(state.job.dist-milesDone).toFixed(1)+" mi";
+  const miles=state.job.dist*p;
+  $("milesDone").textContent=miles.toFixed(1)+" mi";
+  $("milesLeft").textContent=(state.job.dist-miles).toFixed(1)+" mi";
   $("mph").textContent=Math.round(8*mult)+" mph";
+  $("remaining").textContent=Math.max(0,Math.ceil(state.hiddenDuration-state.elapsed))+"m";
 
   renderTop();
   if(p>=1) finish();
@@ -499,17 +479,11 @@ function tick(ts){
 
 function finish(){
   cancelAnimationFrame(state.raf);
-  const timeTaken=Math.max(1,Math.ceil(state.elapsed));
-  const energyUsed=clamp(state.startEnergy-state.energy,0,100);
+  applyPendingEffects();
   const total=state.job.pay;
-  state.cash+=total;
+  state.cash+=total;state.dayEarnings+=total;state.jobsDone++;
   $("resultTitle").textContent="Job complete";
-  $("resultList").innerHTML=`
-    <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
-    <div class="vrow"><span>Energy used</span><span>${Math.round(energyUsed)}%</span></div>
-    <div class="vrow"><span>Pay</span><span>£${state.job.pay}</span></div>
-    <div class="vrow total"><span>Total</span><span>£${total}</span></div>
-  `;
+  $("resultList").innerHTML=`<div class="vrow"><span>Pay</span><span>£${total}</span></div>`;
   state.job=null;
   setMode("result");
   renderTop();
@@ -517,61 +491,75 @@ function finish(){
 
 $("cancel").onclick=()=>{
   cancelAnimationFrame(state.raf);
-  const timeTaken=Math.max(1,Math.ceil(state.elapsed));
-  const energyUsed=clamp(state.startEnergy-state.energy,0,100);
+  applyPendingEffects();
   $("resultTitle").textContent="Job cancelled";
-  $("resultList").innerHTML=`
-    <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
-    <div class="vrow"><span>Energy used</span><span>${Math.round(energyUsed)}%</span></div>
-    <div class="vrow total"><span>Total</span><span>£0</span></div>
-  `;
+  $("resultList").innerHTML=`<div class="vrow total"><span>Total</span><span>£0</span></div>`;
   state.job=null;
   setMode("result");
   renderTop();
 };
 
-$("energy").onclick=()=>{$("energyModal").style.display="flex";};
+$("openConsumables").onclick=()=>{
+  $("drinkLeft").textContent=state.drinks;
+  $("snackLeft").textContent=state.snacks;
+  $("energyModal").style.display="flex";
+};
 $("closeEnergy").onclick=()=>{$("energyModal").style.display="none";};
 
 $("drink").onclick=()=>{
+  if(state.drinks<=0) return;
+  state.drinks--;
   state.energy=clamp(state.energy+20,0,100);
+  state.drinkCrash=true;
+  setTimeout(()=>{state.energy=clamp(state.energy-10,0,100);state.drinkCrash=false;},20000);
   $("energyModal").style.display="none";
 };
 
 $("snack").onclick=()=>{
-  let t=0;
-  const int=setInterval(()=>{
-    t+=500;
-    state.energy=clamp(state.energy+20/30,0,100);
-    if(t>=15000) clearInterval(int);
-  },500);
+  if(state.snacks<=0) return;
+  state.snacks--;
+  let added=0;
+  const id=setInterval(()=>{
+    state.energy=clamp(state.energy+(20/15),0,100);
+    added+=(20/15);
+    if(added>=20){clearInterval(id);state.snackTimer=null;}
+  },1000);
+  state.snackTimer={id,remaining:20-added};
   $("energyModal").style.display="none";
 };
 
-$("goJobs").onclick=()=>{
-  if(!jobsInitialised){
-    genJobs();
-    renderJobs();
-    jobsInitialised=true;
-  }
-  setMode("board");
-  renderTop();
+$("goJobs").onclick=()=>{genJobs();renderJobs();setMode("board");};
+$("refreshJobs").onclick=()=>{genJobs();renderJobs();};
+$("backHub").onclick=()=>setMode("hub");
+$("backHub2").onclick=()=>setMode("hub");
+$("backBoard").onclick=()=>setMode("board");
+
+$("goShop").onclick=()=>{
+  $("drinkCount").textContent=state.drinks;
+  $("snackCount").textContent=state.snacks;
+  setMode("shop");
 };
 
-$("refreshJobs").onclick=()=>{
-  genJobs();
-  renderJobs();
-  jobsInitialised=true;
+$("buyDrink").onclick=()=>{if(state.drinks<5){state.drinks++;$("drinkCount").textContent=state.drinks;}};
+$("buySnack").onclick=()=>{if(state.snacks<5){state.snacks++;$("snackCount").textContent=state.snacks;}};
+
+$("endDay").onclick=()=>{
+  $("endList").innerHTML=`
+    <div class="vrow"><span>Jobs</span><span>${state.jobsDone}</span></div>
+    <div class="vrow"><span>Earnings</span><span>£${state.dayEarnings}</span></div>
+    <div class="vrow total"><span>Net</span><span>£${state.dayEarnings-50}</span></div>`;
+  setMode("end");
 };
 
-$("backHub").onclick=()=>{setMode("hub");renderTop();};
-$("backBoard").onclick=()=>{setMode("board");renderTop();};
+$("confirmEnd").onclick=()=>{
+  state.day++;state.time+=8*60;state.energy=100;
+  state.jobsDone=0;state.dayEarnings=0;
+  setMode("hub");renderTop();
+};
 
 buildSpeed();
 renderTop();
 setMode("hub");
-document.title="Courier v"+VERSION;
-$("ver").textContent="v"+VERSION;
 </script>
 </body>
 </html>

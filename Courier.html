@@ -1,214 +1,404 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Courier v1.0.9</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Courier v1.0.9</title>
+  <style>
+    :root{
+      color-scheme: dark;
+      --bg:#000;
+      --fg:#fff;
+      --border:#fff;
+      --r:16px;
+      --r2:12px;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--fg);
+      font-family:var(--sans);
+      font-size:18px;
+    }
 
-<style>
-:root{
-  --bg:#000;
-  --fg:#fff;
-  --border:#fff;
-  --r:16px;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-}
+    .safe{
+      padding: calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 260px);
+      max-width:760px;
+      margin:0 auto;
+    }
 
-html,body{height:100%}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--fg);
-  font-family:var(--sans);
-  font-size:18px;
-}
+    /* HEADER */
+    .top{
+      display:flex;
+      justify-content:center;
+      align-items:baseline;
+      margin-bottom:14px;
+      text-align:center;
+    }
+    h1{margin:0;font-size:44px;font-weight:900;}
 
-.safe{
-  max-width:760px;
-  margin:0 auto;
-  padding: calc(env(safe-area-inset-top) + 16px) 14px 220px;
-}
+    /* KPIs */
+    .kpis{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .kpi{
+      background:#fff;
+      color:#000;
+      border-radius:var(--r);
+      padding:12px;
+    }
+    .kpi .label{font-family:var(--mono);font-size:14px;font-weight:900;}
+    .kpi .value{margin-top:6px;font-family:var(--mono);font-size:22px;font-weight:950;}
 
-/* HEADER */
-.header{
-  text-align:center;
-  margin-bottom:18px;
-}
-.header h1{
-  margin:0;
-  font-size:44px;
-  font-weight:900;
-}
+    .screen{display:block;}
+    .hidden{display:none!important;}
 
-/* KPIs */
-.kpis{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:12px;
-  margin-bottom:20px;
-}
-.kpi{
-  background:#fff;
-  color:#000;
-  border-radius:var(--r);
-  padding:12px;
-}
-.kpi .label{
-  font-family:var(--mono);
-  font-size:14px;
-  font-weight:900;
-}
-.kpi .value{
-  margin-top:6px;
-  font-family:var(--mono);
-  font-size:22px;
-  font-weight:950;
-}
+    .btn,.btnOutline{
+      width:100%;
+      border-radius:14px;
+      padding:18px 12px;
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:.2px;
+      margin-top:12px;
+      touch-action: manipulation;
+    }
+    .btn{
+      background:#fff;
+      color:#000;
+      border:1px solid #fff;
+    }
+    .btnOutline{
+      background:#000;
+      color:#fff;
+      border:1px solid #fff;
+    }
+    .btn[disabled],.btnOutline[disabled]{opacity:.4;}
 
-/* SCREENS */
-.screen{display:block}
-.hidden{display:none}
+    .btnSmall{
+      padding:8px 12px;
+      font-size:16px;
+      margin-top:0;
+      width:auto;
+    }
 
-/* BUTTONS */
-.btn,.btnOutline{
-  width:100%;
-  border-radius:14px;
-  padding:18px 12px;
-  font-size:18px;
-  font-weight:900;
-  margin-top:12px;
-}
-.btn{
-  background:#fff;
-  color:#000;
-  border:1px solid #fff;
-}
-.btnOutline{
-  background:#000;
-  color:#fff;
-  border:1px solid #fff;
-}
-.btnSmall{
-  width:auto;
-  padding:8px 12px;
-  font-size:16px;
-}
-.btnMini{
-  width:auto;
-  padding:12px 14px;
-  font-size:16px;
-}
+    /* HUB */
+    .hubGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:20px;
+    }
+    .hubGrid .btn,.hubGrid .btnOutline{
+      padding:28px 12px;
+      font-size:20px;
+      margin-top:0;
+    }
 
-/* HUB */
-.hubGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
+    /* JOB BOARD */
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:12px;
+    }
+    .jobs{display:grid;gap:12px;margin-top:12px;}
+    .jobRow{
+      border:1px solid #fff;
+      border-radius:var(--r2);
+      padding:12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      cursor:pointer;
+      user-select:none;
+    }
+    .jobTitle{font-size:22px;font-weight:950;}
+    .jobPay{font-family:var(--mono);font-size:20px;font-weight:950;}
 
-/* JOB BOARD */
-.jobs{
-  display:grid;
-  gap:12px;
-}
-.jobRow{
-  border:1px solid #fff;
-  border-radius:12px;
-  padding:12px;
-  display:flex;
-  justify-content:space-between;
-  cursor:pointer;
-}
-.jobPay{
-  font-family:var(--mono);
-  font-weight:950;
-}
-.refreshText{
-  text-align:center;
-  font-family:var(--mono);
-  font-weight:900;
-  margin-top:14px;
-  cursor:pointer;
-}
+    .refreshText{
+      margin-top:14px;
+      text-align:center;
+      font-family:var(--mono);
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+    }
+    .bottomRight{
+      margin-top:14px;
+      display:flex;
+      justify-content:flex-end;
+    }
 
-/* LIVE JOB */
-.progressRow{
-  display:flex;
-  justify-content:space-between;
-  align-items:baseline;
-}
-.progressLabel,
-.progressPct{
-  font-family:var(--mono);
-  font-size:22px;
-  font-weight:950;
-}
-.bar{
-  height:16px;
-  border:1px solid #fff;
-  border-radius:999px;
-  overflow:hidden;
-  margin-top:6px;
-}
-.fill{height:100%;background:#fff;width:0}
+    /* LIVE JOB */
+    .liveBox{
+      border:1px solid #fff;
+      border-radius:var(--r2);
+      padding:12px;
+      margin-top:12px;
+    }
+    .liveCols{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:12px;
+    }
+    .metaLabel{font-family:var(--mono);font-size:14px;font-weight:800;}
+    .metaValue{font-family:var(--mono);font-size:20px;font-weight:950;margin-top:4px;}
 
-/* SPEED */
-.speedbar{
-  position:fixed;
-  left:0;right:0;
-  bottom:calc(env(safe-area-inset-bottom) + 64px);
-  border-top:1px solid #fff;
-  background:#000;
-  padding:10px 14px 18px;
-}
-.speedwrap{max-width:760px;margin:0 auto}
-.speedhead{
-  display:flex;
-  justify-content:space-between;
-  font-family:var(--mono);
-  font-weight:900;
-  margin-bottom:10px;
-}
-.seg{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:8px;
-}
-.seg button{
-  padding:14px 0;
-  border-radius:14px;
-  border:1px solid #fff;
-  background:#000;
-  color:#fff;
-  font-weight:900;
-}
-.seg button.active{
-  background:#fff;
-  color:#000;
-}
-.seg button[disabled]{opacity:.35}
+    .progressLabel{font-family:var(--mono);font-size:22px;font-weight:950;}
+    .progressPct{font-family:var(--mono);font-size:22px;font-weight:950;}
+    .bar{
+      height:16px;
+      border:1px solid #fff;
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:6px;
+    }
+    .fill{height:100%;width:0;background:#fff;}
 
-/* BOTTOM JOB CONTROLS */
-.jobControls{
-  position:fixed;
-  left:0;right:0;
-  bottom:calc(env(safe-area-inset-bottom) + 140px);
-  padding:10px 14px;
-}
-.jobControlsWrap{
-  max-width:760px;
-  margin:0 auto;
-  display:flex;
-  justify-content:space-between;
-}
-</style>
+    .progressMeta{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      margin-top:8px;
+      font-family:var(--mono);
+      font-size:14px;
+      font-weight:800;
+    }
+    .progressMeta div:nth-child(2){text-align:center;}
+    .progressMeta div:nth-child(3){text-align:right;}
+
+    /* FIXED CONTROLS */
+    .jobControls{
+      position:fixed;
+      left:0;right:0;
+      bottom:calc(env(safe-area-inset-bottom) + 64px + 110px);
+      padding:10px 14px;
+      background:#000;
+    }
+    .jobControlsWrap{
+      max-width:760px;
+      margin:0 auto;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .btnMini{
+      width:auto;
+      margin-top:0;
+      padding:12px 14px;
+      font-size:16px;
+      border-radius:14px;
+    }
+
+    .speedbar{
+      position:fixed;
+      left:0;right:0;
+      bottom:calc(env(safe-area-inset-bottom) + 64px);
+      padding:10px 14px 20px; /* extra bottom padding under buttons */
+      background:#000;
+      border-top:1px solid #fff;
+    }
+    .speedwrap{max-width:760px;margin:0 auto;}
+    .speedhead{display:flex;justify-content:space-between;margin-bottom:8px;}
+    .speedTitle{
+      font-family:var(--mono);
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.3px;
+    }
+    .seg{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:8px;
+    }
+    .seg button{
+      padding:14px 0;
+      border-radius:14px;
+      border:1px solid #fff;
+      background:#000;
+      color:#fff;
+      font-size:16px;
+      font-weight:900;
+      touch-action: manipulation;
+    }
+    .seg button.active{background:#fff;color:#000;}
+    .seg button[disabled]{opacity:.35;}
+
+    /* ENERGY FOOTER */
+    .energyFooter{
+      position:fixed;
+      left:0;right:0;
+      bottom:0;
+      padding:10px 14px calc(env(safe-area-inset-bottom) + 10px);
+      background:#000;
+      border-top:1px solid #fff;
+    }
+    .energyWrap{
+      max-width:760px;
+      margin:0 auto;
+    }
+    .energyLabel{
+      font-family:var(--mono);
+      font-size:14px;
+      font-weight:900;
+      margin-bottom:8px;
+      letter-spacing:.3px;
+    }
+    .energyBar{
+      display:grid;
+      grid-template-columns:repeat(10,1fr);
+      gap:8px;
+    }
+    .energySeg{
+      height:16px;
+      border:1px solid #fff;
+      border-radius:6px;
+      background:#fff;
+      opacity:.12;
+    }
+
+    /* MODALS */
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.7);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .modalBox{
+      border:1px solid #fff;
+      border-radius:20px;
+      padding:16px;
+      max-width:520px;
+      width:100%;
+      background:#000;
+    }
+
+    /* Job modal layout (reference-inspired) */
+    .jobModalHeader{
+      text-align:center;
+      font-family:var(--mono);
+      font-size:18px;
+      font-weight:950;
+      letter-spacing:2px;
+      margin-bottom:14px;
+    }
+    .jobModalTop{
+      display:grid;
+      grid-template-columns:120px 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    .avatar{
+      border:1px solid #fff;
+      border-radius:16px;
+      height:120px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:var(--mono);
+      font-weight:900;
+      opacity:.9;
+    }
+    .jobOrg{
+      font-size:28px;
+      font-weight:950;
+      line-height:1.02;
+    }
+    .jobRole{
+      font-family:var(--mono);
+      font-size:16px;
+      font-weight:900;
+      margin-top:6px;
+      opacity:.9;
+    }
+    .jobQuote{
+      margin-top:14px;
+      border-top:1px solid #fff;
+      padding-top:12px;
+      font-size:22px;
+      font-weight:900;
+      line-height:1.15;
+      opacity:.95;
+    }
+    .jobFacts{
+      margin-top:14px;
+      border-top:1px solid #fff;
+      padding-top:12px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      font-family:var(--mono);
+      font-weight:900;
+    }
+    .factsCol{display:grid;gap:10px;}
+    .fact .k{opacity:.85;}
+    .fact .v{font-size:20px;margin-top:2px;}
+    .fact.pay .v{font-size:28px;}
+
+    .modalActions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:14px;
+    }
+
+    /* Consumables modal */
+    .modalTitle{
+      text-align:center;
+      font-family:var(--mono);
+      font-size:18px;
+      font-weight:950;
+      letter-spacing:2px;
+      margin-bottom:10px;
+    }
+    .modalBtn{
+      width:100%;
+      text-align:center;
+      padding:18px 12px;
+      border-radius:16px;
+      border:1px solid #fff;
+      background:#000;
+      color:#fff;
+      font-weight:950;
+      font-size:22px;
+      margin-top:12px;
+    }
+    .modalBtn .sub{
+      display:block;
+      margin-top:6px;
+      font-family:var(--mono);
+      font-size:14px;
+      font-weight:900;
+      opacity:.9;
+    }
+    .modalBtn[disabled]{opacity:.35;}
+
+    /* RESULT */
+    .resultBox{
+      border:1px solid #fff;
+      border-radius:var(--r2);
+      padding:12px;
+      margin-top:12px;
+    }
+    .vlist{display:grid;gap:8px;}
+    .vrow{display:flex;justify-content:space-between;font-family:var(--mono);font-weight:800;}
+    .vrow.total{border-top:1px solid #fff;padding-top:10px;margin-top:6px;}
+  </style>
 </head>
 
 <body>
 <div class="safe">
-
-  <div class="header">
+  <div class="top">
     <h1>Courier (v1.0.9)</h1>
   </div>
 
@@ -222,91 +412,600 @@ body{
   <div class="screen" id="hub">
     <div class="hubGrid">
       <button class="btnOutline" id="goJobs">Jobs</button>
-      <button class="btnOutline">Shop</button>
+      <button class="btnOutline" id="goShop">Shop</button>
       <button class="btnOutline" disabled>Kit</button>
       <button class="btnOutline" disabled>Bag</button>
+    </div>
+    <button class="btnOutline" id="endDay">End day</button>
+  </div>
+
+  <!-- SHOP -->
+  <div class="screen hidden" id="shop">
+    <div class="jobTitle">Shop</div>
+    <button class="btn" id="buyDrink">Energy drink — £<span id="drinkPrice"></span> (<span id="drinkCount"></span>/5)</button>
+    <button class="btn" id="buySnack">Snack — £<span id="snackPrice"></span> (<span id="snackCount"></span>/5)</button>
+    <div class="bottomRight">
+      <button class="btnOutline btnSmall" id="backHub2">Back</button>
     </div>
   </div>
 
   <!-- JOB BOARD -->
   <div class="screen hidden" id="board">
+    <div class="jobTitle">Job board</div>
     <div class="jobs" id="jobs"></div>
     <div class="refreshText" id="refreshJobs">↻ Refresh jobs</div>
-    <div style="text-align:right;margin-top:14px">
+    <div class="bottomRight">
       <button class="btnOutline btnSmall" id="backHub">Back</button>
     </div>
   </div>
 
   <!-- LIVE JOB -->
   <div class="screen hidden" id="job">
-    <div class="progressRow">
+    <div class="jobTitle" id="jobName">—</div>
+    <div class="liveBox">
+      <div class="liveCols">
+        <div><div class="metaLabel">Deadline</div><div class="metaValue" id="deadline">—</div></div>
+        <div><div class="metaLabel">Remaining</div><div class="metaValue" id="remaining">—</div></div>
+        <div><div class="metaLabel">Pay</div><div class="metaValue" id="pay">—</div></div>
+      </div>
+    </div>
+
+    <div style="height:20px"></div>
+    <div class="row">
       <div class="progressLabel">Progress</div>
       <div class="progressPct" id="pct">0%</div>
     </div>
     <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="progressMeta">
+      <div id="milesDone">0.0 mi</div>
+      <div id="mph">0 mph</div>
+      <div id="milesLeft">0.0 mi</div>
+    </div>
   </div>
 
+  <!-- RESULT -->
+  <div class="screen hidden" id="result">
+    <div class="jobTitle" id="resultTitle">Job complete</div>
+    <div class="resultBox">
+      <div class="vlist" id="resultList"></div>
+    </div>
+    <div style="height:30px"></div>
+    <button class="btn" id="backBoard">Back to job board</button>
+  </div>
+
+  <!-- END DAY -->
+  <div class="screen hidden" id="end">
+    <div class="jobTitle">End of day</div>
+    <div class="resultBox">
+      <div class="vlist" id="endList"></div>
+    </div>
+    <button class="btn" id="confirmEnd">Start next day</button>
+  </div>
 </div>
 
+<!-- Live job bottom controls -->
 <div class="jobControls hidden" id="jobControls">
   <div class="jobControlsWrap">
-    <button class="btnOutline btnMini" id="cancel">Cancel</button>
-    <button class="btnOutline btnMini">Snacks</button>
+    <button class="btnOutline btnMini" id="cancel">Cancel job</button>
+    <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
   </div>
 </div>
 
+<!-- Speed controls -->
 <div class="speedbar hidden" id="speedBar">
   <div class="speedwrap">
     <div class="speedhead">
-      <div>Speed</div>
-      <div id="speedLabel">average</div>
+      <div class="speedTitle">SPEED</div>
+      <div class="speedTitle" id="speedLabel">average</div>
     </div>
     <div class="seg" id="speedSeg"></div>
+  </div>
+</div>
+
+<!-- Energy footer -->
+<div class="energyFooter" id="energyFooter">
+  <div class="energyWrap">
+    <div class="energyLabel">ENERGY</div>
+    <div class="energyBar" id="energyBar"></div>
+  </div>
+</div>
+
+<!-- Job detail modal -->
+<div class="modal" id="jobModal">
+  <div class="modalBox">
+    <div class="jobModalHeader">NEW JOB OFFER</div>
+
+    <div class="jobModalTop">
+      <div class="avatar">AVATAR</div>
+      <div>
+        <div class="jobOrg" id="jmOrg">—</div>
+        <div class="jobRole" id="jmRole">Depot Controller</div>
+      </div>
+    </div>
+
+    <div class="jobQuote" id="jmQuote">—</div>
+
+    <div class="jobFacts">
+      <div class="factsCol">
+        <div class="fact"><div class="k">FROM</div><div class="v" id="jmFrom">Midtown Depot</div></div>
+        <div class="fact"><div class="k">TO</div><div class="v" id="jmTo">—</div></div>
+      </div>
+      <div class="factsCol">
+        <div class="fact pay"><div class="k">PAY</div><div class="v" id="jmPay">£0</div></div>
+        <div class="fact"><div class="k">DEADLINE</div><div class="v" id="jmDeadline">—</div></div>
+      </div>
+    </div>
+
+    <div class="modalActions">
+      <button class="btnOutline" id="declineJob">DECLINE</button>
+      <button class="btn" id="acceptJob">ACCEPT</button>
+    </div>
+  </div>
+</div>
+
+<!-- Consumables modal -->
+<div class="modal" id="energyModal">
+  <div class="modalBox">
+    <div class="modalTitle">SNACKS</div>
+    <button class="modalBtn" id="drinkBtn"></button>
+    <button class="modalBtn" id="snackBtn"></button>
+    <button class="btnOutline" id="closeEnergy">Cancel</button>
   </div>
 </div>
 
 <script>
 const VERSION="1.0.9";
 
-const SPEEDS=[
-  null,
-  {name:"very slow",mult:0.55},
-  {name:"slow",mult:0.8},
-  {name:"average",mult:1},
-  {name:"fast",mult:1.25},
-  {name:"very fast",mult:1.55}
+const PRICES={drink:12,snack:6};
+const COSTS={rent:35,food:15};
+
+const SPEEDS={
+  1:{name:"very slow",mult:0.55},
+  2:{name:"slow",mult:0.8},
+  3:{name:"average",mult:1},
+  4:{name:"fast",mult:1.25},
+  5:{name:"very fast",mult:1.55}
+};
+
+const JOBS=[
+  {name:"Hot food drop",dist:2},
+  {name:"Parcel run",dist:3.5},
+  {name:"Groceries",dist:4.2},
+  {name:"Fragile item",dist:5},
+  {name:"Rush SLA",dist:6}
+];
+
+const QUOTES=[
+  "We’ve had two riders drop this already. Needs doing before the deadline.",
+  "Client is calling every 2 minutes. Keep it moving.",
+  "Estate drop. Stairs. No lift. Don’t be late."
 ];
 
 const state={
+  day:1,
+  cash:0,
   time:15*60,
-  speed:3
+  energy:100,
+  speed:3,
+
+  snacks:1,
+  drinks:1,
+
+  jobsDone:0,
+  dayEarnings:0,
+
+  offers:[],
+  job:null,
+  elapsed:0,
+  hiddenDuration:0,
+  startEnergy:100,
+
+  snackFx:null,
+  drinkFx:null,
+
+  lastTs:0,
+  raf:0
 };
 
+let jobsInitialised=false;
+let selectedOffer=null;
+
 const $=id=>document.getElementById(id);
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+
+function fmtClock(mins){
+  const total=Math.floor(mins);
+  const hh=Math.floor(total/60);
+  const mm=total%60;
+  return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");
+}
+
+function renderEnergyBar(){
+  const bar=$("energyBar"); bar.innerHTML="";
+  for(let i=0;i<10;i++){
+    const seg=document.createElement("div");
+    seg.className="energySeg";
+    const bandStart=i*10;
+    const bandEnd=(i+1)*10;
+    if(state.energy>=bandEnd) seg.style.opacity=1;
+    else if(state.energy>bandStart) seg.style.opacity=(state.energy-bandStart)/10;
+    bar.appendChild(seg);
+  }
+}
+
+function renderTop(){
+  $("cash").textContent="£"+state.cash;
+  $("clock").textContent=fmtClock(state.time);
+  $("day").textContent=state.day;
+  renderEnergyBar();
+}
+
+function setMode(m){
+  state.mode=m;
+  ["hub","shop","board","job","result","end"].forEach(s=>$(s).classList.toggle("hidden",s!==m));
+  $("speedBar").classList.toggle("hidden",m!=="job");
+  $("jobControls").classList.toggle("hidden",m!=="job");
+}
+
+function genJobs(){
+  state.offers=[...JOBS].sort(()=>Math.random()-.5).slice(0,3).map(j=>{
+    const avg=(j.dist/8)*60;
+    const slow=avg/SPEEDS[1].mult;
+    const fast=avg/SPEEDS[5].mult;
+    const hidden=fast+(slow-fast)*(.15+Math.random()*.7);
+    return{
+      ...j,
+      hidden:Math.round(hidden),
+      pay:Math.round(j.dist*12+Math.random()*6),
+      deadline:state.time+Math.round(avg)
+    };
+  });
+}
+
+function openJobModal(o){
+  selectedOffer=o;
+  $("jmOrg").textContent=o.name.toUpperCase();
+  $("jmTo").textContent=o.name.toUpperCase();
+  $("jmPay").textContent="£"+o.pay;
+  $("jmDeadline").textContent=fmtClock(o.deadline);
+  $("jmQuote").textContent="“"+QUOTES[Math.floor(Math.random()*QUOTES.length)]+"”";
+  $("jobModal").style.display="flex";
+}
+
+function renderJobs(){
+  const wrap=$("jobs");wrap.innerHTML="";
+  const noEnergy=state.energy<=0;
+  state.offers.forEach(o=>{
+    const r=document.createElement("div");
+    r.className="jobRow";
+    r.innerHTML=`
+      <div class="jobTitle">${o.name}</div>
+      <div class="jobPay">£${o.pay}</div>
+    `;
+    r.onclick=()=>{ if(!noEnergy) openJobModal(o); };
+    if(noEnergy) r.style.opacity=".4";
+    wrap.appendChild(r);
+  });
+}
+
+function maxSpeed(){
+  if(state.energy<=5) return 1;
+  if(state.energy<=10) return 2;
+  if(state.energy<=15) return 3;
+  if(state.energy<=20) return 4;
+  return 5;
+}
 
 function buildSpeed(){
-  const s=$("speedSeg"); s.innerHTML="";
+  const seg=$("speedSeg");seg.innerHTML="";
   for(let i=1;i<=5;i++){
     const b=document.createElement("button");
     b.textContent=i;
-    b.onclick=()=>setSpeed(i);
-    s.appendChild(b);
+    b.onclick=()=>{state.speed=Math.min(i,maxSpeed());syncSpeed();};
+    seg.appendChild(b);
   }
   syncSpeed();
 }
 
-function setSpeed(i){
-  state.speed=i;
-  syncSpeed();
-}
 function syncSpeed(){
+  const max=maxSpeed();
+  if(state.speed>max) state.speed=max;
   [...$("speedSeg").children].forEach((b,i)=>{
-    b.classList.toggle("active",i+1===state.speed);
+    const s=i+1;
+    b.classList.toggle("active",s===state.speed);
+    b.disabled=s>max;
   });
   $("speedLabel").textContent=SPEEDS[state.speed].name;
 }
 
+function clearSnackFx(){
+  if(!state.snackFx) return;
+  if(state.snackFx.delayId) clearTimeout(state.snackFx.delayId);
+  if(state.snackFx.intervalId) clearInterval(state.snackFx.intervalId);
+  state.snackFx=null;
+}
+
+function clearDrinkFx(){
+  if(!state.drinkFx) return;
+  if(state.drinkFx.timeoutId) clearTimeout(state.drinkFx.timeoutId);
+  state.drinkFx=null;
+}
+
+function applyPendingEffects(){
+  if(state.snackFx){
+    state.energy=clamp(state.energy+state.snackFx.remaining,0,100);
+    clearSnackFx();
+  }
+  if(state.drinkFx){
+    state.energy=clamp(state.energy-10,0,100);
+    clearDrinkFx();
+  }
+}
+
+function startJob(o){
+  state.job=o;
+  state.elapsed=0;
+  state.hiddenDuration=o.hidden;
+  state.startEnergy=state.energy;
+
+  $("jobName").textContent=o.name;
+  $("deadline").textContent=fmtClock(o.deadline);
+  $("pay").textContent="£"+o.pay;
+  $("remaining").textContent=o.hidden+"m";
+  $("pct").textContent="0%";
+  $("fill").style.width="0%";
+  $("milesDone").textContent="0.0 mi";
+  $("milesLeft").textContent=o.dist.toFixed(1)+" mi";
+  $("mph").textContent=Math.round(8*SPEEDS[state.speed].mult)+" mph";
+
+  syncSpeed();
+  setMode("job");
+
+  state.lastTs=performance.now();
+  state.raf=requestAnimationFrame(tick);
+}
+
+function tick(ts){
+  state.raf=requestAnimationFrame(tick);
+  const dtSec=(ts-state.lastTs)/1000;
+  state.lastTs=ts;
+  const dtMin=dtSec;
+
+  const mult=SPEEDS[state.speed].mult;
+
+  state.elapsed+=dtMin;
+  state.time+=dtMin;
+
+  state.energy=clamp(state.energy-(0.65*mult*mult*dtMin),0,100);
+  syncSpeed();
+
+  const remain=Math.max(0,Math.ceil(state.hiddenDuration-state.elapsed));
+  $("remaining").textContent=remain+"m";
+
+  const p=clamp(state.elapsed/state.hiddenDuration,0,1);
+  $("pct").textContent=Math.floor(p*100)+"%";
+  $("fill").style.width=(p*100)+"%";
+
+  const milesDone=(state.job.dist*p);
+  $("milesDone").textContent=milesDone.toFixed(1)+" mi";
+  $("milesLeft").textContent=(state.job.dist-milesDone).toFixed(1)+" mi";
+  $("mph").textContent=Math.round(8*mult)+" mph";
+
+  renderTop();
+  if(p>=1) finish();
+}
+
+function finish(){
+  cancelAnimationFrame(state.raf);
+  applyPendingEffects();
+
+  const timeTaken=Math.max(1,Math.ceil(state.elapsed));
+  const energyUsed=clamp(state.startEnergy-state.energy,0,100);
+  const tip=0;
+  const total=state.job.pay+tip;
+
+  state.cash+=total;
+  state.dayEarnings+=total;
+  state.jobsDone++;
+
+  $("resultTitle").textContent="Job complete";
+  $("resultList").innerHTML=`
+    <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
+    <div class="vrow"><span>Energy used</span><span>${Math.round(energyUsed)}%</span></div>
+    <div class="vrow"><span>Pay</span><span>£${state.job.pay}</span></div>
+    <div class="vrow"><span>Tip / penalty</span><span>£${tip}</span></div>
+    <div class="vrow total"><span>Total</span><span>£${total}</span></div>
+  `;
+
+  state.job=null;
+  setMode("result");
+  renderTop();
+}
+
+/* UI wiring */
+
+$("goJobs").onclick=()=>{
+  if(!jobsInitialised){
+    genJobs();
+    renderJobs();
+    jobsInitialised=true;
+  }
+  setMode("board");
+  renderTop();
+};
+
+$("refreshJobs").onclick=()=>{
+  genJobs();
+  renderJobs();
+  jobsInitialised=true;
+};
+
+$("backHub").onclick=()=>{setMode("hub");renderTop();};
+$("backBoard").onclick=()=>{setMode("board");renderTop();};
+
+$("goShop").onclick=()=>{
+  updateShopUI();
+  setMode("shop");
+  renderTop();
+};
+$("backHub2").onclick=()=>{setMode("hub");renderTop();};
+
+$("declineJob").onclick=()=>{$("jobModal").style.display="none"; selectedOffer=null;};
+$("acceptJob").onclick=()=>{
+  if(!selectedOffer) return;
+  $("jobModal").style.display="none";
+  startJob(selectedOffer);
+  selectedOffer=null;
+};
+
+$("cancel").onclick=()=>{
+  cancelAnimationFrame(state.raf);
+  applyPendingEffects();
+
+  const timeTaken=Math.max(1,Math.ceil(state.elapsed));
+  const energyUsed=clamp(state.startEnergy-state.energy,0,100);
+
+  $("resultTitle").textContent="Job cancelled";
+  $("resultList").innerHTML=`
+    <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
+    <div class="vrow"><span>Energy used</span><span>${Math.round(energyUsed)}%</span></div>
+    <div class="vrow total"><span>Total</span><span>£0</span></div>
+  `;
+
+  state.job=null;
+  setMode("result");
+  renderTop();
+};
+
+/* Consumables */
+function updateConsumablesModal(){
+  const d=$("drinkBtn");
+  const s=$("snackBtn");
+
+  d.innerHTML=`Energy Drink x ${state.drinks}<span class="sub">+20% energy immediately then 10% crash after 15s</span>`;
+  s.innerHTML=`Snack x ${state.snacks}<span class="sub">15s delay, then + energy each second for 15s</span>`;
+
+  d.disabled=state.drinks<=0;
+  s.disabled=state.snacks<=0;
+}
+
+$("openConsumables").onclick=()=>{
+  updateConsumablesModal();
+  $("energyModal").style.display="flex";
+};
+
+$("closeEnergy").onclick=()=>{$("energyModal").style.display="none";};
+
+$("drinkBtn").onclick=()=>{
+  if(state.drinks<=0) return;
+  state.drinks--;
+
+  state.energy=clamp(state.energy+20,0,100);
+
+  clearDrinkFx();
+  state.drinkFx={timeoutId:setTimeout(()=>{
+    state.energy=clamp(state.energy-10,0,100);
+    clearDrinkFx();
+  },15000)};
+
+  $("energyModal").style.display="none";
+  renderTop();
+};
+
+$("snackBtn").onclick=()=>{
+  if(state.snacks<=0) return;
+  state.snacks--;
+
+  clearSnackFx();
+  state.snackFx={remaining:20,delayId:0,intervalId:0};
+
+  state.snackFx.delayId=setTimeout(()=>{
+    if(!state.snackFx) return;
+    let ticks=0;
+    state.snackFx.intervalId=setInterval(()=>{
+      if(!state.snackFx) return;
+      const inc=20/15;
+      state.energy=clamp(state.energy+inc,0,100);
+      state.snackFx.remaining=clamp(state.snackFx.remaining-inc,0,20);
+      ticks++;
+      renderTop();
+      if(ticks>=15){
+        clearSnackFx();
+      }
+    },1000);
+  },15000);
+
+  $("energyModal").style.display="none";
+};
+
+/* Shop */
+function updateShopUI(){
+  $("drinkPrice").textContent=PRICES.drink;
+  $("snackPrice").textContent=PRICES.snack;
+  $("drinkCount").textContent=state.drinks;
+  $("snackCount").textContent=state.snacks;
+
+  const buyDrink=$("buyDrink");
+  const buySnack=$("buySnack");
+
+  buyDrink.disabled = (state.drinks>=5) || (state.cash<PRICES.drink);
+  buySnack.disabled = (state.snacks>=5) || (state.cash<PRICES.snack);
+}
+
+$("buyDrink").onclick=()=>{
+  if(state.drinks>=5) return;
+  if(state.cash<PRICES.drink) return;
+  state.cash-=PRICES.drink;
+  state.drinks++;
+  updateShopUI();
+  renderTop();
+};
+
+$("buySnack").onclick=()=>{
+  if(state.snacks>=5) return;
+  if(state.cash<PRICES.snack) return;
+  state.cash-=PRICES.snack;
+  state.snacks++;
+  updateShopUI();
+  renderTop();
+};
+
+/* End day */
+$("endDay").onclick=()=>{
+  const rent=COSTS.rent;
+  const food=COSTS.food;
+  const deductions=rent+food;
+  const net=state.dayEarnings-deductions;
+
+  $("endList").innerHTML=`
+    <div class="vrow"><span>Jobs</span><span>${state.jobsDone}</span></div>
+    <div class="vrow"><span>Earnings</span><span>£${state.dayEarnings}</span></div>
+    <div class="vrow"><span>Rent</span><span>-£${rent}</span></div>
+    <div class="vrow"><span>Food</span><span>-£${food}</span></div>
+    <div class="vrow total"><span>Net</span><span>£${net}</span></div>
+  `;
+  setMode("end");
+};
+
+$("confirmEnd").onclick=()=>{
+  const deductions=COSTS.rent+COSTS.food;
+  state.cash-=deductions;
+
+  state.day++;
+  state.time+=8*60;
+  state.energy=100;
+
+  state.jobsDone=0;
+  state.dayEarnings=0;
+
+  setMode("hub");
+  renderTop();
+};
+
 buildSpeed();
+renderTop();
+setMode("hub");
+document.title="Courier v"+VERSION;
 </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.11</title>
+  <title>Courier v1.0.12</title>
   <style>
     :root{
       color-scheme: dark;
@@ -14,12 +14,14 @@
       --r2:12px;
       --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --accent:#ffffff;
     }
     html,body{height:100%;}
     body{
       margin:0;
       background:var(--bg);
-      color:var(--fg);
+      color:var(--accent);
       font-family:var(--sans);
       font-size:18px;
     }
@@ -38,7 +40,7 @@
       margin-bottom:14px;
       text-align:center;
     }
-    h1{margin:0;font-size:44px;font-weight:900;}
+    h1{margin:0;font-size:44px;font-weight:900;color:var(--accent);}
 
     /* KPIs */
     .kpis{
@@ -48,7 +50,7 @@
       margin-bottom:18px;
     }
     .kpi{
-      background:#fff;
+      background:var(--accent);
       color:#000;
       border-radius:var(--r);
       padding:12px;
@@ -75,14 +77,14 @@
       touch-action: manipulation;
     }
     .btn{
-      background:#fff;
+      background:var(--accent);
       color:#000;
-      border:1px solid #fff;
+      border:1px solid var(--accent);
     }
     .btnOutline{
-      background:#000;
-      color:#fff;
-      border:1px solid #fff;
+      background:var(--bg);
+      color:var(--accent);
+      border:1px solid var(--accent);
     }
     .btn[disabled],.btnOutline[disabled]{opacity:.4;}
 
@@ -115,7 +117,7 @@
     }
     .jobs{display:grid;gap:12px;margin-top:12px;}
     .jobRow{
-      border:1px solid #fff;
+      border:1px solid var(--accent);
       border-radius:var(--r2);
       padding:12px;
       display:flex;
@@ -124,8 +126,8 @@
       cursor:pointer;
       user-select:none;
     }
-    .jobTitle{font-size:22px;font-weight:950;}
-    .jobPay{font-family:var(--mono);font-size:20px;font-weight:950;}
+    .jobTitle{font-size:22px;font-weight:950;color:var(--accent);}
+    .jobPay{font-family:var(--mono);font-size:20px;font-weight:950;color:var(--accent);}
 
     .refreshText{
       margin-top:14px;
@@ -135,6 +137,7 @@
       font-weight:900;
       cursor:pointer;
       user-select:none;
+      color:var(--accent);
     }
     .bottomRight{
       margin-top:14px;
@@ -144,7 +147,7 @@
 
     /* LIVE JOB */
     .liveBox{
-      border:1px solid #fff;
+      border:1px solid var(--accent);
       border-radius:var(--r2);
       padding:12px;
       margin-top:12px;
@@ -154,19 +157,19 @@
       grid-template-columns:1fr 1fr 1fr;
       gap:12px;
     }
-    .metaLabel{font-family:var(--mono);font-size:14px;font-weight:800;}
-    .metaValue{font-family:var(--mono);font-size:20px;font-weight:950;margin-top:4px;}
+    .metaLabel{font-family:var(--mono);font-size:14px;font-weight:800;color:var(--accent);}
+    .metaValue{font-family:var(--mono);font-size:20px;font-weight:950;margin-top:4px;color:var(--accent);}
 
-    .progressLabel{font-family:var(--mono);font-size:22px;font-weight:950;}
-    .progressPct{font-family:var(--mono);font-size:22px;font-weight:950;}
+    .progressLabel{font-family:var(--mono);font-size:22px;font-weight:950;color:var(--accent);}
+    .progressPct{font-family:var(--mono);font-size:22px;font-weight:950;color:var(--accent);}
     .bar{
       height:16px;
-      border:1px solid #fff;
+      border:1px solid var(--accent);
       border-radius:999px;
       overflow:hidden;
       margin-top:6px;
     }
-    .fill{height:100%;width:0;background:#fff;}
+    .fill{height:100%;width:0;background:var(--accent);}
 
     .progressMeta{
       display:grid;
@@ -175,6 +178,7 @@
       font-family:var(--mono);
       font-size:14px;
       font-weight:800;
+      color:var(--accent);
     }
     .progressMeta div:nth-child(2){text-align:center;}
     .progressMeta div:nth-child(3){text-align:right;}
@@ -185,7 +189,7 @@
       left:0;right:0;
       bottom:calc(env(safe-area-inset-bottom) + 64px + 110px);
       padding:10px 14px;
-      background:#000;
+      background:var(--bg);
     }
     .jobControlsWrap{
       max-width:760px;
@@ -206,9 +210,9 @@
       position:fixed;
       left:0;right:0;
       bottom:calc(env(safe-area-inset-bottom) + 64px);
-      padding:10px 14px 20px; /* extra bottom padding under buttons */
-      background:#000;
-      border-top:1px solid #fff;
+      padding:10px 14px 20px;
+      background:var(--bg);
+      border-top:1px solid var(--accent);
     }
     .speedwrap{max-width:760px;margin:0 auto;}
     .speedhead{display:flex;justify-content:space-between;margin-bottom:8px;}
@@ -217,6 +221,7 @@
       font-size:14px;
       font-weight:900;
       letter-spacing:.3px;
+      color:var(--accent);
     }
     .seg{
       display:grid;
@@ -226,14 +231,14 @@
     .seg button{
       padding:14px 0;
       border-radius:14px;
-      border:1px solid #fff;
-      background:#000;
-      color:#fff;
+      border:1px solid var(--accent);
+      background:var(--bg);
+      color:var(--accent);
       font-size:16px;
       font-weight:900;
       touch-action: manipulation;
     }
-    .seg button.active{background:#fff;color:#000;}
+    .seg button.active{background:var(--accent);color:#000;}
     .seg button[disabled]{opacity:.35;}
 
     /* ENERGY FOOTER */
@@ -242,19 +247,17 @@
       left:0;right:0;
       bottom:0;
       padding:10px 14px calc(env(safe-area-inset-bottom) + 10px);
-      background:#000;
-      border-top:1px solid #fff;
+      background:var(--bg);
+      border-top:1px solid var(--accent);
     }
-    .energyWrap{
-      max-width:760px;
-      margin:0 auto;
-    }
+    .energyWrap{max-width:760px;margin:0 auto;}
     .energyLabel{
       font-family:var(--mono);
       font-size:14px;
       font-weight:900;
       margin-bottom:8px;
       letter-spacing:.3px;
+      color:var(--accent);
     }
     .energyBar{
       display:grid;
@@ -263,7 +266,7 @@
     }
     .energySeg{
       height:16px;
-      border:1px solid #fff;
+      border:1px solid var(--accent);
       border-radius:6px;
       background:transparent; /* empty is truly empty */
       opacity:0;            /* empty stays invisible fill */
@@ -280,12 +283,13 @@
       padding:20px;
     }
     .modalBox{
-      border:1px solid #fff;
+      border:1px solid var(--accent);
       border-radius:20px;
       padding:16px;
       max-width:520px;
       width:100%;
-      background:#000;
+      background:var(--bg);
+      color:var(--accent);
     }
 
     /* Job modal layout */
@@ -296,6 +300,7 @@
       font-weight:950;
       letter-spacing:2px;
       margin-bottom:14px;
+      color:var(--accent);
     }
     .jobModalTop{
       display:grid;
@@ -304,7 +309,7 @@
       align-items:start;
     }
     .avatar{
-      border:1px solid #fff;
+      border:1px solid var(--accent);
       border-radius:16px;
       height:120px;
       display:flex;
@@ -312,12 +317,14 @@
       justify-content:center;
       font-family:var(--mono);
       font-weight:900;
+      color:var(--accent);
       opacity:.9;
     }
     .jobOrg{
       font-size:28px;
       font-weight:950;
       line-height:1.02;
+      color:var(--accent);
     }
     .jobRole{
       font-family:var(--mono);
@@ -325,25 +332,28 @@
       font-weight:900;
       margin-top:6px;
       opacity:.9;
+      color:var(--accent);
     }
     .jobQuote{
       margin-top:14px;
-      border-top:1px solid #fff;
+      border-top:1px solid var(--accent);
       padding-top:12px;
       font-size:22px;
       font-weight:900;
       line-height:1.15;
       opacity:.95;
+      color:var(--accent);
     }
     .jobFacts{
       margin-top:14px;
-      border-top:1px solid #fff;
+      border-top:1px solid var(--accent);
       padding-top:12px;
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:14px;
       font-family:var(--mono);
       font-weight:900;
+      color:var(--accent);
     }
     .factsCol{display:grid;gap:10px;}
     .fact .k{opacity:.85;}
@@ -365,15 +375,16 @@
       font-weight:950;
       letter-spacing:2px;
       margin-bottom:10px;
+      color:var(--accent);
     }
     .modalBtn{
       width:100%;
       text-align:center;
       padding:18px 12px;
       border-radius:16px;
-      border:1px solid #fff;
-      background:#000;
-      color:#fff;
+      border:1px solid var(--accent);
+      background:var(--bg);
+      color:var(--accent);
       font-weight:950;
       font-size:22px;
       margin-top:12px;
@@ -385,26 +396,27 @@
       font-size:14px;
       font-weight:900;
       opacity:.9;
+      color:var(--accent);
     }
     .modalBtn[disabled]{opacity:.35;}
 
     /* RESULT */
     .resultBox{
-      border:1px solid #fff;
+      border:1px solid var(--accent);
       border-radius:var(--r2);
       padding:12px;
       margin-top:12px;
     }
     .vlist{display:grid;gap:8px;}
-    .vrow{display:flex;justify-content:space-between;font-family:var(--mono);font-weight:800;}
-    .vrow.total{border-top:1px solid #fff;padding-top:10px;margin-top:6px;}
+    .vrow{display:flex;justify-content:space-between;font-family:var(--mono);font-weight:800;color:var(--accent);}
+    .vrow.total{border-top:1px solid var(--accent);padding-top:10px;margin-top:6px;}
   </style>
 </head>
 
 <body>
 <div class="safe">
   <div class="top">
-    <h1>Courier (v1.0.11)</h1>
+    <h1>Courier (v1.0.12)</h1>
   </div>
 
   <div class="kpis">
@@ -571,7 +583,7 @@
 </div>
 
 <script>
-const VERSION="1.0.11";
+const VERSION="1.0.12";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -618,6 +630,7 @@ const state={
   progress:0,       // progress-minutes, scaled by speed
   hiddenDuration:0,
   startEnergy:100,
+  energySpentJob:0, // total drain from effort (ignores top-ups)
 
   snackFx:null,
   drinkFx:null,
@@ -657,6 +670,61 @@ function fmtClock(mins){
   return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");
 }
 
+function hexToRgb(hex){
+  const h=hex.replace("#","").trim();
+  const full = (h.length===3) ? h.split("").map(c=>c+c).join("") : h;
+  const n=parseInt(full,16);
+  return {r:(n>>16)&255,g:(n>>8)&255,b:n&255};
+}
+function rgbToHex(r,g,b){
+  const to=h=>h.toString(16).padStart(2,"0");
+  return "#"+to(r)+to(g)+to(b);
+}
+function lerp(a,b,t){ return a + (b-a)*t; }
+function lerpColor(c1,c2,t){
+  const a=hexToRgb(c1), b=hexToRgb(c2);
+  const r=Math.round(lerp(a.r,b.r,t));
+  const g=Math.round(lerp(a.g,b.g,t));
+  const bb=Math.round(lerp(a.b,b.b,t));
+  return rgbToHex(r,g,bb);
+}
+function setAccentFromTime(){
+  const m=minutesOfDay();
+
+  const stops=[
+    {m:  360, c:"#B8C9CA"}, // 06:00
+    {m:  600, c:"#C1E7B8"}, // 10:00
+    {m:  780, c:"#EBE8B8"}, // 13:00
+    {m:  960, c:"#F8BFC7"}, // 16:00
+    {m: 1140, c:"#F2A9CC"}, // 19:00
+    {m: 1320, c:"#C9A6D8"}  // 22:00
+  ];
+
+  // Before 06:00: treat as continuation from purple -> blue
+  if(m < stops[0].m){
+    const t = m / stops[0].m;
+    const col = lerpColor(stops[stops.length-1].c, stops[0].c, t);
+    document.documentElement.style.setProperty("--accent", col);
+    return;
+  }
+
+  // After 22:00: hold purple
+  if(m >= stops[stops.length-1].m){
+    document.documentElement.style.setProperty("--accent", stops[stops.length-1].c);
+    return;
+  }
+
+  for(let i=0;i<stops.length-1;i++){
+    const a=stops[i], b=stops[i+1];
+    if(m>=a.m && m<b.m){
+      const t = (m-a.m)/(b.m-a.m);
+      const col = lerpColor(a.c,b.c,t);
+      document.documentElement.style.setProperty("--accent", col);
+      return;
+    }
+  }
+}
+
 function renderEnergyBar(){
   const bar=$("energyBar"); bar.innerHTML="";
   for(let i=0;i<10;i++){
@@ -665,7 +733,7 @@ function renderEnergyBar(){
     const bandStart=i*10;
     const frac=clamp((state.energy-bandStart)/10,0,1);
     if(frac>0){
-      seg.style.background="#fff";
+      seg.style.background="var(--accent)";
       seg.style.opacity=String(frac);
     }else{
       seg.style.background="transparent";
@@ -676,6 +744,7 @@ function renderEnergyBar(){
 }
 
 function renderTop(){
+  setAccentFromTime();
   $("cash").textContent="£"+state.cash;
   $("clock").textContent=fmtClock(minutesOfDay());
   $("day").textContent=state.day;
@@ -742,7 +811,7 @@ function maxSpeed(){
   if(state.energy<=5) return 1;
   if(state.energy<=10) return 2;
   if(state.energy<=15) return 3;
-  if(state.energy<=20) return 4;
+  if(state.energy<=20) return 4; // 20% reduces max to 4
   return 5;
 }
 
@@ -798,6 +867,7 @@ function startJob(o){
   state.progress=0;
   state.hiddenDuration=o.hidden;
   state.startEnergy=state.energy;
+  state.energySpentJob=0;
 
   $("jobName").textContent=o.name;
   $("deadline").textContent=fmtClock(o.deadlineAbs % 1440);
@@ -830,7 +900,9 @@ function tick(ts){
 
   advanceMinutes(dtMin);            // clock/day rollover
 
-  state.energy=clamp(state.energy-(0.65*mult*mult*dtMin),0,100);
+  const drain = 0.65*mult*mult*dtMin;
+  state.energySpentJob += drain;
+  state.energy=clamp(state.energy-drain,0,100);
   syncSpeed();
 
   const remain=Math.max(0,Math.ceil(state.hiddenDuration-state.progress));
@@ -854,7 +926,7 @@ function finish(){
   applyPendingEffects();
 
   const timeTaken=Math.max(1,Math.ceil(state.elapsed));
-  const energyUsed=clamp(state.startEnergy-state.energy,0,100);
+  const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
   const tip=0;
   const total=state.job.pay+tip;
 
@@ -865,7 +937,7 @@ function finish(){
   $("resultTitle").textContent="Job complete";
   $("resultList").innerHTML=`
     <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
-    <div class="vrow"><span>Energy used</span><span>${Math.round(energyUsed)}%</span></div>
+    <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>
     <div class="vrow"><span>Pay</span><span>£${state.job.pay}</span></div>
     <div class="vrow"><span>Tip / penalty</span><span>£${tip}</span></div>
     <div class="vrow total"><span>Total</span><span>£${total}</span></div>
@@ -930,12 +1002,12 @@ $("cancel").onclick=()=>{
   applyPendingEffects();
 
   const timeTaken=Math.max(1,Math.ceil(state.elapsed));
-  const energyUsed=clamp(state.startEnergy-state.energy,0,100);
+  const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
 
   $("resultTitle").textContent="Job cancelled";
   $("resultList").innerHTML=`
     <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
-    <div class="vrow"><span>Energy used</span><span>${Math.round(energyUsed)}%</span></div>
+    <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>
     <div class="vrow total"><span>Total</span><span>£0</span></div>
   `;
 
@@ -1060,8 +1132,13 @@ function closeRest(){
   $("restModal").style.display="none";
 }
 
+function restGain(hours){
+  state.energy = clamp(state.energy + hours, 0, 100);
+}
+
 function restHours(h){
   advanceMinutes(h*60);
+  restGain(h);
   pruneOffers();
   renderJobs();
   renderTop();
@@ -1070,12 +1147,16 @@ function restHours(h){
 
 function restUntilMorning(){
   if(!canUntilMorning()) return;
+  const before = nowAbs();
   const m=minutesOfDay();
   if(m<6*60){
     advanceMinutes((6*60)-m);
   }else{
     advanceMinutes((1440-m)+(6*60));
   }
+  const after = nowAbs();
+  const sleptHours = Math.max(0, (after-before)/60);
+  restGain(sleptHours);
   pruneOffers();
   renderJobs();
   renderTop();

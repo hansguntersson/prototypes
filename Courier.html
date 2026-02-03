@@ -1,13 +1,3 @@
-Yes — it’s broken because the JavaScript doesn’t parse.
-
-You’ve got a syntax error here (missing closing quote):
-
-$("mph").textContent=Math.round(8*SPEEDS[state.speed].mult)+" mph;
-
-That single error stops all JS from running, so the whole game appears “dead”.
-
-Below is a full corrected file with only that fix + version bump to v1.0.15 (title + header + VERSION). Everything else remains as in the v1.0.14 attempt.
-
 <!doctype html>
 <html lang="en">
 <head>

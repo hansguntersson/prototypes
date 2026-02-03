@@ -3,19 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.12</title>
+  <title>Courier v1.0.13</title>
   <style>
     :root{
       color-scheme: dark;
       --bg:#000;
-      --fg:#fff;
-      --border:#fff;
+      --accent:#ffffff;
       --r:16px;
       --r2:12px;
       --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-
-      --accent:#ffffff;
     }
     html,body{height:100%;}
     body{
@@ -32,7 +29,6 @@
       margin:0 auto;
     }
 
-    /* HEADER */
     .top{
       display:flex;
       justify-content:center;
@@ -42,7 +38,6 @@
     }
     h1{margin:0;font-size:44px;font-weight:900;color:var(--accent);}
 
-    /* KPIs */
     .kpis{
       display:grid;
       grid-template-columns:1fr 1fr 1fr;
@@ -95,7 +90,6 @@
       width:auto;
     }
 
-    /* HUB */
     .hubGrid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -108,7 +102,6 @@
       margin-top:0;
     }
 
-    /* JOB BOARD */
     .row{
       display:flex;
       justify-content:space-between;
@@ -145,7 +138,6 @@
       justify-content:flex-end;
     }
 
-    /* LIVE JOB */
     .liveBox{
       border:1px solid var(--accent);
       border-radius:var(--r2);
@@ -183,7 +175,6 @@
     .progressMeta div:nth-child(2){text-align:center;}
     .progressMeta div:nth-child(3){text-align:right;}
 
-    /* FIXED CONTROLS */
     .jobControls{
       position:fixed;
       left:0;right:0;
@@ -241,7 +232,6 @@
     .seg button.active{background:var(--accent);color:#000;}
     .seg button[disabled]{opacity:.35;}
 
-    /* ENERGY FOOTER */
     .energyFooter{
       position:fixed;
       left:0;right:0;
@@ -268,11 +258,84 @@
       height:16px;
       border:1px solid var(--accent);
       border-radius:6px;
-      background:transparent; /* empty is truly empty */
-      opacity:0;            /* empty stays invisible fill */
+      background:transparent;
+      opacity:0;
     }
 
-    /* MODALS */
+    /* OFFER SCREEN (formerly modal layout, now full screen) */
+    .offerHeader{
+      text-align:center;
+      font-family:var(--mono);
+      font-size:18px;
+      font-weight:950;
+      letter-spacing:2px;
+      margin-bottom:14px;
+      color:var(--accent);
+    }
+    .offerTop{
+      display:grid;
+      grid-template-columns:120px 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    .avatar{
+      border:1px solid var(--accent);
+      border-radius:16px;
+      height:120px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:var(--mono);
+      font-weight:900;
+      color:var(--accent);
+      opacity:.9;
+    }
+    .offerOrg{
+      font-size:28px;
+      font-weight:950;
+      line-height:1.02;
+      color:var(--accent);
+    }
+    .offerRole{
+      font-family:var(--mono);
+      font-size:16px;
+      font-weight:900;
+      margin-top:6px;
+      opacity:.9;
+      color:var(--accent);
+    }
+    .offerQuote{
+      margin-top:14px;
+      border-top:1px solid var(--accent);
+      padding-top:12px;
+      font-size:22px;
+      font-weight:900;
+      line-height:1.15;
+      opacity:.95;
+      color:var(--accent);
+    }
+    .offerFacts{
+      margin-top:14px;
+      border-top:1px solid var(--accent);
+      padding-top:12px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      font-family:var(--mono);
+      font-weight:900;
+      color:var(--accent);
+    }
+    .factsCol{display:grid;gap:10px;}
+    .fact .k{opacity:.85;}
+    .fact .v{font-size:20px;margin-top:2px;}
+    .fact.pay .v{font-size:28px;}
+    .offerActions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:14px;
+    }
+
     .modal{
       position:fixed;
       inset:0;
@@ -291,83 +354,6 @@
       background:var(--bg);
       color:var(--accent);
     }
-
-    /* Job modal layout */
-    .jobModalHeader{
-      text-align:center;
-      font-family:var(--mono);
-      font-size:18px;
-      font-weight:950;
-      letter-spacing:2px;
-      margin-bottom:14px;
-      color:var(--accent);
-    }
-    .jobModalTop{
-      display:grid;
-      grid-template-columns:120px 1fr;
-      gap:14px;
-      align-items:start;
-    }
-    .avatar{
-      border:1px solid var(--accent);
-      border-radius:16px;
-      height:120px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-family:var(--mono);
-      font-weight:900;
-      color:var(--accent);
-      opacity:.9;
-    }
-    .jobOrg{
-      font-size:28px;
-      font-weight:950;
-      line-height:1.02;
-      color:var(--accent);
-    }
-    .jobRole{
-      font-family:var(--mono);
-      font-size:16px;
-      font-weight:900;
-      margin-top:6px;
-      opacity:.9;
-      color:var(--accent);
-    }
-    .jobQuote{
-      margin-top:14px;
-      border-top:1px solid var(--accent);
-      padding-top:12px;
-      font-size:22px;
-      font-weight:900;
-      line-height:1.15;
-      opacity:.95;
-      color:var(--accent);
-    }
-    .jobFacts{
-      margin-top:14px;
-      border-top:1px solid var(--accent);
-      padding-top:12px;
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      font-family:var(--mono);
-      font-weight:900;
-      color:var(--accent);
-    }
-    .factsCol{display:grid;gap:10px;}
-    .fact .k{opacity:.85;}
-    .fact .v{font-size:20px;margin-top:2px;}
-    .fact.pay .v{font-size:28px;}
-
-    .modalActions{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      margin-top:14px;
-    }
-
-    /* Generic modal (consumables/rest) */
     .modalTitle{
       text-align:center;
       font-family:var(--mono);
@@ -400,7 +386,6 @@
     }
     .modalBtn[disabled]{opacity:.35;}
 
-    /* RESULT */
     .resultBox{
       border:1px solid var(--accent);
       border-radius:var(--r2);
@@ -416,7 +401,7 @@
 <body>
 <div class="safe">
   <div class="top">
-    <h1>Courier (v1.0.12)</h1>
+    <h1>Courier (v1.0.13)</h1>
   </div>
 
   <div class="kpis">
@@ -428,19 +413,19 @@
   <!-- HUB -->
   <div class="screen" id="hub">
     <div class="hubGrid">
-      <button class="btnOutline" id="goJobs">Jobs</button>
-      <button class="btnOutline" id="goShop">Shop</button>
-      <button class="btnOutline" disabled>Kit</button>
-      <button class="btnOutline" disabled>Bag</button>
+      <button class="btnOutline" id="goJobs">🧾 Jobs</button>
+      <button class="btnOutline" id="goShop">🛒 Shop</button>
+      <button class="btnOutline" disabled>🧰 Kit</button>
+      <button class="btnOutline" disabled>🎒 Bag</button>
     </div>
-    <button class="btnOutline" id="restOpen">Rest</button>
+    <button class="btnOutline" id="restOpen">🛏️ Rest</button>
   </div>
 
   <!-- SHOP -->
   <div class="screen hidden" id="shop">
     <div class="jobTitle">Shop</div>
-    <button class="btn" id="buyDrink">Energy drink — £<span id="drinkPrice"></span> (<span id="drinkCount"></span>/5)</button>
-    <button class="btn" id="buySnack">Snack — £<span id="snackPrice"></span> (<span id="snackCount"></span>/5)</button>
+    <button class="btn" id="buyDrink">🥤 Energy drink — £<span id="drinkPrice"></span> (<span id="drinkCount"></span>/5)</button>
+    <button class="btn" id="buySnack">🍫 Snack — £<span id="snackPrice"></span> (<span id="snackCount"></span>/5)</button>
     <div class="bottomRight">
       <button class="btnOutline btnSmall" id="backHub2">Back</button>
     </div>
@@ -453,6 +438,37 @@
     <div class="refreshText" id="refreshJobs">↻ Refresh jobs</div>
     <div class="bottomRight">
       <button class="btnOutline btnSmall" id="backHub">Back</button>
+    </div>
+  </div>
+
+  <!-- OFFER -->
+  <div class="screen hidden" id="offer">
+    <div class="offerHeader">NEW JOB OFFER</div>
+
+    <div class="offerTop">
+      <div class="avatar">AVATAR</div>
+      <div>
+        <div class="offerOrg" id="ofOrg">—</div>
+        <div class="offerRole" id="ofRole">Depot Controller</div>
+      </div>
+    </div>
+
+    <div class="offerQuote" id="ofQuote">—</div>
+
+    <div class="offerFacts">
+      <div class="factsCol">
+        <div class="fact"><div class="k">DISTANCE</div><div class="v" id="ofDistance">—</div></div>
+        <div class="fact"><div class="k">ROUTE</div><div class="v" id="ofRoute">—</div></div>
+      </div>
+      <div class="factsCol">
+        <div class="fact pay"><div class="k">PAY</div><div class="v" id="ofPay">£0</div></div>
+        <div class="fact"><div class="k">DEADLINE</div><div class="v" id="ofDeadline">—</div></div>
+      </div>
+    </div>
+
+    <div class="offerActions">
+      <button class="btnOutline" id="offerBack">Back</button>
+      <button class="btn" id="offerAccept">ACCEPT</button>
     </div>
   </div>
 
@@ -490,9 +506,9 @@
     <button class="btn" id="backBoard">Back to job board</button>
   </div>
 
-  <!-- END DAY (kept but unused for now) -->
+  <!-- END DAY -->
   <div class="screen hidden" id="end">
-    <div class="jobTitle">End of day</div>
+    <div class="jobTitle" id="endTitle">End of day</div>
     <div class="resultBox">
       <div class="vlist" id="endList"></div>
     </div>
@@ -503,8 +519,8 @@
 <!-- Live job bottom controls -->
 <div class="jobControls hidden" id="jobControls">
   <div class="jobControlsWrap">
-    <button class="btnOutline btnMini" id="cancel">Cancel job</button>
-    <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
+    <button class="btnOutline btnMini" id="cancel">🚫 Cancel job</button>
+    <button class="btnOutline btnMini" id="openConsumables">🍫 Snacks</button>
   </div>
 </div>
 
@@ -524,39 +540,6 @@
   <div class="energyWrap">
     <div class="energyLabel">ENERGY</div>
     <div class="energyBar" id="energyBar"></div>
-  </div>
-</div>
-
-<!-- Job detail modal -->
-<div class="modal" id="jobModal">
-  <div class="modalBox">
-    <div class="jobModalHeader">NEW JOB OFFER</div>
-
-    <div class="jobModalTop">
-      <div class="avatar">AVATAR</div>
-      <div>
-        <div class="jobOrg" id="jmOrg">—</div>
-        <div class="jobRole" id="jmRole">Depot Controller</div>
-      </div>
-    </div>
-
-    <div class="jobQuote" id="jmQuote">—</div>
-
-    <div class="jobFacts">
-      <div class="factsCol">
-        <div class="fact"><div class="k">FROM</div><div class="v" id="jmFrom">Midtown Depot</div></div>
-        <div class="fact"><div class="k">TO</div><div class="v" id="jmTo">—</div></div>
-      </div>
-      <div class="factsCol">
-        <div class="fact pay"><div class="k">PAY</div><div class="v" id="jmPay">£0</div></div>
-        <div class="fact"><div class="k">DEADLINE</div><div class="v" id="jmDeadline">—</div></div>
-      </div>
-    </div>
-
-    <div class="modalActions">
-      <button class="btnOutline" id="declineJob">DECLINE</button>
-      <button class="btn" id="acceptJob">ACCEPT</button>
-    </div>
   </div>
 </div>
 
@@ -583,7 +566,7 @@
 </div>
 
 <script>
-const VERSION="1.0.12";
+const VERSION="1.0.13";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -603,6 +586,8 @@ const JOBS=[
   {name:"Fragile item",dist:5},
   {name:"Rush SLA",dist:6}
 ];
+
+const ROUTES=["Easy","Mid","Tricky","Hellish"];
 
 const QUOTES=[
   "We’ve had two riders drop this already. Needs doing before the deadline.",
@@ -630,10 +615,13 @@ const state={
   progress:0,       // progress-minutes, scaled by speed
   hiddenDuration:0,
   startEnergy:100,
-  energySpentJob:0, // total drain from effort (ignores top-ups)
+  energySpentJob:0,
 
   snackFx:null,
   drinkFx:null,
+
+  pendingEndOfDay:false,
+  eod:null,
 
   lastTs:0,
   raf:0
@@ -650,17 +638,6 @@ function minutesOfDay(){
 }
 function nowAbs(){
   return (state.day-1)*1440 + minutesOfDay();
-}
-function advanceMinutes(mins){
-  state.time += mins;
-  while(state.time>=1440){
-    state.time -= 1440;
-    state.day++;
-  }
-  while(state.time<0){
-    state.time += 1440;
-    state.day = Math.max(1, state.day-1);
-  }
 }
 
 function fmtClock(mins){
@@ -690,7 +667,6 @@ function lerpColor(c1,c2,t){
 }
 function setAccentFromTime(){
   const m=minutesOfDay();
-
   const stops=[
     {m:  360, c:"#B8C9CA"}, // 06:00
     {m:  600, c:"#C1E7B8"}, // 10:00
@@ -700,20 +676,16 @@ function setAccentFromTime(){
     {m: 1320, c:"#C9A6D8"}  // 22:00
   ];
 
-  // Before 06:00: treat as continuation from purple -> blue
   if(m < stops[0].m){
     const t = m / stops[0].m;
     const col = lerpColor(stops[stops.length-1].c, stops[0].c, t);
     document.documentElement.style.setProperty("--accent", col);
     return;
   }
-
-  // After 22:00: hold purple
   if(m >= stops[stops.length-1].m){
     document.documentElement.style.setProperty("--accent", stops[stops.length-1].c);
     return;
   }
-
   for(let i=0;i<stops.length-1;i++){
     const a=stops[i], b=stops[i+1];
     if(m>=a.m && m<b.m){
@@ -753,9 +725,57 @@ function renderTop(){
 
 function setMode(m){
   state.mode=m;
-  ["hub","shop","board","job","result","end"].forEach(s=>$(s).classList.toggle("hidden",s!==m));
+  ["hub","shop","board","offer","job","result","end"].forEach(s=>$(s).classList.toggle("hidden",s!==m));
   $("speedBar").classList.toggle("hidden",m!=="job");
   $("jobControls").classList.toggle("hidden",m!=="job");
+}
+
+function snapshotEOD(){
+  state.eod={
+    dayEnded: state.day-1,
+    jobs: state.jobsDone,
+    earnings: state.dayEarnings,
+    rent: COSTS.rent,
+    food: COSTS.food
+  };
+}
+function showEndOfDay(){
+  if(!state.eod) snapshotEOD();
+  const deductions=state.eod.rent+state.eod.food;
+  const net=state.eod.earnings-deductions;
+  $("endTitle").textContent="End of day (Day "+state.eod.dayEnded+")";
+  $("endList").innerHTML=`
+    <div class="vrow"><span>Jobs</span><span>${state.eod.jobs}</span></div>
+    <div class="vrow"><span>Earnings</span><span>£${state.eod.earnings}</span></div>
+    <div class="vrow"><span>Rent</span><span>-£${state.eod.rent}</span></div>
+    <div class="vrow"><span>Food</span><span>-£${state.eod.food}</span></div>
+    <div class="vrow total"><span>Net</span><span>£${net}</span></div>
+  `;
+  setMode("end");
+  renderTop();
+}
+function onMidnightRollover(){
+  if(!state.eod) snapshotEOD();
+  if(state.job){
+    state.pendingEndOfDay=true;
+    return;
+  }
+  showEndOfDay();
+}
+
+function advanceMinutes(mins){
+  state.time += mins;
+  let rolled=0;
+  while(state.time>=1440){
+    state.time -= 1440;
+    state.day++;
+    rolled++;
+  }
+  while(state.time<0){
+    state.time += 1440;
+    state.day = Math.max(1, state.day-1);
+  }
+  if(rolled>0) onMidnightRollover();
 }
 
 function pruneOffers(){
@@ -766,28 +786,31 @@ function pruneOffers(){
 function genJobs(){
   const base=nowAbs();
   state.offers=[...JOBS].sort(()=>Math.random()-.5).slice(0,3).map(j=>{
-    const avg=(j.dist/8)*60;                // avg minutes at average pace
+    const avg=(j.dist/8)*60;
     const slow=avg/SPEEDS[1].mult;
     const fast=avg/SPEEDS[5].mult;
-    const hidden=fast+(slow-fast)*(.15+Math.random()*.7);  // not quite extremes
+    const hidden=fast+(slow-fast)*(.15+Math.random()*.7);
     return{
       ...j,
       hidden:Math.round(hidden),
       pay:Math.round(j.dist*12+Math.random()*6),
+      route: ROUTES[Math.floor(Math.random()*ROUTES.length)],
       deadlineAbs: base + Math.round(avg)
     };
   });
   pruneOffers();
 }
 
-function openJobModal(o){
+function openOffer(o){
   selectedOffer=o;
-  $("jmOrg").textContent=o.name.toUpperCase();
-  $("jmTo").textContent=o.name.toUpperCase();
-  $("jmPay").textContent="£"+o.pay;
-  $("jmDeadline").textContent=fmtClock(o.deadlineAbs % 1440);
-  $("jmQuote").textContent="“"+QUOTES[Math.floor(Math.random()*QUOTES.length)]+"”";
-  $("jobModal").style.display="flex";
+  $("ofOrg").textContent=o.name.toUpperCase();
+  $("ofDistance").textContent=o.dist.toFixed(1)+" mi";
+  $("ofRoute").textContent=o.route;
+  $("ofPay").textContent="£"+o.pay;
+  $("ofDeadline").textContent=fmtClock(o.deadlineAbs % 1440);
+  $("ofQuote").textContent="“"+QUOTES[Math.floor(Math.random()*QUOTES.length)]+"”";
+  setMode("offer");
+  renderTop();
 }
 
 function renderJobs(){
@@ -801,7 +824,7 @@ function renderJobs(){
       <div class="jobTitle">${o.name}</div>
       <div class="jobPay">£${o.pay}</div>
     `;
-    r.onclick=()=>{ if(!noEnergy) openJobModal(o); };
+    r.onclick=()=>{ if(!noEnergy) openOffer(o); };
     if(noEnergy) r.style.opacity=".4";
     wrap.appendChild(r);
   });
@@ -811,7 +834,7 @@ function maxSpeed(){
   if(state.energy<=5) return 1;
   if(state.energy<=10) return 2;
   if(state.energy<=15) return 3;
-  if(state.energy<=20) return 4; // 20% reduces max to 4
+  if(state.energy<=20) return 4;
   return 5;
 }
 
@@ -891,14 +914,14 @@ function tick(ts){
   const dtSec=(ts-state.lastTs)/1000;
   state.lastTs=ts;
 
-  const dtMin=dtSec; // (intentional) real seconds == game minutes
+  const dtMin=dtSec; // real seconds == game minutes
 
   const mult=SPEEDS[state.speed].mult;
 
-  state.elapsed += dtMin;           // time taken (game minutes)
-  state.progress += dtMin * mult;   // progress scaled by speed
+  state.elapsed += dtMin;
+  state.progress += dtMin * mult;
 
-  advanceMinutes(dtMin);            // clock/day rollover
+  advanceMinutes(dtMin);
 
   const drain = 0.65*mult*mult*dtMin;
   state.energySpentJob += drain;
@@ -948,6 +971,12 @@ function finish(){
   pruneOffers();
   renderJobs();
 
+  if(state.pendingEndOfDay){
+    state.pendingEndOfDay=false;
+    showEndOfDay();
+    return;
+  }
+
   setMode("result");
   renderTop();
 }
@@ -975,6 +1004,19 @@ $("refreshJobs").onclick=()=>{
 
 $("backHub").onclick=()=>{setMode("hub");renderTop();};
 
+$("offerBack").onclick=()=>{
+  selectedOffer=null;
+  setMode("board");
+  renderTop();
+};
+
+$("offerAccept").onclick=()=>{
+  if(!selectedOffer) return;
+  const o=selectedOffer;
+  selectedOffer=null;
+  startJob(o);
+};
+
 $("backBoard").onclick=()=>{
   pruneOffers();
   renderJobs();
@@ -988,14 +1030,6 @@ $("goShop").onclick=()=>{
   renderTop();
 };
 $("backHub2").onclick=()=>{setMode("hub");renderTop();};
-
-$("declineJob").onclick=()=>{$("jobModal").style.display="none"; selectedOffer=null;};
-$("acceptJob").onclick=()=>{
-  if(!selectedOffer) return;
-  $("jobModal").style.display="none";
-  startJob(selectedOffer);
-  selectedOffer=null;
-};
 
 $("cancel").onclick=()=>{
   cancelAnimationFrame(state.raf);
@@ -1015,6 +1049,12 @@ $("cancel").onclick=()=>{
 
   pruneOffers();
   renderJobs();
+
+  if(state.pendingEndOfDay){
+    state.pendingEndOfDay=false;
+    showEndOfDay();
+    return;
+  }
 
   setMode("result");
   renderTop();
@@ -1117,7 +1157,7 @@ $("buySnack").onclick=()=>{
 /* Rest */
 function canUntilMorning(){
   const m=minutesOfDay();
-  return (m>=18*60 || m<6*60); // 18:00 -> 06:00
+  return (m>=18*60 || m<6*60);
 }
 
 function openRest(){
@@ -1147,15 +1187,15 @@ function restHours(h){
 
 function restUntilMorning(){
   if(!canUntilMorning()) return;
-  const before = nowAbs();
+  const before=nowAbs();
   const m=minutesOfDay();
   if(m<6*60){
     advanceMinutes((6*60)-m);
   }else{
     advanceMinutes((1440-m)+(6*60));
   }
-  const after = nowAbs();
-  const sleptHours = Math.max(0, (after-before)/60);
+  const after=nowAbs();
+  const sleptHours=Math.max(0,(after-before)/60);
   restGain(sleptHours);
   pruneOffers();
   renderJobs();
@@ -1170,14 +1210,18 @@ $("rest4").onclick=()=>{ restHours(4); };
 $("rest8").onclick=()=>{ restHours(8); };
 $("restMorning").onclick=()=>{ restUntilMorning(); };
 
-/* End day (kept) */
 $("confirmEnd").onclick=()=>{
-  const deductions=COSTS.rent+COSTS.food;
-  state.cash-=deductions;
-  advanceMinutes(8*60);
-  state.energy=100;
+  if(!state.eod) snapshotEOD();
+  const deductions=state.eod.rent+state.eod.food;
+  state.cash -= deductions;
+
   state.jobsDone=0;
   state.dayEarnings=0;
+  state.eod=null;
+
+  state.energy=100;
+  state.time = 6*60;
+
   setMode("hub");
   renderTop();
 };

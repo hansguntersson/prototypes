@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.10</title>
+  <title>Courier v1.0.11</title>
   <style>
     :root{
       color-scheme: dark;
@@ -30,6 +30,7 @@
       margin:0 auto;
     }
 
+    /* HEADER */
     .top{
       display:flex;
       justify-content:center;
@@ -39,6 +40,7 @@
     }
     h1{margin:0;font-size:44px;font-weight:900;}
 
+    /* KPIs */
     .kpis{
       display:grid;
       grid-template-columns:1fr 1fr 1fr;
@@ -91,6 +93,7 @@
       width:auto;
     }
 
+    /* HUB */
     .hubGrid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -103,6 +106,7 @@
       margin-top:0;
     }
 
+    /* JOB BOARD */
     .row{
       display:flex;
       justify-content:space-between;
@@ -138,6 +142,7 @@
       justify-content:flex-end;
     }
 
+    /* LIVE JOB */
     .liveBox{
       border:1px solid #fff;
       border-radius:var(--r2);
@@ -174,6 +179,7 @@
     .progressMeta div:nth-child(2){text-align:center;}
     .progressMeta div:nth-child(3){text-align:right;}
 
+    /* FIXED CONTROLS */
     .jobControls{
       position:fixed;
       left:0;right:0;
@@ -200,7 +206,7 @@
       position:fixed;
       left:0;right:0;
       bottom:calc(env(safe-area-inset-bottom) + 64px);
-      padding:10px 14px 20px;
+      padding:10px 14px 20px; /* extra bottom padding under buttons */
       background:#000;
       border-top:1px solid #fff;
     }
@@ -225,10 +231,12 @@
       color:#fff;
       font-size:16px;
       font-weight:900;
+      touch-action: manipulation;
     }
     .seg button.active{background:#fff;color:#000;}
     .seg button[disabled]{opacity:.35;}
 
+    /* ENERGY FOOTER */
     .energyFooter{
       position:fixed;
       left:0;right:0;
@@ -237,12 +245,16 @@
       background:#000;
       border-top:1px solid #fff;
     }
-    .energyWrap{max-width:760px;margin:0 auto;}
+    .energyWrap{
+      max-width:760px;
+      margin:0 auto;
+    }
     .energyLabel{
       font-family:var(--mono);
       font-size:14px;
       font-weight:900;
       margin-bottom:8px;
+      letter-spacing:.3px;
     }
     .energyBar{
       display:grid;
@@ -253,12 +265,11 @@
       height:16px;
       border:1px solid #fff;
       border-radius:6px;
-      background:transparent;
-    }
-    .energySeg.filled{
-      background:#fff;
+      background:transparent; /* empty is truly empty */
+      opacity:0;            /* empty stays invisible fill */
     }
 
+    /* MODALS */
     .modal{
       position:fixed;
       inset:0;
@@ -277,6 +288,76 @@
       background:#000;
     }
 
+    /* Job modal layout */
+    .jobModalHeader{
+      text-align:center;
+      font-family:var(--mono);
+      font-size:18px;
+      font-weight:950;
+      letter-spacing:2px;
+      margin-bottom:14px;
+    }
+    .jobModalTop{
+      display:grid;
+      grid-template-columns:120px 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    .avatar{
+      border:1px solid #fff;
+      border-radius:16px;
+      height:120px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:var(--mono);
+      font-weight:900;
+      opacity:.9;
+    }
+    .jobOrg{
+      font-size:28px;
+      font-weight:950;
+      line-height:1.02;
+    }
+    .jobRole{
+      font-family:var(--mono);
+      font-size:16px;
+      font-weight:900;
+      margin-top:6px;
+      opacity:.9;
+    }
+    .jobQuote{
+      margin-top:14px;
+      border-top:1px solid #fff;
+      padding-top:12px;
+      font-size:22px;
+      font-weight:900;
+      line-height:1.15;
+      opacity:.95;
+    }
+    .jobFacts{
+      margin-top:14px;
+      border-top:1px solid #fff;
+      padding-top:12px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      font-family:var(--mono);
+      font-weight:900;
+    }
+    .factsCol{display:grid;gap:10px;}
+    .fact .k{opacity:.85;}
+    .fact .v{font-size:20px;margin-top:2px;}
+    .fact.pay .v{font-size:28px;}
+
+    .modalActions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:14px;
+    }
+
+    /* Generic modal (consumables/rest) */
     .modalTitle{
       text-align:center;
       font-family:var(--mono);
@@ -285,7 +366,6 @@
       letter-spacing:2px;
       margin-bottom:10px;
     }
-
     .modalBtn{
       width:100%;
       text-align:center;
@@ -298,8 +378,17 @@
       font-size:22px;
       margin-top:12px;
     }
+    .modalBtn .sub{
+      display:block;
+      margin-top:6px;
+      font-family:var(--mono);
+      font-size:14px;
+      font-weight:900;
+      opacity:.9;
+    }
     .modalBtn[disabled]{opacity:.35;}
 
+    /* RESULT */
     .resultBox{
       border:1px solid #fff;
       border-radius:var(--r2);
@@ -315,7 +404,7 @@
 <body>
 <div class="safe">
   <div class="top">
-    <h1>Courier (v1.0.10)</h1>
+    <h1>Courier (v1.0.11)</h1>
   </div>
 
   <div class="kpis">
@@ -324,6 +413,7 @@
     <div class="kpi"><div class="label">Cash</div><div class="value" id="cash">£0</div></div>
   </div>
 
+  <!-- HUB -->
   <div class="screen" id="hub">
     <div class="hubGrid">
       <button class="btnOutline" id="goJobs">Jobs</button>
@@ -331,9 +421,20 @@
       <button class="btnOutline" disabled>Kit</button>
       <button class="btnOutline" disabled>Bag</button>
     </div>
-    <button class="btnOutline" id="restBtn">Rest</button>
+    <button class="btnOutline" id="restOpen">Rest</button>
   </div>
 
+  <!-- SHOP -->
+  <div class="screen hidden" id="shop">
+    <div class="jobTitle">Shop</div>
+    <button class="btn" id="buyDrink">Energy drink — £<span id="drinkPrice"></span> (<span id="drinkCount"></span>/5)</button>
+    <button class="btn" id="buySnack">Snack — £<span id="snackPrice"></span> (<span id="snackCount"></span>/5)</button>
+    <div class="bottomRight">
+      <button class="btnOutline btnSmall" id="backHub2">Back</button>
+    </div>
+  </div>
+
+  <!-- JOB BOARD -->
   <div class="screen hidden" id="board">
     <div class="jobTitle">Job board</div>
     <div class="jobs" id="jobs"></div>
@@ -343,6 +444,7 @@
     </div>
   </div>
 
+  <!-- LIVE JOB -->
   <div class="screen hidden" id="job">
     <div class="jobTitle" id="jobName">—</div>
     <div class="liveBox">
@@ -366,6 +468,7 @@
     </div>
   </div>
 
+  <!-- RESULT -->
   <div class="screen hidden" id="result">
     <div class="jobTitle" id="resultTitle">Job complete</div>
     <div class="resultBox">
@@ -374,14 +477,26 @@
     <div style="height:30px"></div>
     <button class="btn" id="backBoard">Back to job board</button>
   </div>
-</div>
 
-<div class="jobControls hidden" id="jobControls">
-  <div class="jobControlsWrap">
-    <button class="btnOutline btnMini" id="cancel">Cancel job</button>
+  <!-- END DAY (kept but unused for now) -->
+  <div class="screen hidden" id="end">
+    <div class="jobTitle">End of day</div>
+    <div class="resultBox">
+      <div class="vlist" id="endList"></div>
+    </div>
+    <button class="btn" id="confirmEnd">Start next day</button>
   </div>
 </div>
 
+<!-- Live job bottom controls -->
+<div class="jobControls hidden" id="jobControls">
+  <div class="jobControlsWrap">
+    <button class="btnOutline btnMini" id="cancel">Cancel job</button>
+    <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
+  </div>
+</div>
+
+<!-- Speed controls -->
 <div class="speedbar hidden" id="speedBar">
   <div class="speedwrap">
     <div class="speedhead">
@@ -392,6 +507,7 @@
   </div>
 </div>
 
+<!-- Energy footer -->
 <div class="energyFooter" id="energyFooter">
   <div class="energyWrap">
     <div class="energyLabel">ENERGY</div>
@@ -399,19 +515,66 @@
   </div>
 </div>
 
+<!-- Job detail modal -->
+<div class="modal" id="jobModal">
+  <div class="modalBox">
+    <div class="jobModalHeader">NEW JOB OFFER</div>
+
+    <div class="jobModalTop">
+      <div class="avatar">AVATAR</div>
+      <div>
+        <div class="jobOrg" id="jmOrg">—</div>
+        <div class="jobRole" id="jmRole">Depot Controller</div>
+      </div>
+    </div>
+
+    <div class="jobQuote" id="jmQuote">—</div>
+
+    <div class="jobFacts">
+      <div class="factsCol">
+        <div class="fact"><div class="k">FROM</div><div class="v" id="jmFrom">Midtown Depot</div></div>
+        <div class="fact"><div class="k">TO</div><div class="v" id="jmTo">—</div></div>
+      </div>
+      <div class="factsCol">
+        <div class="fact pay"><div class="k">PAY</div><div class="v" id="jmPay">£0</div></div>
+        <div class="fact"><div class="k">DEADLINE</div><div class="v" id="jmDeadline">—</div></div>
+      </div>
+    </div>
+
+    <div class="modalActions">
+      <button class="btnOutline" id="declineJob">DECLINE</button>
+      <button class="btn" id="acceptJob">ACCEPT</button>
+    </div>
+  </div>
+</div>
+
+<!-- Consumables modal -->
+<div class="modal" id="energyModal">
+  <div class="modalBox">
+    <div class="modalTitle">SNACKS</div>
+    <button class="modalBtn" id="drinkBtn"></button>
+    <button class="modalBtn" id="snackBtn"></button>
+    <button class="btnOutline" id="closeEnergy">Cancel</button>
+  </div>
+</div>
+
+<!-- Rest modal -->
 <div class="modal" id="restModal">
   <div class="modalBox">
     <div class="modalTitle">REST</div>
-    <button class="modalBtn" data-hours="2">Rest 2 hours</button>
-    <button class="modalBtn" data-hours="4">Rest 4 hours</button>
-    <button class="modalBtn" data-hours="8">Rest 8 hours</button>
-    <button class="modalBtn" id="untilMorning">Until morning</button>
+    <button class="modalBtn" id="rest2">Rest 2 hours</button>
+    <button class="modalBtn" id="rest4">Rest 4 hours</button>
+    <button class="modalBtn" id="rest8">Rest 8 hours</button>
+    <button class="modalBtn" id="restMorning">Until morning</button>
     <button class="btnOutline" id="closeRest">Cancel</button>
   </div>
 </div>
 
 <script>
-const VERSION="1.0.10";
+const VERSION="1.0.11";
+
+const PRICES={drink:12,snack:6};
+const COSTS={rent:35,food:15};
 
 const SPEEDS={
   1:{name:"very slow",mult:0.55},
@@ -429,35 +592,69 @@ const JOBS=[
   {name:"Rush SLA",dist:6}
 ];
 
+const QUOTES=[
+  "We’ve had two riders drop this already. Needs doing before the deadline.",
+  "Client is calling every 2 minutes. Keep it moving.",
+  "Estate drop. Stairs. No lift. Don’t be late."
+];
+
 const state={
   day:1,
   cash:0,
-  time:15*60,
+  time:15*60,     // minutes into current day (0..1439)
   energy:100,
   speed:3,
-  elapsed:0,
-  progress:0,
-  job:null,
+
+  snacks:1,
+  drinks:1,
+
+  jobsDone:0,
+  dayEarnings:0,
+
   offers:[],
+  job:null,
+
+  elapsed:0,        // (game) minutes elapsed on this job (seconds-as-minutes model)
+  progress:0,       // progress-minutes, scaled by speed
+  hiddenDuration:0,
+  startEnergy:100,
+
+  snackFx:null,
+  drinkFx:null,
+
   lastTs:0,
   raf:0
 };
 
+let jobsInitialised=false;
+let selectedOffer=null;
+
 const $=id=>document.getElementById(id);
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 
-function fmtClock(mins){
-  const total=Math.floor(mins);
-  const hh=Math.floor(total/60)%24;
-  const mm=total%60;
-  return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");
+function minutesOfDay(){
+  return ((Math.floor(state.time)%1440)+1440)%1440;
 }
-
-function applyDayRollover(){
+function nowAbs(){
+  return (state.day-1)*1440 + minutesOfDay();
+}
+function advanceMinutes(mins){
+  state.time += mins;
   while(state.time>=1440){
-    state.time-=1440;
+    state.time -= 1440;
     state.day++;
   }
+  while(state.time<0){
+    state.time += 1440;
+    state.day = Math.max(1, state.day-1);
+  }
+}
+
+function fmtClock(mins){
+  const total=Math.floor(mins);
+  const hh=Math.floor(total/60);
+  const mm=total%60;
+  return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");
 }
 
 function renderEnergyBar(){
@@ -465,52 +662,145 @@ function renderEnergyBar(){
   for(let i=0;i<10;i++){
     const seg=document.createElement("div");
     seg.className="energySeg";
-    if(state.energy>i*10) seg.classList.add("filled");
+    const bandStart=i*10;
+    const frac=clamp((state.energy-bandStart)/10,0,1);
+    if(frac>0){
+      seg.style.background="#fff";
+      seg.style.opacity=String(frac);
+    }else{
+      seg.style.background="transparent";
+      seg.style.opacity="0";
+    }
     bar.appendChild(seg);
   }
 }
 
 function renderTop(){
-  applyDayRollover();
   $("cash").textContent="£"+state.cash;
-  $("clock").textContent=fmtClock(state.time);
+  $("clock").textContent=fmtClock(minutesOfDay());
   $("day").textContent=state.day;
   renderEnergyBar();
 }
 
+function setMode(m){
+  state.mode=m;
+  ["hub","shop","board","job","result","end"].forEach(s=>$(s).classList.toggle("hidden",s!==m));
+  $("speedBar").classList.toggle("hidden",m!=="job");
+  $("jobControls").classList.toggle("hidden",m!=="job");
+}
+
+function pruneOffers(){
+  const now=nowAbs();
+  state.offers = state.offers.filter(o => o.deadlineAbs > now);
+}
+
 function genJobs(){
+  const base=nowAbs();
   state.offers=[...JOBS].sort(()=>Math.random()-.5).slice(0,3).map(j=>{
-    const avg=(j.dist/8)*60;
+    const avg=(j.dist/8)*60;                // avg minutes at average pace
     const slow=avg/SPEEDS[1].mult;
     const fast=avg/SPEEDS[5].mult;
-    const hidden=fast+(slow-fast)*(.15+Math.random()*.7);
+    const hidden=fast+(slow-fast)*(.15+Math.random()*.7);  // not quite extremes
     return{
       ...j,
       hidden:Math.round(hidden),
       pay:Math.round(j.dist*12+Math.random()*6),
-      deadline:state.time+Math.round(avg)
+      deadlineAbs: base + Math.round(avg)
     };
   });
+  pruneOffers();
+}
+
+function openJobModal(o){
+  selectedOffer=o;
+  $("jmOrg").textContent=o.name.toUpperCase();
+  $("jmTo").textContent=o.name.toUpperCase();
+  $("jmPay").textContent="£"+o.pay;
+  $("jmDeadline").textContent=fmtClock(o.deadlineAbs % 1440);
+  $("jmQuote").textContent="“"+QUOTES[Math.floor(Math.random()*QUOTES.length)]+"”";
+  $("jobModal").style.display="flex";
 }
 
 function renderJobs(){
+  pruneOffers();
   const wrap=$("jobs");wrap.innerHTML="";
-  state.offers=state.offers.filter(o=>o.deadline>state.time);
+  const noEnergy=state.energy<=0;
   state.offers.forEach(o=>{
     const r=document.createElement("div");
     r.className="jobRow";
-    r.innerHTML=`<div class="jobTitle">${o.name}</div><div class="jobPay">£${o.pay}</div>`;
-    r.onclick=()=>startJob(o);
+    r.innerHTML=`
+      <div class="jobTitle">${o.name}</div>
+      <div class="jobPay">£${o.pay}</div>
+    `;
+    r.onclick=()=>{ if(!noEnergy) openJobModal(o); };
+    if(noEnergy) r.style.opacity=".4";
     wrap.appendChild(r);
   });
+}
+
+function maxSpeed(){
+  if(state.energy<=5) return 1;
+  if(state.energy<=10) return 2;
+  if(state.energy<=15) return 3;
+  if(state.energy<=20) return 4;
+  return 5;
+}
+
+function buildSpeed(){
+  const seg=$("speedSeg");seg.innerHTML="";
+  for(let i=1;i<=5;i++){
+    const b=document.createElement("button");
+    b.textContent=i;
+    b.onclick=()=>{state.speed=Math.min(i,maxSpeed());syncSpeed();};
+    seg.appendChild(b);
+  }
+  syncSpeed();
+}
+
+function syncSpeed(){
+  const max=maxSpeed();
+  if(state.speed>max) state.speed=max;
+  [...$("speedSeg").children].forEach((b,i)=>{
+    const s=i+1;
+    b.classList.toggle("active",s===state.speed);
+    b.disabled=s>max;
+  });
+  $("speedLabel").textContent=SPEEDS[state.speed].name;
+}
+
+function clearSnackFx(){
+  if(!state.snackFx) return;
+  if(state.snackFx.delayId) clearTimeout(state.snackFx.delayId);
+  if(state.snackFx.intervalId) clearInterval(state.snackFx.intervalId);
+  state.snackFx=null;
+}
+
+function clearDrinkFx(){
+  if(!state.drinkFx) return;
+  if(state.drinkFx.timeoutId) clearTimeout(state.drinkFx.timeoutId);
+  state.drinkFx=null;
+}
+
+function applyPendingEffects(){
+  if(state.snackFx){
+    state.energy=clamp(state.energy+state.snackFx.remaining,0,100);
+    clearSnackFx();
+  }
+  if(state.drinkFx){
+    state.energy=clamp(state.energy-10,0,100);
+    clearDrinkFx();
+  }
 }
 
 function startJob(o){
   state.job=o;
   state.elapsed=0;
   state.progress=0;
+  state.hiddenDuration=o.hidden;
+  state.startEnergy=state.energy;
+
   $("jobName").textContent=o.name;
-  $("deadline").textContent=fmtClock(o.deadline);
+  $("deadline").textContent=fmtClock(o.deadlineAbs % 1440);
   $("pay").textContent="£"+o.pay;
   $("remaining").textContent=o.hidden+"m";
   $("pct").textContent="0%";
@@ -518,72 +808,302 @@ function startJob(o){
   $("milesDone").textContent="0.0 mi";
   $("milesLeft").textContent=o.dist.toFixed(1)+" mi";
   $("mph").textContent=Math.round(8*SPEEDS[state.speed].mult)+" mph";
-  $("job").classList.remove("hidden");
-  $("hub").classList.add("hidden");
-  $("board").classList.add("hidden");
-  $("speedBar").classList.remove("hidden");
-  $("jobControls").classList.remove("hidden");
+
+  syncSpeed();
+  setMode("job");
+
   state.lastTs=performance.now();
   state.raf=requestAnimationFrame(tick);
 }
 
 function tick(ts){
   state.raf=requestAnimationFrame(tick);
-  const dt=(ts-state.lastTs)/1000;
+  const dtSec=(ts-state.lastTs)/1000;
   state.lastTs=ts;
+
+  const dtMin=dtSec; // (intentional) real seconds == game minutes
+
   const mult=SPEEDS[state.speed].mult;
-  state.elapsed+=dt;
-  state.progress+=dt*mult;
-  state.time+=dt;
-  const p=clamp(state.progress/state.job.hidden,0,1);
+
+  state.elapsed += dtMin;           // time taken (game minutes)
+  state.progress += dtMin * mult;   // progress scaled by speed
+
+  advanceMinutes(dtMin);            // clock/day rollover
+
+  state.energy=clamp(state.energy-(0.65*mult*mult*dtMin),0,100);
+  syncSpeed();
+
+  const remain=Math.max(0,Math.ceil(state.hiddenDuration-state.progress));
+  $("remaining").textContent=remain+"m";
+
+  const p=clamp(state.progress/state.hiddenDuration,0,1);
   $("pct").textContent=Math.floor(p*100)+"%";
   $("fill").style.width=(p*100)+"%";
-  $("remaining").textContent=Math.max(0,Math.ceil(state.job.hidden-state.progress))+"m";
-  const milesDone=state.job.dist*p;
+
+  const milesDone=(state.job.dist*p);
   $("milesDone").textContent=milesDone.toFixed(1)+" mi";
   $("milesLeft").textContent=(state.job.dist-milesDone).toFixed(1)+" mi";
+  $("mph").textContent=Math.round(8*mult)+" mph";
+
   renderTop();
   if(p>=1) finish();
 }
 
 function finish(){
   cancelAnimationFrame(state.raf);
-  state.cash+=state.job.pay;
-  state.job=null;
-  renderJobs();
-  $("job").classList.add("hidden");
-  $("speedBar").classList.add("hidden");
-  $("jobControls").classList.add("hidden");
-  $("result").classList.remove("hidden");
+  applyPendingEffects();
+
+  const timeTaken=Math.max(1,Math.ceil(state.elapsed));
+  const energyUsed=clamp(state.startEnergy-state.energy,0,100);
+  const tip=0;
+  const total=state.job.pay+tip;
+
+  state.cash+=total;
+  state.dayEarnings+=total;
+  state.jobsDone++;
+
   $("resultTitle").textContent="Job complete";
-  $("resultList").innerHTML=`<div class="vrow total"><span>Total</span><span>£${state.cash}</span></div>`;
+  $("resultList").innerHTML=`
+    <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
+    <div class="vrow"><span>Energy used</span><span>${Math.round(energyUsed)}%</span></div>
+    <div class="vrow"><span>Pay</span><span>£${state.job.pay}</span></div>
+    <div class="vrow"><span>Tip / penalty</span><span>£${tip}</span></div>
+    <div class="vrow total"><span>Total</span><span>£${total}</span></div>
+  `;
+
+  state.job=null;
+
+  pruneOffers();
+  renderJobs();
+
+  setMode("result");
+  renderTop();
 }
 
-$("goJobs").onclick=()=>{genJobs();renderJobs();$("hub").classList.add("hidden");$("board").classList.remove("hidden");};
-$("backHub").onclick=()=>{$("board").classList.add("hidden");$("hub").classList.remove("hidden");};
-$("backBoard").onclick=()=>{$("result").classList.add("hidden");$("board").classList.remove("hidden");};
+/* UI wiring */
 
-$("restBtn").onclick=()=>{
-  const mins=state.time%1440;
-  $("untilMorning").disabled=!(mins>=1080||mins<360);
-  $("restModal").style.display="flex";
-};
-$("closeRest").onclick=()=>{$("restModal").style.display="none";};
-document.querySelectorAll('#restModal .modalBtn[data-hours]').forEach(b=>{
-  b.onclick=()=>{
-    state.time+=Number(b.dataset.hours)*60;
-    $("restModal").style.display="none";
-    renderTop();
-  };
-});
-$("untilMorning").onclick=()=>{
-  const mins=state.time%1440;
-  state.time+=mins<360?(360-mins):(1440-mins+360);
-  $("restModal").style.display="none";
+$("goJobs").onclick=()=>{
+  if(!jobsInitialised){
+    genJobs();
+    renderJobs();
+    jobsInitialised=true;
+  }else{
+    pruneOffers();
+    renderJobs();
+  }
+  setMode("board");
   renderTop();
 };
 
+$("refreshJobs").onclick=()=>{
+  genJobs();
+  renderJobs();
+  jobsInitialised=true;
+};
+
+$("backHub").onclick=()=>{setMode("hub");renderTop();};
+
+$("backBoard").onclick=()=>{
+  pruneOffers();
+  renderJobs();
+  setMode("board");
+  renderTop();
+};
+
+$("goShop").onclick=()=>{
+  updateShopUI();
+  setMode("shop");
+  renderTop();
+};
+$("backHub2").onclick=()=>{setMode("hub");renderTop();};
+
+$("declineJob").onclick=()=>{$("jobModal").style.display="none"; selectedOffer=null;};
+$("acceptJob").onclick=()=>{
+  if(!selectedOffer) return;
+  $("jobModal").style.display="none";
+  startJob(selectedOffer);
+  selectedOffer=null;
+};
+
+$("cancel").onclick=()=>{
+  cancelAnimationFrame(state.raf);
+  applyPendingEffects();
+
+  const timeTaken=Math.max(1,Math.ceil(state.elapsed));
+  const energyUsed=clamp(state.startEnergy-state.energy,0,100);
+
+  $("resultTitle").textContent="Job cancelled";
+  $("resultList").innerHTML=`
+    <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
+    <div class="vrow"><span>Energy used</span><span>${Math.round(energyUsed)}%</span></div>
+    <div class="vrow total"><span>Total</span><span>£0</span></div>
+  `;
+
+  state.job=null;
+
+  pruneOffers();
+  renderJobs();
+
+  setMode("result");
+  renderTop();
+};
+
+/* Consumables */
+function updateConsumablesModal(){
+  const d=$("drinkBtn");
+  const s=$("snackBtn");
+
+  d.innerHTML=`Energy Drink x ${state.drinks}<span class="sub">+20% energy immediately then 10% crash after 15s</span>`;
+  s.innerHTML=`Snack x ${state.snacks}<span class="sub">15s delay, then + energy each second for 15s</span>`;
+
+  d.disabled=state.drinks<=0;
+  s.disabled=state.snacks<=0;
+}
+
+$("openConsumables").onclick=()=>{
+  updateConsumablesModal();
+  $("energyModal").style.display="flex";
+};
+
+$("closeEnergy").onclick=()=>{$("energyModal").style.display="none";};
+
+$("drinkBtn").onclick=()=>{
+  if(state.drinks<=0) return;
+  state.drinks--;
+
+  state.energy=clamp(state.energy+20,0,100);
+
+  clearDrinkFx();
+  state.drinkFx={timeoutId:setTimeout(()=>{
+    state.energy=clamp(state.energy-10,0,100);
+    clearDrinkFx();
+    renderTop();
+  },15000)};
+
+  $("energyModal").style.display="none";
+  renderTop();
+};
+
+$("snackBtn").onclick=()=>{
+  if(state.snacks<=0) return;
+  state.snacks--;
+
+  clearSnackFx();
+  state.snackFx={remaining:20,delayId:0,intervalId:0};
+
+  state.snackFx.delayId=setTimeout(()=>{
+    if(!state.snackFx) return;
+    let ticks=0;
+    state.snackFx.intervalId=setInterval(()=>{
+      if(!state.snackFx) return;
+      const inc=20/15;
+      state.energy=clamp(state.energy+inc,0,100);
+      state.snackFx.remaining=clamp(state.snackFx.remaining-inc,0,20);
+      ticks++;
+      renderTop();
+      if(ticks>=15){
+        clearSnackFx();
+      }
+    },1000);
+  },15000);
+
+  $("energyModal").style.display="none";
+};
+
+/* Shop */
+function updateShopUI(){
+  $("drinkPrice").textContent=PRICES.drink;
+  $("snackPrice").textContent=PRICES.snack;
+  $("drinkCount").textContent=state.drinks;
+  $("snackCount").textContent=state.snacks;
+
+  const buyDrink=$("buyDrink");
+  const buySnack=$("buySnack");
+
+  buyDrink.disabled = (state.drinks>=5) || (state.cash<PRICES.drink);
+  buySnack.disabled = (state.snacks>=5) || (state.cash<PRICES.snack);
+}
+
+$("buyDrink").onclick=()=>{
+  if(state.drinks>=5) return;
+  if(state.cash<PRICES.drink) return;
+  state.cash-=PRICES.drink;
+  state.drinks++;
+  updateShopUI();
+  renderTop();
+};
+
+$("buySnack").onclick=()=>{
+  if(state.snacks>=5) return;
+  if(state.cash<PRICES.snack) return;
+  state.cash-=PRICES.snack;
+  state.snacks++;
+  updateShopUI();
+  renderTop();
+};
+
+/* Rest */
+function canUntilMorning(){
+  const m=minutesOfDay();
+  return (m>=18*60 || m<6*60); // 18:00 -> 06:00
+}
+
+function openRest(){
+  const btn=$("restMorning");
+  const allowed=canUntilMorning();
+  btn.disabled=!allowed;
+  btn.style.display=allowed ? "block" : "none";
+  $("restModal").style.display="flex";
+}
+
+function closeRest(){
+  $("restModal").style.display="none";
+}
+
+function restHours(h){
+  advanceMinutes(h*60);
+  pruneOffers();
+  renderJobs();
+  renderTop();
+  closeRest();
+}
+
+function restUntilMorning(){
+  if(!canUntilMorning()) return;
+  const m=minutesOfDay();
+  if(m<6*60){
+    advanceMinutes((6*60)-m);
+  }else{
+    advanceMinutes((1440-m)+(6*60));
+  }
+  pruneOffers();
+  renderJobs();
+  renderTop();
+  closeRest();
+}
+
+$("restOpen").onclick=()=>{ openRest(); };
+$("closeRest").onclick=()=>{ closeRest(); };
+$("rest2").onclick=()=>{ restHours(2); };
+$("rest4").onclick=()=>{ restHours(4); };
+$("rest8").onclick=()=>{ restHours(8); };
+$("restMorning").onclick=()=>{ restUntilMorning(); };
+
+/* End day (kept) */
+$("confirmEnd").onclick=()=>{
+  const deductions=COSTS.rent+COSTS.food;
+  state.cash-=deductions;
+  advanceMinutes(8*60);
+  state.energy=100;
+  state.jobsDone=0;
+  state.dayEarnings=0;
+  setMode("hub");
+  renderTop();
+};
+
+buildSpeed();
 renderTop();
+setMode("hub");
 document.title="Courier v"+VERSION;
 </script>
 </body>

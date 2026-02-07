@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.21</title>
+  <title>Courier v1.0.22</title>
   <style>
     :root{
       color-scheme: dark;
@@ -240,18 +240,42 @@
     .progressMeta div:nth-child(2){text-align:center;}
     .progressMeta div:nth-child(3){text-align:right;}
 
-    .timeLeftRow{
-      margin-top:14px;
+    /* TIME LEFT: circular dial + text */
+    .timeLeftWrap{
+      margin-top:16px;
       border-top:var(--stroke) solid var(--accent);
-      padding-top:12px;
+      padding-top:14px;
       display:flex;
-      justify-content:space-between;
-      align-items:baseline;
-      font-family:var(--mono);
+      align-items:center;
+      justify-content:center;
+      gap:16px;
       color:var(--accent);
     }
-    .timeLeftRow .k{font-size:14px;font-weight:800;opacity:.9;}
-    .timeLeftRow .v{font-size:20px;font-weight:950;}
+    .timeDial{
+      width:88px;
+      height:88px;
+      flex:0 0 auto;
+    }
+    .timeDial circle{
+      vector-effect: non-scaling-stroke;
+    }
+    .timeLeftText{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      align-items:flex-start;
+      font-family:var(--mono);
+    }
+    .timeLeftText .k{
+      font-size:14px;
+      font-weight:800;
+      opacity:.9;
+      letter-spacing:.2px;
+    }
+    .timeLeftText .v{
+      font-size:20px;
+      font-weight:950;
+    }
 
     .jobControls{
       position:fixed;
@@ -351,7 +375,7 @@
       font-size:22px;
       font-weight:950;
       letter-spacing:1px;
-      margin-bottom:18px; /* more space */
+      margin-bottom:18px;
       text-transform:uppercase;
     }
     .offerTop{
@@ -359,7 +383,7 @@
       grid-template-columns:120px 1fr;
       gap:16px;
       align-items:start;
-      margin-bottom:22px; /* more space */
+      margin-bottom:22px;
     }
     .avatar{
       border:var(--stroke) solid var(--accent);
@@ -396,7 +420,7 @@
       color:var(--accent);
     }
     .offerFacts{
-      margin-top:18px; /* more space */
+      margin-top:18px;
       border-top:var(--stroke) solid var(--accent);
       padding-top:14px;
       display:grid;
@@ -414,7 +438,7 @@
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:14px;
-      margin-top:18px; /* more space */
+      margin-top:18px;
     }
 
     .modal{
@@ -498,7 +522,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.21</div>
+      <div class="kpiMid" id="versionText">v1.0.22</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -599,14 +623,10 @@
 
     <div class="offerTop">
       <div class="avatar" aria-label="Dispatcher">
-        <!-- new icon + fills box better -->
+        <!-- simplified person icon -->
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M6.5 11.5c-1.5 0-2.8-1.3-2.8-3s1.3-3 2.8-3"></path>
-          <path d="M17.5 11.5c1.5 0 2.8-1.3 2.8-3s-1.3-3-2.8-3"></path>
-          <path d="M7 10V9a5 5 0 0 1 10 0v1"></path>
-          <circle cx="12" cy="10.2" r="3.4"></circle>
-          <path d="M7.2 20c.7-3.2 3.1-4.9 4.8-4.9h0c1.7 0 4.1 1.7 4.8 4.9"></path>
-          <path d="M17.2 14.6h2.2c.9 0 1.6.7 1.6 1.6v1.1"></path>
+          <circle cx="12" cy="8" r="3.2"></circle>
+          <path d="M5.5 20c1.6-4.4 11.4-4.4 13 0"></path>
         </svg>
       </div>
       <div>
@@ -656,10 +676,26 @@
       <div id="milesLeft">0.0 mi</div>
     </div>
 
-    <!-- time left moved here -->
-    <div class="timeLeftRow">
-      <div class="k">TIME LEFT</div>
-      <div class="v" id="remaining">—</div>
+    <!-- time left as circular dial + text -->
+    <div class="timeLeftWrap">
+      <svg class="timeDial" viewBox="0 0 100 100" aria-label="Time left">
+        <!-- track -->
+        <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="6" fill="none" opacity="0.22"></circle>
+        <!-- remaining arc (shrinks, so empty wedge increases) -->
+        <circle id="timeArc" cx="50" cy="50" r="38"
+          stroke="var(--accent)"
+          stroke-width="8"
+          fill="none"
+          stroke-linecap="butt"
+          stroke-dasharray="238.761"
+          stroke-dashoffset="0"
+          transform="rotate(-90 50 50)"></circle>
+      </svg>
+
+      <div class="timeLeftText">
+        <div class="k">TIME LEFT</div>
+        <div class="v" id="remaining">—</div>
+      </div>
     </div>
   </div>
 
@@ -733,7 +769,7 @@
 </div>
 
 <script>
-const VERSION="1.0.21";
+const VERSION="1.0.22";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -746,7 +782,7 @@ const SPEEDS={
   5:{name:"very fast",mult:1.55}
 };
 
-/* expanded job pool (+7) */
+/* JOBS — all names <= 20 chars */
 const JOBS=[
   {name:"Hot food drop",dist:2},
   {name:"Parcel run",dist:3.5},
@@ -754,13 +790,13 @@ const JOBS=[
   {name:"Fragile item",dist:5},
   {name:"Rush SLA",dist:6},
 
-  {name:"Mysterious briefcase (no questions)",dist:4.8},
-  {name:"VIP sushi apology delivery",dist:3.2},
-  {name:"Wedding cake rescue mission",dist:5.6},
-  {name:"Escape room props emergency",dist:2.7},
-  {name:"Library book: ‘DO NOT BEND’",dist:3.9},
-  {name:"Pet iguana medication dash",dist:6.4},
-  {name:"Band merch drop (sold-out panic)",dist:4.1}
+  {name:"Mysterious briefcase",dist:4.8}, /* 20 */
+  {name:"VIP sushi apology",dist:3.2},
+  {name:"Cake rescue mission",dist:5.6},
+  {name:"Escape room props",dist:2.7},
+  {name:"Do not bend book",dist:3.9},
+  {name:"Iguana meds dash",dist:6.4},
+  {name:"Band merch panic",dist:4.1}
 ];
 
 const ROUTES=["Easy","Mid","Tricky","Hellish"];
@@ -771,7 +807,6 @@ const QUOTES=[
   "Estate drop. Stairs. No lift. Don’t be late."
 ];
 
-/* expanded requesters */
 const GIVERS=[
   "Sam Patel",
   "Rosa Klein",
@@ -909,6 +944,16 @@ function renderEnergyBar(){
     }
     bar.appendChild(seg);
   }
+}
+
+function updateTimeDial(p){
+  const arc=$("timeArc");
+  if(!arc) return;
+  const r=38;
+  const C=2*Math.PI*r; // ~238.761
+  const off=clamp(p,0,1)*C; // progress eats the arc (empty wedge grows)
+  arc.style.strokeDasharray=String(C);
+  arc.style.strokeDashoffset=String(off);
 }
 
 function renderTop(){
@@ -1114,6 +1159,8 @@ function startJob(o){
   $("milesLeft").textContent=o.dist.toFixed(1)+" mi";
   $("mph").textContent=Math.round(8*SPEEDS[state.speed].mult)+" mph";
 
+  updateTimeDial(0);
+
   syncSpeed();
   setMode("job");
 
@@ -1145,6 +1192,8 @@ function tick(ts){
   const p=clamp(state.progress/state.hiddenDuration,0,1);
   $("pct").textContent=Math.floor(p*100)+"%";
   $("fill").style.width=(p*100)+"%";
+
+  updateTimeDial(p);
 
   const milesDone=(state.job.dist*p);
   $("milesDone").textContent=milesDone.toFixed(1)+" mi";

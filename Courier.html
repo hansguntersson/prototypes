@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.29</title>
+  <title>Courier v1.0.30</title>
   <style>
     :root{
       color-scheme: dark;
@@ -186,6 +186,13 @@
 
     .jobTitle{font-size:22px;font-weight:950;color:var(--accent);}
     .jobPay{font-family:var(--mono);font-size:20px;font-weight:950;color:var(--accent);}
+
+    /* Centered page titles (Job board / Shop / Job complete) */
+    .pageTitle{
+      text-align:center;
+      margin-top:28px;     /* increased spacing above */
+      margin-bottom:12px;
+    }
 
     .refreshText{
       margin-top:14px;
@@ -510,7 +517,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.29</div>
+      <div class="kpiMid" id="versionText">v1.0.30</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -537,23 +544,33 @@
         </svg>
         Shop
       </button>
-      <button class="btnOutline hubBtn" disabled aria-label="Kit">
+
+      <!-- Equipment (was Kit) -->
+      <button class="btnOutline hubBtn" disabled aria-label="Equipment">
         <svg viewBox="0 0 24 24">
-          <rect x="4" y="8" width="16" height="10" rx="2"></rect>
-          <path d="M9 8V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
-          <line x1="12" y1="11" x2="12" y2="15"></line>
-          <line x1="10" y1="13" x2="14" y2="13"></line>
+          <!-- wrench -->
+          <path d="M14.5 5.2a3.7 3.7 0 0 0-4.9 4.9L4.4 15.3a2 2 0 0 0 2.8 2.8l5.2-5.2a3.7 3.7 0 0 0 4.9-4.9l-2 2-2-2 2-2Z"></path>
+          <!-- small bolt -->
+          <path d="M18.5 15.5l1.6 1.6"></path>
+          <path d="M17.3 16.7l1.6-1.6"></path>
         </svg>
-        Kit
+        Equipment
       </button>
-      <button class="btnOutline hubBtn" disabled aria-label="Bag">
+
+      <!-- Vehicles (was Bag) -->
+      <button class="btnOutline hubBtn" disabled aria-label="Vehicles">
         <svg viewBox="0 0 24 24">
-          <path d="M7 8h10l-1 13H8L7 8Z"></path>
-          <path d="M9 8V6a3 3 0 0 1 6 0v2"></path>
+          <!-- simple bike -->
+          <circle cx="7" cy="17" r="3"></circle>
+          <circle cx="17" cy="17" r="3"></circle>
+          <path d="M9 17l3-7h3l2 4"></path>
+          <path d="M12 10l-2-3H7"></path>
+          <path d="M12 10h4"></path>
         </svg>
-        Bag
+        Vehicles
       </button>
     </div>
+
     <button class="btn hubBtn hubBtnInline" id="restOpen" aria-label="Rest">
       <svg viewBox="0 0 24 24">
         <path d="M4 12V8a2 2 0 0 1 2-2h11a3 3 0 0 1 3 3v3"></path>
@@ -566,7 +583,7 @@
 
   <!-- SHOP -->
   <div class="screen hidden" id="shop">
-    <div class="jobTitle">Shop</div>
+    <div class="jobTitle pageTitle">Shop</div>
 
     <button class="btn btnIcon" id="buyDrink">
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -597,7 +614,7 @@
 
   <!-- JOB BOARD -->
   <div class="screen hidden" id="board">
-    <div class="jobTitle">Job board</div>
+    <div class="jobTitle pageTitle">Job board</div>
     <div class="jobs" id="jobs"></div>
     <div class="refreshText" id="refreshJobs">↻ Refresh jobs</div>
     <div class="bottomRight">
@@ -645,18 +662,13 @@
 
     <div class="timeLeftWrap">
       <svg class="timeDial" viewBox="0 0 100 100" aria-label="Time left">
-        <!-- track -->
         <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="14" fill="none" opacity="0.18"></circle>
-
-        <!-- remaining arc as PATH -->
         <path id="timeArc"
           stroke="var(--accent)"
           stroke-width="16"
           fill="none"
           stroke-linecap="butt"
           d=""></path>
-
-        <!-- inner text -->
         <text class="dialK" x="50" y="45">TIME LEFT</text>
         <text class="dialV" id="remaining" x="50" y="57">—</text>
       </svg>
@@ -678,7 +690,7 @@
 
   <!-- RESULT -->
   <div class="screen hidden" id="result">
-    <div class="jobTitle" id="resultTitle">Job complete</div>
+    <div class="jobTitle pageTitle" id="resultTitle">Job complete</div>
     <div class="resultBox">
       <div class="vlist" id="resultList"></div>
     </div>
@@ -699,7 +711,7 @@
 <!-- Live job bottom controls -->
 <div class="jobControls hidden" id="jobControls">
   <div class="jobControlsWrap">
-    <button class="btnOutline btnMini" id="cancel">Abort job</button>
+    <button class="btnOutline btnMini" id="cancel">Abort</button>
     <button class="btnOutline btnMini" id="eventBtn">Event</button>
     <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
   </div>
@@ -758,7 +770,7 @@
 </div>
 
 <script>
-const VERSION="1.0.29";
+const VERSION="1.0.30";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -1061,7 +1073,7 @@ function pruneOffers(){
 
 function genJobs(){
   const base=nowAbs();
-  state.offers=[...JOBS].sort(()=>Math.random()-.5).slice(0,3).map(j=>{
+  state.offers=[...JOBS].sort(()=>Math.random()-.5).slice(0,5).map(j=>{
     const avg=(j.dist/8)*60;
     const slow=avg/SPEEDS[1].mult;
     const fast=avg/SPEEDS[5].mult;
@@ -1169,10 +1181,10 @@ function applyPendingEffects(){
   }
 }
 
-/* tip/penalty now uses precise time base */
+/* tip/penalty uses precise time base */
 function tipPenaltyForFinish(){
   const now=nowAbsPrecise();
-  const delta = state.job.deadlineAbs - now; // >0 early, <0 late
+  const delta = state.job.deadlineAbs - now;
 
   if(delta>0){
     const raw = Math.floor(delta/10);
@@ -1257,6 +1269,7 @@ function finish(){
 
   const timeTaken=Math.max(1,Math.ceil(state.elapsed));
   const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
+  const avgSpeed = (state.job.dist * 60) / timeTaken; // mph
 
   const tp = tipPenaltyForFinish();
   const total = Math.max(0, state.job.pay + tp);
@@ -1268,6 +1281,7 @@ function finish(){
   $("resultTitle").textContent="Job complete";
   $("resultList").innerHTML=`
     <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
+    <div class="vrow"><span>Average speed</span><span>${avgSpeed.toFixed(1)} mph</span></div>
     <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>
     <div class="vrow"><span>Pay</span><span>£${state.job.pay}</span></div>
     <div class="vrow"><span>Tip / penalty</span><span>${tp>=0 ? "£"+tp : "-£"+Math.abs(tp)}</span></div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.23</title>
+  <title>Courier v1.0.24</title>
   <style>
     :root{
       color-scheme: dark;
@@ -256,9 +256,7 @@
       height:88px;
       flex:0 0 auto;
     }
-    .timeDial circle{
-      vector-effect: non-scaling-stroke;
-    }
+    .timeDial circle{ vector-effect: non-scaling-stroke; }
     .timeLeftText{
       display:flex;
       flex-direction:column;
@@ -266,16 +264,8 @@
       align-items:flex-start;
       font-family:var(--mono);
     }
-    .timeLeftText .k{
-      font-size:14px;
-      font-weight:800;
-      opacity:.9;
-      letter-spacing:.2px;
-    }
-    .timeLeftText .v{
-      font-size:20px;
-      font-weight:950;
-    }
+    .timeLeftText .k{ font-size:14px; font-weight:800; opacity:.9; letter-spacing:.2px; }
+    .timeLeftText .v{ font-size:20px; font-weight:950; }
 
     .jobControls{
       position:fixed;
@@ -491,10 +481,7 @@
     }
     .modalBtn[disabled]{opacity:.35;}
 
-    .modalBtnFill{
-      background:var(--accent);
-      color:#000;
-    }
+    .modalBtnFill{ background:var(--accent); color:#000; }
     .modalBtnFill .sub{ color:#000; }
 
     .resultBox{
@@ -522,7 +509,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.23</div>
+      <div class="kpiMid" id="versionText">v1.0.24</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -675,7 +662,6 @@
       <div id="milesLeft">0.0 mi</div>
     </div>
 
-    <!-- time left as circular dial + text -->
     <div class="timeLeftWrap">
       <svg class="timeDial" viewBox="0 0 100 100" aria-label="Time left">
         <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="6" fill="none" opacity="0.22"></circle>
@@ -691,11 +677,9 @@
 
       <div class="timeLeftText">
         <div class="k">TIME LEFT</div>
-        <div class="v" id="deadlineRemaining">—</div>
+        <div class="v" id="remaining">—</div>
       </div>
     </div>
-
-    <!-- (kept) job-time remaining meta value lives in results only; the liveBox no longer has a Remaining column in this version -->
   </div>
 
   <!-- RESULT -->
@@ -780,7 +764,7 @@
 </div>
 
 <script>
-const VERSION="1.0.23";
+const VERSION="1.0.24";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -841,7 +825,7 @@ const GIVERS=[
 const state={
   day:1,
   cash:0,
-  time:15*60,     // minutes into current day (0..1439)
+  time:15*60,
   energy:100,
   speed:3,
 
@@ -860,13 +844,12 @@ const state={
   startEnergy:100,
   energySpentJob:0,
 
-  /* deadline dial baseline */
   jobStartAbs:0,
 
-  /* event scheduling */
-  eventPlan:[],      // array of progress fractions at which an event becomes available
-  eventGranted:0,    // how many have been granted so far (based on progress)
-  eventAvailable:0,  // how many can be clicked right now
+  /* event availability (0..3 occurrences per job) */
+  eventPlan:[],
+  eventGranted:0,
+  eventAvailable:0,
 
   snackFx:null,
   drinkFx:null,
@@ -967,9 +950,9 @@ function renderEnergyBar(){
 }
 
 /* TIME CIRCLE FIX:
-   - Based on time until deadline (NOT speed/progress)
-   - Empty wedge starts at TOP and grows clockwise
-   - Correct dasharray (visible gap), not single-value dasharray */
+   - based on time left until deadline (not speed/progress)
+   - correct dasharray: "visible gap"
+   - empty wedge starts at TOP (rotate -90) and grows clockwise as visible shrinks */
 function updateTimeDialFromDeadline(){
   const arc=$("timeArc");
   if(!arc || !state.job) return;
@@ -987,7 +970,7 @@ function updateTimeDialFromDeadline(){
   arc.style.strokeDasharray = `${visible} ${C}`;
   arc.style.strokeDashoffset = "0";
 
-  $("deadlineRemaining").textContent=Math.max(0,Math.ceil(left))+"m";
+  $("remaining").textContent=Math.max(0,Math.ceil(left))+"m";
 }
 
 function renderTop(){
@@ -1173,16 +1156,18 @@ function applyPendingEffects(){
 
 /* TIP if early, PENALTY if late */
 function tipPenaltyForFinish(){
+  if(!state.job) return 0;
   const now=nowAbs();
   const delta = state.job.deadlineAbs - now; // >0 early, <0 late
 
   if(delta>0){
-    const raw = Math.floor(delta/10); // £1 per 10m early
+    const raw = Math.floor(delta/10); // +£1 per 10m early
     const cap = Math.max(1, Math.floor(state.job.pay*0.30));
     return Math.min(raw, cap);
-  }else if(delta<0){
-    const late = Math.ceil(Math.abs(delta)/5); // -£2 per 5m late
-    const raw = -(late*2);
+  }
+  if(delta<0){
+    const lateBlocks = Math.ceil(Math.abs(delta)/5); // -£2 per 5m late
+    const raw = -(lateBlocks*2);
     return Math.max(raw, -state.job.pay);
   }
   return 0;
@@ -1190,12 +1175,11 @@ function tipPenaltyForFinish(){
 
 /* PENALTY if abort */
 function abortPenalty(){
+  if(!state.job) return 0;
   return -Math.max(5, Math.round(state.job.pay*0.35));
 }
 
-/* EVENT PLAN:
-   - 0..3 events per job
-   - each event becomes available when progress crosses a random threshold */
+/* EVENT PLAN: 0..3 events per job, unlocked by progress thresholds */
 function buildEventPlan(){
   const n = Math.floor(Math.random()*4); // 0..3
   const arr=[];
@@ -1292,10 +1276,10 @@ function finish(){
   const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
 
   const tp = tipPenaltyForFinish();
-  const total = Math.max(0, state.job.pay + tp);
+  const total = state.job.pay + tp;
 
-  state.cash+=total;
-  state.dayEarnings+=total;
+  state.cash += total;
+  state.dayEarnings += total;
   state.jobsDone++;
 
   $("resultTitle").textContent="Job complete";
@@ -1372,7 +1356,7 @@ $("goShop").onclick=()=>{
 };
 $("backHub2").onclick=()=>{setMode("hub");renderTop();};
 
-/* Abort now applies a penalty */
+/* Abort + penalty */
 $("cancel").onclick=()=>{
   cancelAnimationFrame(state.raf);
   applyPendingEffects();
@@ -1380,9 +1364,9 @@ $("cancel").onclick=()=>{
   const timeTaken=Math.max(1,Math.ceil(state.elapsed));
   const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
 
-  const pen = abortPenalty();
-  state.cash += pen;        // pen is negative
-  state.dayEarnings += pen; // track the hit
+  const pen = abortPenalty(); // negative
+  state.cash += pen;
+  state.dayEarnings += pen;
 
   $("resultTitle").textContent="Job aborted";
   $("resultList").innerHTML=`

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.25</title>
+  <title>Courier v1.0.26</title>
   <style>
     :root{
       color-scheme: dark;
@@ -229,22 +229,19 @@
     /* TIME LEFT: circular dial + text (inside) */
     .timeLeftWrap{
       margin-top:16px;
-      padding-top:0;              /* no divider under job title */
+      padding-top:0;
       display:flex;
       align-items:center;
       justify-content:center;
       color:var(--accent);
     }
-    /* 2x bigger */
     .timeDial{
       width:176px;
       height:176px;
       flex:0 0 auto;
       display:block;
     }
-    .timeDial circle{
-      vector-effect: non-scaling-stroke;
-    }
+    .timeDial circle{ vector-effect: non-scaling-stroke; }
     .timeDial text{
       font-family:var(--mono);
       fill:var(--accent);
@@ -262,7 +259,6 @@
       font-weight:950;
     }
 
-    /* extra spacing under Progress header */
     .progressBlock{ margin-top:26px; }
     .progressHead{ margin-bottom:18px; }
 
@@ -286,6 +282,7 @@
       padding:12px 14px;
       font-size:16px;
       border-radius:14px;
+      flex:1 1 0;
     }
 
     .speedbar{
@@ -511,7 +508,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.25</div>
+      <div class="kpiMid" id="versionText">v1.0.26</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -612,7 +609,6 @@
 
     <div class="offerTop">
       <div class="avatar" aria-label="Dispatcher">
-        <!-- simplified person icon -->
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="8" r="3.2"></circle>
           <path d="M5.5 20c1.6-4.4 11.4-4.4 13 0"></path>
@@ -645,28 +641,24 @@
   <div class="screen hidden" id="job">
     <div class="offerHeader" id="jobName">—</div>
 
-    <!-- time left as circular dial (text inside) -->
     <div class="timeLeftWrap">
       <svg class="timeDial" viewBox="0 0 100 100" aria-label="Time left">
-        <!-- track (thicker) -->
         <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="14" fill="none" opacity="0.18"></circle>
-        <!-- remaining arc (thicker). rotate so empty wedge starts at TOP and grows clockwise -->
+        <!-- remaining arc: empty wedge starts at TOP and grows clockwise -->
         <circle id="timeArc" cx="50" cy="50" r="38"
           stroke="var(--accent)"
           stroke-width="16"
           fill="none"
           stroke-linecap="butt"
-          stroke-dasharray="238.761"
+          stroke-dasharray="0 999"
           stroke-dashoffset="0"
           transform="rotate(-90 50 50)"></circle>
 
-        <!-- inner text -->
         <text class="dialK" x="50" y="45">TIME LEFT</text>
         <text class="dialV" id="remaining" x="50" y="57">—</text>
       </svg>
     </div>
 
-    <!-- Progress moved BELOW time left -->
     <div class="progressBlock">
       <div class="row progressHead">
         <div class="progressLabel">Progress</div>
@@ -704,7 +696,8 @@
 <!-- Live job bottom controls -->
 <div class="jobControls hidden" id="jobControls">
   <div class="jobControlsWrap">
-    <button class="btnOutline btnMini" id="cancel">Abort job</button>
+    <button class="btnOutline btnMini" id="cancel">Abort</button>
+    <button class="btnOutline btnMini" id="eventBtn" disabled>Event</button>
     <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
   </div>
 </div>
@@ -738,6 +731,17 @@
   </div>
 </div>
 
+<!-- Event modal -->
+<div class="modal" id="eventModal">
+  <div class="modalBox">
+    <div class="modalTitle">EVENT</div>
+    <div style="text-align:center;font-family:var(--mono);font-weight:900;opacity:.85;padding:12px 6px;">
+      Event placeholder.
+    </div>
+    <button class="btnOutline" id="closeEvent">Close</button>
+  </div>
+</div>
+
 <!-- Rest modal -->
 <div class="modal" id="restModal">
   <div class="modalBox">
@@ -751,7 +755,7 @@
 </div>
 
 <script>
-const VERSION="1.0.25";
+const VERSION="1.0.26";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -772,7 +776,7 @@ const JOBS=[
   {name:"Fragile item",dist:5},
   {name:"Rush SLA",dist:6},
 
-  {name:"Mysterious briefcase",dist:4.8}, /* 20 */
+  {name:"Mysterious briefcase",dist:4.8},
   {name:"VIP sushi apology",dist:3.2},
   {name:"Cake rescue mission",dist:5.6},
   {name:"Escape room props",dist:2.7},
@@ -812,7 +816,7 @@ const GIVERS=[
 const state={
   day:1,
   cash:0,
-  time:15*60,     // minutes into current day (0..1439)
+  time:15*60,
   energy:100,
   speed:3,
 
@@ -825,14 +829,19 @@ const state={
   offers:[],
   job:null,
 
-  elapsed:0,        // (game) minutes elapsed on this job (seconds-as-minutes model)
-  progress:0,       // progress-minutes, scaled by speed
+  elapsed:0,
+  progress:0,
   hiddenDuration:0,
   startEnergy:100,
   energySpentJob:0,
 
   /* deadline dial baseline */
   jobStartAbs:0,
+
+  /* event availability: 0..3 triggers per job */
+  eventPlan:[],
+  eventGranted:0,
+  eventAvailable:0,
 
   snackFx:null,
   drinkFx:null,
@@ -885,12 +894,12 @@ function lerpColor(c1,c2,t){
 function setAccentFromTime(){
   const m=minutesOfDay();
   const stops=[
-    {m:  360, c:"#B8C9CA"}, // 06:00
-    {m:  600, c:"#C1E7B8"}, // 10:00
-    {m:  780, c:"#EBE8B8"}, // 13:00
-    {m:  960, c:"#F8BFC7"}, // 16:00
-    {m: 1140, c:"#F2A9CC"}, // 19:00
-    {m: 1320, c:"#C9A6D8"}  // 22:00
+    {m:  360, c:"#B8C9CA"},
+    {m:  600, c:"#C1E7B8"},
+    {m:  780, c:"#EBE8B8"},
+    {m:  960, c:"#F8BFC7"},
+    {m: 1140, c:"#F2A9CC"},
+    {m: 1320, c:"#C9A6D8"}
   ];
 
   if(m < stops[0].m){
@@ -932,8 +941,9 @@ function renderEnergyBar(){
   }
 }
 
-/* time dial based on deadline, not speed/progress
-   empty wedge starts at TOP and grows clockwise */
+/* TIME DIAL (FIXED)
+   - driven by deadline time left, not speed/progress
+   - empty wedge starts at TOP and grows clockwise */
 function updateTimeDialFromDeadline(){
   const arc=$("timeArc");
   if(!arc || !state.job) return;
@@ -945,11 +955,11 @@ function updateTimeDialFromDeadline(){
   const total=Math.max(1, state.job.deadlineAbs - state.jobStartAbs);
   const left=Math.max(0, state.job.deadlineAbs - now);
 
-  const elapsedFrac=clamp(1 - (left/total), 0, 1);  // 0 at accept -> 1 at deadline
-  const off=C*elapsedFrac;
+  const fracLeft=clamp(left/total,0,1);
+  const visible=C*fracLeft;
 
-  arc.style.strokeDasharray=String(C);
-  arc.style.strokeDashoffset=String(off);
+  arc.style.strokeDasharray = `${visible} ${C}`;
+  arc.style.strokeDashoffset = "0";
 
   $("remaining").textContent=Math.max(0,Math.ceil(left))+"m";
 }
@@ -968,8 +978,6 @@ function setMode(m){
   ["hub","shop","board","offer","job","result","end"].forEach(s=>$(s).classList.toggle("hidden",s!==m));
   $("speedBar").classList.toggle("hidden",m!=="job");
   $("jobControls").classList.toggle("hidden",m!=="job");
-
-  /* KPI visible only on hub */
   $("kpiWrap").classList.toggle("hidden", m!=="hub");
 }
 
@@ -1137,27 +1145,48 @@ function applyPendingEffects(){
   }
 }
 
+/* TIP if early, penalty if late */
 function tipPenaltyForFinish(){
   const now=nowAbs();
   const delta = state.job.deadlineAbs - now; // >0 early, <0 late
 
   if(delta>0){
-    /* £1 per 10m early, capped at +30% pay */
-    const raw = Math.floor(delta/10);
+    const raw = Math.floor(delta/10);              // +£1 per 10m early
     const cap = Math.max(1, Math.floor(state.job.pay*0.30));
     return Math.min(raw, cap);
   }else if(delta<0){
-    /* -£2 per 5m late, capped at -100% pay */
-    const late = Math.ceil(Math.abs(delta)/5);
+    const late = Math.ceil(Math.abs(delta)/5);     // -£2 per 5m late
     const raw = -(late*2);
     return Math.max(raw, -state.job.pay);
   }
   return 0;
 }
 
+/* penalty if abort */
 function abortPenalty(){
-  /* -35% of pay, min -£5 */
   return -Math.max(5, Math.round(state.job.pay*0.35));
+}
+
+/* EVENT: 0..3 activations per job, unlocked by progress thresholds */
+function buildEventPlan(){
+  const n = Math.floor(Math.random()*4); // 0..3
+  const arr=[];
+  for(let i=0;i<n;i++){
+    arr.push(0.15 + Math.random()*0.7); // 0.15..0.85
+  }
+  arr.sort((a,b)=>a-b);
+  state.eventPlan=arr;
+  state.eventGranted=0;
+  state.eventAvailable=0;
+  $("eventBtn").disabled=true;
+}
+
+function maybeGrantEvents(p){
+  while(state.eventGranted < state.eventPlan.length && p >= state.eventPlan[state.eventGranted]){
+    state.eventGranted++;
+    state.eventAvailable++;
+  }
+  $("eventBtn").disabled = state.eventAvailable<=0;
 }
 
 function startJob(o){
@@ -1170,9 +1199,10 @@ function startJob(o){
 
   state.jobStartAbs = nowAbs();
 
+  buildEventPlan();
+
   $("jobName").textContent=o.name.toUpperCase();
 
-  $("remaining").textContent="—";
   $("pct").textContent="0%";
   $("fill").style.width="0%";
   $("milesDone").textContent="0.0 mi";
@@ -1209,6 +1239,8 @@ function tick(ts){
   const p=clamp(state.progress/state.hiddenDuration,0,1);
   $("pct").textContent=Math.floor(p*100)+"%";
   $("fill").style.width=(p*100)+"%";
+
+  maybeGrantEvents(p);
 
   const milesDone=(state.job.dist*p);
   $("milesDone").textContent=milesDone.toFixed(1)+" mi";
@@ -1343,6 +1375,15 @@ $("cancel").onclick=()=>{
   renderTop();
 };
 
+/* Event button + modal */
+$("eventBtn").onclick=()=>{
+  if(state.eventAvailable<=0) return;
+  state.eventAvailable--;
+  $("eventBtn").disabled = state.eventAvailable<=0;
+  $("eventModal").style.display="flex";
+};
+$("closeEvent").onclick=()=>{ $("eventModal").style.display="none"; };
+
 /* Consumables */
 function updateConsumablesModal(){
   const d=$("drinkBtn");
@@ -1455,7 +1496,6 @@ function closeRest(){
   $("restModal").style.display="none";
 }
 
-/* boosted 4h and 8h */
 function restGainChoice(hours){
   if(hours===4) return 18;
   if(hours===8) return 40;

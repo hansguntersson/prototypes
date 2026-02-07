@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.24</title>
+  <title>Courier v1.0.25</title>
   <style>
     :root{
       color-scheme: dark;
@@ -226,15 +226,13 @@
     .progressMeta div:nth-child(2){text-align:center;}
     .progressMeta div:nth-child(3){text-align:right;}
 
-    /* TIME LEFT: circular dial + text */
+    /* TIME LEFT: circular dial + text (inside) */
     .timeLeftWrap{
       margin-top:16px;
-      border-top:var(--stroke) solid var(--accent);
-      padding-top:14px;
+      padding-top:0;              /* no divider under job title */
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:18px;
       color:var(--accent);
     }
     /* 2x bigger */
@@ -242,31 +240,31 @@
       width:176px;
       height:176px;
       flex:0 0 auto;
+      display:block;
     }
     .timeDial circle{
       vector-effect: non-scaling-stroke;
     }
-    .timeLeftText{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      align-items:flex-start;
+    .timeDial text{
       font-family:var(--mono);
+      fill:var(--accent);
+      text-anchor:middle;
+      dominant-baseline:middle;
     }
-    .timeLeftText .k{
-      font-size:16px;
+    .timeDial .dialK{
+      font-size:8px;
       font-weight:900;
+      letter-spacing:.8px;
       opacity:.9;
-      letter-spacing:.2px;
     }
-    .timeLeftText .v{
-      font-size:26px;
+    .timeDial .dialV{
+      font-size:12px;
       font-weight:950;
     }
 
     /* extra spacing under Progress header */
-    .progressBlock{ margin-top:22px; }
-    .progressHead{ margin-bottom:14px; }
+    .progressBlock{ margin-top:26px; }
+    .progressHead{ margin-bottom:18px; }
 
     .jobControls{
       position:fixed;
@@ -513,7 +511,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.24</div>
+      <div class="kpiMid" id="versionText">v1.0.25</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -647,27 +645,25 @@
   <div class="screen hidden" id="job">
     <div class="offerHeader" id="jobName">—</div>
 
-    <!-- time left as circular dial + text -->
+    <!-- time left as circular dial (text inside) -->
     <div class="timeLeftWrap">
       <svg class="timeDial" viewBox="0 0 100 100" aria-label="Time left">
-        <!-- track -->
-        <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="6" fill="none" opacity="0.22"></circle>
-        <!-- remaining arc (shrinks, so empty wedge increases) -->
-        <!-- NOTE: circle path starts at 3 o'clock; rotate so empty wedge starts at TOP -->
+        <!-- track (thicker) -->
+        <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="14" fill="none" opacity="0.18"></circle>
+        <!-- remaining arc (thicker). rotate so empty wedge starts at TOP and grows clockwise -->
         <circle id="timeArc" cx="50" cy="50" r="38"
           stroke="var(--accent)"
-          stroke-width="8"
+          stroke-width="16"
           fill="none"
           stroke-linecap="butt"
           stroke-dasharray="238.761"
           stroke-dashoffset="0"
           transform="rotate(-90 50 50)"></circle>
-      </svg>
 
-      <div class="timeLeftText">
-        <div class="k">TIME LEFT</div>
-        <div class="v" id="remaining">—</div>
-      </div>
+        <!-- inner text -->
+        <text class="dialK" x="50" y="45">TIME LEFT</text>
+        <text class="dialV" id="remaining" x="50" y="57">—</text>
+      </svg>
     </div>
 
     <!-- Progress moved BELOW time left -->
@@ -755,7 +751,7 @@
 </div>
 
 <script>
-const VERSION="1.0.24";
+const VERSION="1.0.25";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -1038,8 +1034,8 @@ function genJobs(){
     const fast=avg/SPEEDS[5].mult;
     const hidden=fast+(slow-fast)*(.15+Math.random()*.7);
 
-    /* +0–4 hours slack */
-    const slack = Math.round(Math.random()*4*60);
+    /* +0–2 hours slack */
+    const slack = Math.round(Math.random()*2*60);
 
     return{
       ...j,
@@ -1141,6 +1137,29 @@ function applyPendingEffects(){
   }
 }
 
+function tipPenaltyForFinish(){
+  const now=nowAbs();
+  const delta = state.job.deadlineAbs - now; // >0 early, <0 late
+
+  if(delta>0){
+    /* £1 per 10m early, capped at +30% pay */
+    const raw = Math.floor(delta/10);
+    const cap = Math.max(1, Math.floor(state.job.pay*0.30));
+    return Math.min(raw, cap);
+  }else if(delta<0){
+    /* -£2 per 5m late, capped at -100% pay */
+    const late = Math.ceil(Math.abs(delta)/5);
+    const raw = -(late*2);
+    return Math.max(raw, -state.job.pay);
+  }
+  return 0;
+}
+
+function abortPenalty(){
+  /* -35% of pay, min -£5 */
+  return -Math.max(5, Math.round(state.job.pay*0.35));
+}
+
 function startJob(o){
   state.job=o;
   state.elapsed=0;
@@ -1208,11 +1227,12 @@ function finish(){
 
   const timeTaken=Math.max(1,Math.ceil(state.elapsed));
   const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
-  const tip=0;
-  const total=state.job.pay+tip;
 
-  state.cash+=total;
-  state.dayEarnings+=total;
+  const tp = tipPenaltyForFinish();
+  const total = Math.max(0, state.job.pay + tp);
+
+  state.cash += total;
+  state.dayEarnings += total;
   state.jobsDone++;
 
   $("resultTitle").textContent="Job complete";
@@ -1220,7 +1240,7 @@ function finish(){
     <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
     <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>
     <div class="vrow"><span>Pay</span><span>£${state.job.pay}</span></div>
-    <div class="vrow"><span>Tip / penalty</span><span>£${tip}</span></div>
+    <div class="vrow"><span>Tip / penalty</span><span>${tp>=0 ? "£"+tp : "-£"+Math.abs(tp)}</span></div>
     <div class="vrow total"><span>Total</span><span>£${total}</span></div>
   `;
 
@@ -1296,11 +1316,16 @@ $("cancel").onclick=()=>{
   const timeTaken=Math.max(1,Math.ceil(state.elapsed));
   const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
 
+  const pen = abortPenalty();
+  state.cash += pen;
+  state.dayEarnings += pen;
+
   $("resultTitle").textContent="Job aborted";
   $("resultList").innerHTML=`
     <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
     <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>
-    <div class="vrow total"><span>Total</span><span>£0</span></div>
+    <div class="vrow"><span>Penalty</span><span>-£${Math.abs(pen)}</span></div>
+    <div class="vrow total"><span>Total</span><span>-£${Math.abs(pen)}</span></div>
   `;
 
   state.job=null;

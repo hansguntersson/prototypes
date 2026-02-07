@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.27</title>
+  <title>Courier v1.0.28</title>
   <style>
     :root{
       color-scheme: dark;
@@ -241,7 +241,8 @@
       flex:0 0 auto;
       display:block;
     }
-    .timeDial circle{
+    .timeDial circle,
+    .timeDial path{
       vector-effect: non-scaling-stroke;
     }
     .timeDial text{
@@ -509,7 +510,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.27</div>
+      <div class="kpiMid" id="versionText">v1.0.28</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -644,16 +645,18 @@
 
     <div class="timeLeftWrap">
       <svg class="timeDial" viewBox="0 0 100 100" aria-label="Time left">
+        <!-- track -->
         <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="14" fill="none" opacity="0.18"></circle>
-        <circle id="timeArc" cx="50" cy="50" r="38"
+
+        <!-- remaining arc as PATH (prevents seam wrap/splitting) -->
+        <path id="timeArc"
           stroke="var(--accent)"
           stroke-width="16"
           fill="none"
           stroke-linecap="butt"
-          stroke-dasharray="238.761"
-          stroke-dashoffset="0"
-          transform="rotate(-90 50 50)"></circle>
+          d=""></path>
 
+        <!-- inner text -->
         <text class="dialK" x="50" y="45">TIME LEFT</text>
         <text class="dialV" id="remaining" x="50" y="57">—</text>
       </svg>
@@ -693,6 +696,7 @@
   </div>
 </div>
 
+<!-- Live job bottom controls -->
 <div class="jobControls hidden" id="jobControls">
   <div class="jobControlsWrap">
     <button class="btnOutline btnMini" id="cancel">Abort job</button>
@@ -700,6 +704,7 @@
   </div>
 </div>
 
+<!-- Speed controls -->
 <div class="speedbar hidden" id="speedBar">
   <div class="speedwrap">
     <div class="speedhead">
@@ -710,6 +715,7 @@
   </div>
 </div>
 
+<!-- Energy footer -->
 <div class="energyFooter" id="energyFooter">
   <div class="energyWrap">
     <div class="energyLabel">ENERGY</div>
@@ -717,6 +723,7 @@
   </div>
 </div>
 
+<!-- Consumables modal -->
 <div class="modal" id="energyModal">
   <div class="modalBox">
     <div class="modalTitle">SNACKS</div>
@@ -726,6 +733,7 @@
   </div>
 </div>
 
+<!-- Rest modal -->
 <div class="modal" id="restModal">
   <div class="modalBox">
     <div class="modalTitle">REST</div>
@@ -738,7 +746,7 @@
 </div>
 
 <script>
-const VERSION="1.0.27";
+const VERSION="1.0.28";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -839,8 +847,6 @@ const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function minutesOfDay(){
   return ((Math.floor(state.time)%1440)+1440)%1440;
 }
-
-/* precise time (no floor) for smooth dial */
 function minutesOfDayPrecise(){
   return ((state.time%1440)+1440)%1440;
 }
@@ -848,7 +854,6 @@ function minutesOfDayPrecise(){
 function nowAbs(){
   return (state.day-1)*1440 + minutesOfDay();
 }
-
 function nowAbsPrecise(){
   return (state.day-1)*1440 + minutesOfDayPrecise();
 }
@@ -858,6 +863,24 @@ function fmtClock(mins){
   const hh=Math.floor(total/60);
   const mm=total%60;
   return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");
+}
+
+/* SVG arc helpers (0deg at TOP, clockwise) */
+function polarToCartesian(cx, cy, r, angleDeg){
+  const rad=(angleDeg-90) * Math.PI/180;
+  return {x: cx + (r*Math.cos(rad)), y: cy + (r*Math.sin(rad))};
+}
+function describeArc(cx, cy, r, startAngle, endAngle){
+  const start=polarToCartesian(cx, cy, r, endAngle);
+  const end=polarToCartesian(cx, cy, r, startAngle);
+  const largeArcFlag = (endAngle-startAngle) <= 180 ? "0" : "1";
+  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`;
+}
+function describeFullCircle(cx, cy, r){
+  /* two 180° arcs to make a full 360° ring */
+  const a1 = describeArc(cx, cy, r, 0, 180);
+  const a2 = describeArc(cx, cy, r, 180, 360);
+  return `${a1} ${a2}`;
 }
 
 function hexToRgb(hex){
@@ -881,12 +904,12 @@ function lerpColor(c1,c2,t){
 function setAccentFromTime(){
   const m=minutesOfDay();
   const stops=[
-    {m:  360, c:"#B8C9CA"},
-    {m:  600, c:"#C1E7B8"},
-    {m:  780, c:"#EBE8B8"},
-    {m:  960, c:"#F8BFC7"},
-    {m: 1140, c:"#F2A9CC"},
-    {m: 1320, c:"#C9A6D8"}
+    {m:  360, c:"#B8C9CA"}, // 06:00
+    {m:  600, c:"#C1E7B8"}, // 10:00
+    {m:  780, c:"#EBE8B8"}, // 13:00
+    {m:  960, c:"#F8BFC7"}, // 16:00
+    {m: 1140, c:"#F2A9CC"}, // 19:00
+    {m: 1320, c:"#C9A6D8"}  // 22:00
   ];
 
   if(m < stops[0].m){
@@ -928,13 +951,12 @@ function renderEnergyBar(){
   }
 }
 
-/* time dial based on deadline (smooth, precise). full ring at start */
+/* time dial based on deadline (smooth, never splits, starts full) */
 function updateTimeDialFromDeadline(){
   const arc=$("timeArc");
   if(!arc || !state.job) return;
 
-  const r=38;
-  const C=2*Math.PI*r;
+  const cx=50, cy=50, r=38;
 
   const now=nowAbsPrecise();
   const total=Math.max(0.000001, state.job.deadlineAbs - state.jobStartAbs);
@@ -942,13 +964,17 @@ function updateTimeDialFromDeadline(){
 
   const fracLeft=clamp(left/total, 0, 1);
 
-  if(fracLeft >= 0.999999){
-    arc.style.strokeDasharray = `${C} 0`;
+  if(left<=0){
+    arc.setAttribute("d","");
+    arc.style.opacity="0";
+  }else if(fracLeft >= 0.999999){
+    arc.setAttribute("d", describeFullCircle(cx,cy,r));
+    arc.style.opacity="1";
   }else{
-    arc.style.strokeDasharray = `${C*fracLeft} ${C}`;
+    const endAngle = 360*fracLeft;
+    arc.setAttribute("d", describeArc(cx,cy,r,0,endAngle));
+    arc.style.opacity="1";
   }
-  arc.style.strokeDashoffset = "0";
-  arc.style.opacity = (left<=0 ? "0" : "1");
 
   $("remaining").textContent=Math.max(0,Math.ceil(left))+"m";
 }
@@ -1030,6 +1056,7 @@ function genJobs(){
     const fast=avg/SPEEDS[5].mult;
     const hidden=fast+(slow-fast)*(.15+Math.random()*.7);
 
+    /* +0–2 hours slack */
     const slack = Math.round(Math.random()*2*60);
 
     return{
@@ -1252,6 +1279,7 @@ function finish(){
 }
 
 /* UI wiring */
+
 $("goJobs").onclick=()=>{
   if(!jobsInitialised){
     genJobs();

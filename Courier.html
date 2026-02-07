@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.23</title>
+  <title>Courier v1.0.24</title>
   <style>
     :root{
       color-scheme: dark;
@@ -234,12 +234,13 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:16px;
+      gap:18px;
       color:var(--accent);
     }
+    /* 2x bigger */
     .timeDial{
-      width:88px;
-      height:88px;
+      width:176px;
+      height:176px;
       flex:0 0 auto;
     }
     .timeDial circle{
@@ -248,20 +249,24 @@
     .timeLeftText{
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:10px;
       align-items:flex-start;
       font-family:var(--mono);
     }
     .timeLeftText .k{
-      font-size:14px;
-      font-weight:800;
+      font-size:16px;
+      font-weight:900;
       opacity:.9;
       letter-spacing:.2px;
     }
     .timeLeftText .v{
-      font-size:20px;
+      font-size:26px;
       font-weight:950;
     }
+
+    /* extra spacing under Progress header */
+    .progressBlock{ margin-top:22px; }
+    .progressHead{ margin-bottom:14px; }
 
     .jobControls{
       position:fixed;
@@ -508,7 +513,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.23</div>
+      <div class="kpiMid" id="versionText">v1.0.24</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -642,37 +647,40 @@
   <div class="screen hidden" id="job">
     <div class="offerHeader" id="jobName">—</div>
 
-    <div style="height:20px"></div>
-    <div class="row">
-      <div class="progressLabel">Progress</div>
-      <div class="progressPct" id="pct">0%</div>
-    </div>
-    <div class="bar"><div class="fill" id="fill"></div></div>
-    <div class="progressMeta">
-      <div id="milesDone">0.0 mi</div>
-      <div id="mph">0 mph</div>
-      <div id="milesLeft">0.0 mi</div>
-    </div>
-
     <!-- time left as circular dial + text -->
     <div class="timeLeftWrap">
       <svg class="timeDial" viewBox="0 0 100 100" aria-label="Time left">
         <!-- track -->
         <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="6" fill="none" opacity="0.22"></circle>
         <!-- remaining arc (shrinks, so empty wedge increases) -->
-        <!-- NOTE: circle path starts at 3 o'clock and proceeds clockwise -->
+        <!-- NOTE: circle path starts at 3 o'clock; rotate so empty wedge starts at TOP -->
         <circle id="timeArc" cx="50" cy="50" r="38"
           stroke="var(--accent)"
           stroke-width="8"
           fill="none"
           stroke-linecap="butt"
           stroke-dasharray="238.761"
-          stroke-dashoffset="0"></circle>
+          stroke-dashoffset="0"
+          transform="rotate(-90 50 50)"></circle>
       </svg>
 
       <div class="timeLeftText">
         <div class="k">TIME LEFT</div>
         <div class="v" id="remaining">—</div>
+      </div>
+    </div>
+
+    <!-- Progress moved BELOW time left -->
+    <div class="progressBlock">
+      <div class="row progressHead">
+        <div class="progressLabel">Progress</div>
+        <div class="progressPct" id="pct">0%</div>
+      </div>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div class="progressMeta">
+        <div id="milesDone">0.0 mi</div>
+        <div id="mph">0 mph</div>
+        <div id="milesLeft">0.0 mi</div>
       </div>
     </div>
   </div>
@@ -747,7 +755,7 @@
 </div>
 
 <script>
-const VERSION="1.0.23";
+const VERSION="1.0.24";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -929,7 +937,7 @@ function renderEnergyBar(){
 }
 
 /* time dial based on deadline, not speed/progress
-   empty wedge starts at 3 o'clock (right) and grows clockwise */
+   empty wedge starts at TOP and grows clockwise */
 function updateTimeDialFromDeadline(){
   const arc=$("timeArc");
   if(!arc || !state.job) return;

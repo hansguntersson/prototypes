@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.28</title>
+  <title>Courier v1.0.29</title>
   <style>
     :root{
       color-scheme: dark;
@@ -510,7 +510,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.28</div>
+      <div class="kpiMid" id="versionText">v1.0.29</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -648,7 +648,7 @@
         <!-- track -->
         <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="14" fill="none" opacity="0.18"></circle>
 
-        <!-- remaining arc as PATH (prevents seam wrap/splitting) -->
+        <!-- remaining arc as PATH -->
         <path id="timeArc"
           stroke="var(--accent)"
           stroke-width="16"
@@ -700,6 +700,7 @@
 <div class="jobControls hidden" id="jobControls">
   <div class="jobControlsWrap">
     <button class="btnOutline btnMini" id="cancel">Abort job</button>
+    <button class="btnOutline btnMini" id="eventBtn">Event</button>
     <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
   </div>
 </div>
@@ -733,6 +734,17 @@
   </div>
 </div>
 
+<!-- Event modal (placeholder) -->
+<div class="modal" id="eventModal">
+  <div class="modalBox">
+    <div class="modalTitle">EVENT</div>
+    <div class="resultBox" style="margin-top:0">
+      <div class="vlist" id="eventList"></div>
+    </div>
+    <button class="btnOutline" id="closeEvent">Continue</button>
+  </div>
+</div>
+
 <!-- Rest modal -->
 <div class="modal" id="restModal">
   <div class="modalBox">
@@ -746,7 +758,7 @@
 </div>
 
 <script>
-const VERSION="1.0.28";
+const VERSION="1.0.29";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -877,7 +889,6 @@ function describeArc(cx, cy, r, startAngle, endAngle){
   return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`;
 }
 function describeFullCircle(cx, cy, r){
-  /* two 180° arcs to make a full 360° ring */
   const a1 = describeArc(cx, cy, r, 0, 180);
   const a2 = describeArc(cx, cy, r, 180, 360);
   return `${a1} ${a2}`;
@@ -904,12 +915,12 @@ function lerpColor(c1,c2,t){
 function setAccentFromTime(){
   const m=minutesOfDay();
   const stops=[
-    {m:  360, c:"#B8C9CA"}, // 06:00
-    {m:  600, c:"#C1E7B8"}, // 10:00
-    {m:  780, c:"#EBE8B8"}, // 13:00
-    {m:  960, c:"#F8BFC7"}, // 16:00
-    {m: 1140, c:"#F2A9CC"}, // 19:00
-    {m: 1320, c:"#C9A6D8"}  // 22:00
+    {m:  360, c:"#B8C9CA"},
+    {m:  600, c:"#C1E7B8"},
+    {m:  780, c:"#EBE8B8"},
+    {m:  960, c:"#F8BFC7"},
+    {m: 1140, c:"#F2A9CC"},
+    {m: 1320, c:"#C9A6D8"}
   ];
 
   if(m < stops[0].m){
@@ -1056,7 +1067,6 @@ function genJobs(){
     const fast=avg/SPEEDS[5].mult;
     const hidden=fast+(slow-fast)*(.15+Math.random()*.7);
 
-    /* +0–2 hours slack */
     const slack = Math.round(Math.random()*2*60);
 
     return{
@@ -1159,9 +1169,10 @@ function applyPendingEffects(){
   }
 }
 
+/* tip/penalty now uses precise time base */
 function tipPenaltyForFinish(){
-  const now=nowAbs();
-  const delta = state.job.deadlineAbs - now;
+  const now=nowAbsPrecise();
+  const delta = state.job.deadlineAbs - now; // >0 early, <0 late
 
   if(delta>0){
     const raw = Math.floor(delta/10);
@@ -1277,6 +1288,42 @@ function finish(){
   setMode("result");
   renderTop();
 }
+
+/* Event (placeholder modal + small time/energy consequence) */
+const EVENTS=[
+  {t:"Red light gamble", d:"You gun it through a late amber. Lose 6% energy.", energy:-6, mins:0},
+  {t:"Stairwell detour", d:"Lift is out. Lose 4 minutes.", energy:0, mins:4},
+  {t:"Tailwind stretch", d:"Clear road. Gain 2 minutes.", energy:0, mins:-2},
+  {t:"Loose strap", d:"Bag strap slips. Lose 3% energy and 2 minutes.", energy:-3, mins:2}
+];
+
+function openEvent(){
+  if(!state.job) return;
+
+  const e=EVENTS[Math.floor(Math.random()*EVENTS.length)];
+  const rows=[];
+  rows.push(`<div class="vrow"><span>${e.t}</span><span></span></div>`);
+  rows.push(`<div class="vrow"><span style="opacity:.85">${e.d}</span><span></span></div>`);
+
+  if(e.mins!==0) rows.push(`<div class="vrow"><span>Time</span><span>${e.mins>0?"+":""}${e.mins}m</span></div>`);
+  if(e.energy!==0) rows.push(`<div class="vrow"><span>Energy</span><span>${e.energy>0?"+":""}${e.energy}%</span></div>`);
+
+  $("eventList").innerHTML=rows.join("");
+
+  if(e.mins!==0) advanceMinutes(e.mins);
+  if(e.energy!==0) state.energy=clamp(state.energy+e.energy,0,100);
+
+  updateTimeDialFromDeadline();
+  renderTop();
+
+  $("eventModal").style.display="flex";
+}
+function closeEvent(){
+  $("eventModal").style.display="none";
+}
+
+$("eventBtn").onclick=()=>{ openEvent(); };
+$("closeEvent").onclick=()=>{ closeEvent(); };
 
 /* UI wiring */
 

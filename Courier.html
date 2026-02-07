@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.22</title>
+  <title>Courier v1.0.23</title>
   <style>
     :root{
       color-scheme: dark;
@@ -202,20 +202,6 @@
       display:flex;
       justify-content:flex-end;
     }
-
-    .liveBox{
-      border:var(--stroke) solid var(--accent);
-      border-radius:var(--r2);
-      padding:12px;
-      margin-top:12px;
-    }
-    .liveCols{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:12px;
-    }
-    .metaLabel{font-family:var(--mono);font-size:14px;font-weight:800;color:var(--accent);}
-    .metaValue{font-family:var(--mono);font-size:20px;font-weight:950;margin-top:4px;color:var(--accent);}
 
     .progressLabel{font-family:var(--mono);font-size:22px;font-weight:950;color:var(--accent);}
     .progressPct{font-family:var(--mono);font-size:22px;font-weight:950;color:var(--accent);}
@@ -522,7 +508,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.22</div>
+      <div class="kpiMid" id="versionText">v1.0.23</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -656,14 +642,6 @@
   <div class="screen hidden" id="job">
     <div class="offerHeader" id="jobName">—</div>
 
-    <div class="liveBox">
-      <div class="liveCols">
-        <div><div class="metaLabel">Deadline</div><div class="metaValue" id="deadline">—</div></div>
-        <div><div class="metaLabel">Route</div><div class="metaValue" id="routeVal">—</div></div>
-        <div><div class="metaLabel">Pay</div><div class="metaValue" id="pay">—</div></div>
-      </div>
-    </div>
-
     <div style="height:20px"></div>
     <div class="row">
       <div class="progressLabel">Progress</div>
@@ -682,14 +660,14 @@
         <!-- track -->
         <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="6" fill="none" opacity="0.22"></circle>
         <!-- remaining arc (shrinks, so empty wedge increases) -->
+        <!-- NOTE: circle path starts at 3 o'clock and proceeds clockwise -->
         <circle id="timeArc" cx="50" cy="50" r="38"
           stroke="var(--accent)"
           stroke-width="8"
           fill="none"
           stroke-linecap="butt"
           stroke-dasharray="238.761"
-          stroke-dashoffset="0"
-          transform="rotate(-90 50 50)"></circle>
+          stroke-dashoffset="0"></circle>
       </svg>
 
       <div class="timeLeftText">
@@ -769,7 +747,7 @@
 </div>
 
 <script>
-const VERSION="1.0.22";
+const VERSION="1.0.23";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -807,6 +785,7 @@ const QUOTES=[
   "Estate drop. Stairs. No lift. Don’t be late."
 ];
 
+/* bracketed content removed */
 const GIVERS=[
   "Sam Patel",
   "Rosa Klein",
@@ -817,9 +796,9 @@ const GIVERS=[
   "Dan Cho",
 
   "Countess Von Deliverance",
-  "DJ Deadline (literally shaking)",
+  "DJ Deadline",
   "Chef Enzo ‘Two-Minute’ Marino",
-  "Professor Hargreaves (mildly panicking)",
+  "Professor Hargreaves",
   "Theatre Stage Manager: ‘We’re LIVE’",
   "Nadia ‘No Small Talk’ Novak",
   "Balthazar, Boutique Cryptid Curator",
@@ -847,6 +826,9 @@ const state={
   hiddenDuration:0,
   startEnergy:100,
   energySpentJob:0,
+
+  /* deadline dial baseline */
+  jobStartAbs:0,
 
   snackFx:null,
   drinkFx:null,
@@ -946,14 +928,26 @@ function renderEnergyBar(){
   }
 }
 
-function updateTimeDial(p){
+/* time dial based on deadline, not speed/progress
+   empty wedge starts at 3 o'clock (right) and grows clockwise */
+function updateTimeDialFromDeadline(){
   const arc=$("timeArc");
-  if(!arc) return;
+  if(!arc || !state.job) return;
+
   const r=38;
-  const C=2*Math.PI*r; // ~238.761
-  const off=clamp(p,0,1)*C; // progress eats the arc (empty wedge grows)
+  const C=2*Math.PI*r;
+
+  const now=nowAbs();
+  const total=Math.max(1, state.job.deadlineAbs - state.jobStartAbs);
+  const left=Math.max(0, state.job.deadlineAbs - now);
+
+  const elapsedFrac=clamp(1 - (left/total), 0, 1);  // 0 at accept -> 1 at deadline
+  const off=C*elapsedFrac;
+
   arc.style.strokeDasharray=String(C);
   arc.style.strokeDashoffset=String(off);
+
+  $("remaining").textContent=Math.max(0,Math.ceil(left))+"m";
 }
 
 function renderTop(){
@@ -1147,19 +1141,18 @@ function startJob(o){
   state.startEnergy=state.energy;
   state.energySpentJob=0;
 
-  $("jobName").textContent=o.name.toUpperCase();
-  $("deadline").textContent=fmtClock(o.deadlineAbs % 1440);
-  $("routeVal").textContent=o.route;
-  $("pay").textContent="£"+o.pay;
+  state.jobStartAbs = nowAbs();
 
-  $("remaining").textContent=o.hidden+"m";
+  $("jobName").textContent=o.name.toUpperCase();
+
+  $("remaining").textContent="—";
   $("pct").textContent="0%";
   $("fill").style.width="0%";
   $("milesDone").textContent="0.0 mi";
   $("milesLeft").textContent=o.dist.toFixed(1)+" mi";
   $("mph").textContent=Math.round(8*SPEEDS[state.speed].mult)+" mph";
 
-  updateTimeDial(0);
+  updateTimeDialFromDeadline();
 
   syncSpeed();
   setMode("job");
@@ -1186,19 +1179,16 @@ function tick(ts){
   state.energy=clamp(state.energy-drain,0,100);
   syncSpeed();
 
-  const remain=Math.max(0,Math.ceil(state.hiddenDuration-state.progress));
-  $("remaining").textContent=remain+"m";
-
   const p=clamp(state.progress/state.hiddenDuration,0,1);
   $("pct").textContent=Math.floor(p*100)+"%";
   $("fill").style.width=(p*100)+"%";
-
-  updateTimeDial(p);
 
   const milesDone=(state.job.dist*p);
   $("milesDone").textContent=milesDone.toFixed(1)+" mi";
   $("milesLeft").textContent=(state.job.dist-milesDone).toFixed(1)+" mi";
   $("mph").textContent=Math.round(8*mult)+" mph";
+
+  updateTimeDialFromDeadline();
 
   renderTop();
   if(p>=1) finish();

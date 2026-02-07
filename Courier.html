@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.20</title>
+  <title>Courier v1.0.21</title>
   <style>
     :root{
       color-scheme: dark;
@@ -54,7 +54,7 @@
     }
 
     .divider{
-      height:4px; /* doubled */
+      height:4px;
       background:var(--accent);
       margin:14px 0;
     }
@@ -240,6 +240,19 @@
     .progressMeta div:nth-child(2){text-align:center;}
     .progressMeta div:nth-child(3){text-align:right;}
 
+    .timeLeftRow{
+      margin-top:14px;
+      border-top:var(--stroke) solid var(--accent);
+      padding-top:12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      font-family:var(--mono);
+      color:var(--accent);
+    }
+    .timeLeftRow .k{font-size:14px;font-weight:800;opacity:.9;}
+    .timeLeftRow .v{font-size:20px;font-weight:950;}
+
     .jobControls{
       position:fixed;
       left:0;right:0;
@@ -338,15 +351,15 @@
       font-size:22px;
       font-weight:950;
       letter-spacing:1px;
-      margin-bottom:14px;
-      text-transform:uppercase; /* ALL CAPS (via CSS) */
+      margin-bottom:18px; /* more space */
+      text-transform:uppercase;
     }
     .offerTop{
       display:grid;
       grid-template-columns:120px 1fr;
-      gap:14px;
+      gap:16px;
       align-items:start;
-      margin-bottom:14px;
+      margin-bottom:22px; /* more space */
     }
     .avatar{
       border:var(--stroke) solid var(--accent);
@@ -359,8 +372,8 @@
       opacity:.95;
     }
     .avatar svg{
-      width:78px;   /* fills better */
-      height:78px;
+      width:92px;
+      height:92px;
       stroke:currentColor;
       fill:none;
       stroke-width:2;
@@ -378,14 +391,14 @@
       font-family:var(--mono);
       font-size:14px;
       font-weight:900;
-      margin-top:8px;
+      margin-top:10px;
       opacity:.85;
       color:var(--accent);
     }
     .offerFacts{
-      margin-top:14px;
+      margin-top:18px; /* more space */
       border-top:var(--stroke) solid var(--accent);
-      padding-top:12px;
+      padding-top:14px;
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:14px;
@@ -401,7 +414,7 @@
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:14px;
-      margin-top:14px;
+      margin-top:18px; /* more space */
     }
 
     .modal{
@@ -485,7 +498,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.20</div>
+      <div class="kpiMid" id="versionText">v1.0.21</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -586,14 +599,14 @@
 
     <div class="offerTop">
       <div class="avatar" aria-label="Dispatcher">
-        <!-- more appropriate + fills better -->
+        <!-- new icon + fills box better -->
         <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6.5 11.5c-1.5 0-2.8-1.3-2.8-3s1.3-3 2.8-3"></path>
+          <path d="M17.5 11.5c1.5 0 2.8-1.3 2.8-3s-1.3-3-2.8-3"></path>
           <path d="M7 10V9a5 5 0 0 1 10 0v1"></path>
-          <path d="M6.5 11.5c-1.3 0-2.5-1.2-2.5-2.6S5.2 6.5 6.6 6.5"></path>
-          <path d="M17.5 11.5c1.3 0 2.5-1.2 2.5-2.6S18.8 6.5 17.4 6.5"></path>
-          <circle cx="12" cy="10.2" r="3.2"></circle>
-          <path d="M7.2 20c.8-3 3-4.6 4.8-4.6h0c1.8 0 4 1.6 4.8 4.6"></path>
-          <path d="M17 14.2h2.3c.9 0 1.7.7 1.7 1.7v.9"></path>
+          <circle cx="12" cy="10.2" r="3.4"></circle>
+          <path d="M7.2 20c.7-3.2 3.1-4.9 4.8-4.9h0c1.7 0 4.1 1.7 4.8 4.9"></path>
+          <path d="M17.2 14.6h2.2c.9 0 1.6.7 1.6 1.6v1.1"></path>
         </svg>
       </div>
       <div>
@@ -621,12 +634,12 @@
 
   <!-- LIVE JOB -->
   <div class="screen hidden" id="job">
-    <!-- now same format as offer title -->
     <div class="offerHeader" id="jobName">—</div>
+
     <div class="liveBox">
       <div class="liveCols">
         <div><div class="metaLabel">Deadline</div><div class="metaValue" id="deadline">—</div></div>
-        <div><div class="metaLabel">Remaining</div><div class="metaValue" id="remaining">—</div></div>
+        <div><div class="metaLabel">Route</div><div class="metaValue" id="routeVal">—</div></div>
         <div><div class="metaLabel">Pay</div><div class="metaValue" id="pay">—</div></div>
       </div>
     </div>
@@ -641,6 +654,12 @@
       <div id="milesDone">0.0 mi</div>
       <div id="mph">0 mph</div>
       <div id="milesLeft">0.0 mi</div>
+    </div>
+
+    <!-- time left moved here -->
+    <div class="timeLeftRow">
+      <div class="k">TIME LEFT</div>
+      <div class="v" id="remaining">—</div>
     </div>
   </div>
 
@@ -667,23 +686,8 @@
 <!-- Live job bottom controls -->
 <div class="jobControls hidden" id="jobControls">
   <div class="jobControlsWrap">
-    <button class="btnOutline btnMini btnIcon" id="cancel">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="9"></circle>
-        <path d="M9 9l6 6"></path>
-        <path d="M15 9l-6 6"></path>
-      </svg>
-      <span>Cancel job</span>
-    </button>
-    <button class="btnOutline btnMini btnIcon" id="openConsumables">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="6" y="5" width="12" height="16" rx="2"></rect>
-        <path d="M9 8v10"></path>
-        <path d="M12 8v10"></path>
-        <path d="M15 8v10"></path>
-      </svg>
-      <span>Snacks</span>
-    </button>
+    <button class="btnOutline btnMini" id="cancel">Abort job</button>
+    <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
   </div>
 </div>
 
@@ -729,7 +733,7 @@
 </div>
 
 <script>
-const VERSION="1.0.20";
+const VERSION="1.0.21";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -742,12 +746,21 @@ const SPEEDS={
   5:{name:"very fast",mult:1.55}
 };
 
+/* expanded job pool (+7) */
 const JOBS=[
   {name:"Hot food drop",dist:2},
   {name:"Parcel run",dist:3.5},
   {name:"Groceries",dist:4.2},
   {name:"Fragile item",dist:5},
-  {name:"Rush SLA",dist:6}
+  {name:"Rush SLA",dist:6},
+
+  {name:"Mysterious briefcase (no questions)",dist:4.8},
+  {name:"VIP sushi apology delivery",dist:3.2},
+  {name:"Wedding cake rescue mission",dist:5.6},
+  {name:"Escape room props emergency",dist:2.7},
+  {name:"Library book: ‘DO NOT BEND’",dist:3.9},
+  {name:"Pet iguana medication dash",dist:6.4},
+  {name:"Band merch drop (sold-out panic)",dist:4.1}
 ];
 
 const ROUTES=["Easy","Mid","Tricky","Hellish"];
@@ -758,6 +771,7 @@ const QUOTES=[
   "Estate drop. Stairs. No lift. Don’t be late."
 ];
 
+/* expanded requesters */
 const GIVERS=[
   "Sam Patel",
   "Rosa Klein",
@@ -765,7 +779,16 @@ const GIVERS=[
   "Tom Weaver",
   "Mike O’Donnell",
   "Leah Brooks",
-  "Dan Cho"
+  "Dan Cho",
+
+  "Countess Von Deliverance",
+  "DJ Deadline (literally shaking)",
+  "Chef Enzo ‘Two-Minute’ Marino",
+  "Professor Hargreaves (mildly panicking)",
+  "Theatre Stage Manager: ‘We’re LIVE’",
+  "Nadia ‘No Small Talk’ Novak",
+  "Balthazar, Boutique Cryptid Curator",
+  "Gus from ‘Gus’s Very Serious Fish’"
 ];
 
 const state={
@@ -967,6 +990,10 @@ function genJobs(){
     const slow=avg/SPEEDS[1].mult;
     const fast=avg/SPEEDS[5].mult;
     const hidden=fast+(slow-fast)*(.15+Math.random()*.7);
+
+    /* +0–4 hours slack */
+    const slack = Math.round(Math.random()*4*60);
+
     return{
       ...j,
       giver: GIVERS[Math.floor(Math.random()*GIVERS.length)],
@@ -974,7 +1001,7 @@ function genJobs(){
       hidden:Math.round(hidden),
       pay:Math.round(j.dist*12+Math.random()*6),
       route: ROUTES[Math.floor(Math.random()*ROUTES.length)],
-      deadlineAbs: base + Math.round(avg)
+      deadlineAbs: base + Math.round(avg) + slack
     };
   });
   pruneOffers();
@@ -983,7 +1010,7 @@ function genJobs(){
 function openOffer(o){
   selectedOffer=o;
 
-  $("offerTitle").textContent=o.name.toUpperCase(); /* ALL CAPS */
+  $("offerTitle").textContent=o.name.toUpperCase();
   $("ofOrg").textContent=o.giver;
   $("ofQuote").textContent="“"+o.quote+"”";
 
@@ -1075,9 +1102,11 @@ function startJob(o){
   state.startEnergy=state.energy;
   state.energySpentJob=0;
 
-  $("jobName").textContent=o.name.toUpperCase(); /* match offer format */
+  $("jobName").textContent=o.name.toUpperCase();
   $("deadline").textContent=fmtClock(o.deadlineAbs % 1440);
+  $("routeVal").textContent=o.route;
   $("pay").textContent="£"+o.pay;
+
   $("remaining").textContent=o.hidden+"m";
   $("pct").textContent="0%";
   $("fill").style.width="0%";
@@ -1220,7 +1249,7 @@ $("cancel").onclick=()=>{
   const timeTaken=Math.max(1,Math.ceil(state.elapsed));
   const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
 
-  $("resultTitle").textContent="Job cancelled";
+  $("resultTitle").textContent="Job aborted";
   $("resultList").innerHTML=`
     <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
     <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>

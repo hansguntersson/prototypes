@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.30</title>
+  <title>Courier v1.0.31</title>
   <style>
     :root{
       color-scheme: dark;
@@ -517,7 +517,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.30</div>
+      <div class="kpiMid" id="versionText">v1.0.31</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -578,6 +578,16 @@
         <path d="M7 10h3"></path>
       </svg>
       Rest
+    </button>
+
+    <button class="btnOutline hubBtn hubBtnInline" id="resetGame" aria-label="Reset game">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+        <path d="M21 3v6h-6"></path>
+        <path d="M9 9l6 6"></path>
+        <path d="M15 9l-6 6"></path>
+      </svg>
+      Reset game
     </button>
   </div>
 
@@ -712,7 +722,6 @@
 <div class="jobControls hidden" id="jobControls">
   <div class="jobControlsWrap">
     <button class="btnOutline btnMini" id="cancel">Abort</button>
-    <button class="btnOutline btnMini" id="eventBtn">Event</button>
     <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
   </div>
 </div>
@@ -746,7 +755,7 @@
   </div>
 </div>
 
-<!-- Event modal (placeholder) -->
+<!-- Event modal -->
 <div class="modal" id="eventModal">
   <div class="modalBox">
     <div class="modalTitle">EVENT</div>
@@ -770,7 +779,7 @@
 </div>
 
 <script>
-const VERSION="1.0.30";
+const VERSION="1.0.31";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -827,6 +836,24 @@ const GIVERS=[
   "Gus from ‘Gus’s Very Serious Fish’"
 ];
 
+/* Events: accidents weighted up at higher speeds */
+const EVENT_POOL = {
+  normal: [
+    {t:"Stairwell detour", d:"Lift is out. Lose 4 minutes.", energy:0, mins:4},
+    {t:"Tailwind stretch", d:"Clear road. Gain 2 minutes.", energy:0, mins:-2},
+    {t:"Loose strap", d:"Bag strap slips. Lose 3% energy and 2 minutes.", energy:-3, mins:2},
+    {t:"Shortcut gamble", d:"You cut through a back alley. Gain 1 minute, lose 2% energy.", energy:-2, mins:-1}
+  ],
+  accident: [
+    {t:"Near miss", d:"Hard brake. You wobble it out. Lose 8% energy and 3 minutes.", energy:-8, mins:3},
+    {t:"Minor spill", d:"You clip a curb. Lose 12% energy and 6 minutes.", energy:-12, mins:6},
+    {t:"Impact scare", d:"Close call with a car door. Lose 10% energy and 4 minutes.", energy:-10, mins:4}
+  ]
+};
+
+const SAVE_KEY="courier_save";
+const SAVE_SCHEMA=1;
+
 const state={
   day:1,
   cash:0,
@@ -858,12 +885,18 @@ const state={
   pendingEndOfDay:false,
   eod:null,
 
+  /* random event control */
+  lastEventAbs:-1e9,
+
   lastTs:0,
   raf:0
 };
 
 let jobsInitialised=false;
 let selectedOffer=null;
+
+/* throttled autosave */
+let lastSaveMs=0;
 
 const $=id=>document.getElementById(id);
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -956,6 +989,103 @@ function setAccentFromTime(){
   }
 }
 
+/* ===== SAVE / LOAD ===== */
+
+function safeJsonParse(s){
+  try{ return JSON.parse(s); }catch(e){ return null; }
+}
+
+function saveState(force=false){
+  const now=performance.now();
+  if(!force && (now-lastSaveMs)<900) return;
+  lastSaveMs=now;
+
+  const payload={
+    schema:SAVE_SCHEMA,
+    version:VERSION,
+    state:{
+      day:state.day,
+      cash:state.cash,
+      time:state.time,
+      energy:state.energy,
+      speed:state.speed,
+      snacks:state.snacks,
+      drinks:state.drinks,
+      jobsDone:state.jobsDone,
+      dayEarnings:state.dayEarnings,
+      offers:state.offers,
+      job:state.job,
+      elapsed:state.elapsed,
+      progress:state.progress,
+      hiddenDuration:state.hiddenDuration,
+      startEnergy:state.startEnergy,
+      energySpentJob:state.energySpentJob,
+      jobStartAbs:state.jobStartAbs,
+      pendingEndOfDay:state.pendingEndOfDay,
+      eod:state.eod,
+      lastEventAbs:state.lastEventAbs
+    }
+  };
+
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+  }catch(e){
+    /* ignore (storage full / blocked) */
+  }
+}
+
+function loadState(){
+  const raw=localStorage.getItem(SAVE_KEY);
+  if(!raw) return false;
+
+  const data=safeJsonParse(raw);
+  if(!data || !data.state) return false;
+
+  const s=data.state;
+
+  state.day = (typeof s.day==="number" && s.day>=1) ? s.day : state.day;
+  state.cash = (typeof s.cash==="number") ? s.cash : state.cash;
+  state.time = (typeof s.time==="number") ? s.time : state.time;
+  state.energy = (typeof s.energy==="number") ? clamp(s.energy,0,100) : state.energy;
+  state.speed = (typeof s.speed==="number") ? clamp(Math.round(s.speed),1,5) : state.speed;
+
+  state.snacks = (typeof s.snacks==="number") ? clamp(Math.round(s.snacks),0,5) : state.snacks;
+  state.drinks = (typeof s.drinks==="number") ? clamp(Math.round(s.drinks),0,5) : state.drinks;
+
+  state.jobsDone = (typeof s.jobsDone==="number") ? Math.max(0,Math.round(s.jobsDone)) : state.jobsDone;
+  state.dayEarnings = (typeof s.dayEarnings==="number") ? Math.round(s.dayEarnings) : state.dayEarnings;
+
+  state.offers = Array.isArray(s.offers) ? s.offers : state.offers;
+
+  state.job = s.job || null;
+  state.elapsed = (typeof s.elapsed==="number") ? s.elapsed : 0;
+  state.progress = (typeof s.progress==="number") ? s.progress : 0;
+  state.hiddenDuration = (typeof s.hiddenDuration==="number") ? s.hiddenDuration : 0;
+  state.startEnergy = (typeof s.startEnergy==="number") ? s.startEnergy : state.energy;
+  state.energySpentJob = (typeof s.energySpentJob==="number") ? s.energySpentJob : 0;
+  state.jobStartAbs = (typeof s.jobStartAbs==="number") ? s.jobStartAbs : nowAbsPrecise();
+
+  state.pendingEndOfDay = !!s.pendingEndOfDay;
+  state.eod = (s.eod && typeof s.eod==="object") ? s.eod : null;
+
+  state.lastEventAbs = (typeof s.lastEventAbs==="number") ? s.lastEventAbs : -1e9;
+
+  /* do not restore in-flight consumable timers (safer) */
+  state.snackFx=null;
+  state.drinkFx=null;
+
+  jobsInitialised = Array.isArray(state.offers) && state.offers.length>0;
+  selectedOffer=null;
+
+  return true;
+}
+
+function wipeSave(){
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+}
+
+/* ===== UI ===== */
+
 function renderEnergyBar(){
   const bar=$("energyBar"); bar.innerHTML="";
   for(let i=0;i<10;i++){
@@ -1016,6 +1146,7 @@ function setMode(m){
   $("speedBar").classList.toggle("hidden",m!=="job");
   $("jobControls").classList.toggle("hidden",m!=="job");
   $("kpiWrap").classList.toggle("hidden", m!=="hub");
+  saveState();
 }
 
 function snapshotEOD(){
@@ -1041,11 +1172,13 @@ function showEndOfDay(){
   `;
   setMode("end");
   renderTop();
+  saveState(true);
 }
 function onMidnightRollover(){
   if(!state.eod) snapshotEOD();
   if(state.job){
     state.pendingEndOfDay=true;
+    saveState(true);
     return;
   }
   showEndOfDay();
@@ -1092,6 +1225,7 @@ function genJobs(){
     };
   });
   pruneOffers();
+  saveState(true);
 }
 
 function openOffer(o){
@@ -1140,7 +1274,7 @@ function buildSpeed(){
   for(let i=1;i<=5;i++){
     const b=document.createElement("button");
     b.textContent=i;
-    b.onclick=()=>{state.speed=Math.min(i,maxSpeed());syncSpeed();};
+    b.onclick=()=>{state.speed=Math.min(i,maxSpeed());syncSpeed();saveState(true);};
     seg.appendChild(b);
   }
   syncSpeed();
@@ -1202,23 +1336,27 @@ function abortPenalty(){
   return -Math.max(5, Math.round(state.job.pay*0.35));
 }
 
-function startJob(o){
+function startJob(o, resume=false){
   state.job=o;
-  state.elapsed=0;
-  state.progress=0;
-  state.hiddenDuration=o.hidden;
-  state.startEnergy=state.energy;
-  state.energySpentJob=0;
-
-  state.jobStartAbs = nowAbsPrecise();
+  if(!resume){
+    state.elapsed=0;
+    state.progress=0;
+    state.hiddenDuration=o.hidden;
+    state.startEnergy=state.energy;
+    state.energySpentJob=0;
+    state.jobStartAbs = nowAbsPrecise();
+    state.lastEventAbs = -1e9;
+  }
 
   $("jobName").textContent=o.name.toUpperCase();
 
-  $("remaining").textContent="—";
-  $("pct").textContent="0%";
-  $("fill").style.width="0%";
-  $("milesDone").textContent="0.0 mi";
-  $("milesLeft").textContent=o.dist.toFixed(1)+" mi";
+  const p=clamp(state.hiddenDuration>0 ? (state.progress/state.hiddenDuration) : 0,0,1);
+  $("pct").textContent=Math.floor(p*100)+"%";
+  $("fill").style.width=(p*100)+"%";
+
+  const milesDone=(o.dist*p);
+  $("milesDone").textContent=milesDone.toFixed(1)+" mi";
+  $("milesLeft").textContent=(o.dist-milesDone).toFixed(1)+" mi";
   $("mph").textContent=Math.round(8*SPEEDS[state.speed].mult)+" mph";
 
   updateTimeDialFromDeadline();
@@ -1227,11 +1365,93 @@ function startJob(o){
   setMode("job");
 
   state.lastTs=performance.now();
+  cancelAnimationFrame(state.raf);
   state.raf=requestAnimationFrame(tick);
+
+  saveState(true);
+}
+
+/* ===== RANDOM EVENT SYSTEM ===== */
+
+function chanceFromLambda(lambdaPerMin, dtMin){
+  const x = lambdaPerMin * Math.max(0,dtMin);
+  return 1 - Math.exp(-x);
+}
+
+function lambdaForSpeed(speed){
+  /* per in-game minute */
+  const bySpeed=[0, 0.010, 0.014, 0.020, 0.028, 0.038]; // 1..5
+  return bySpeed[clamp(speed,1,5)];
+}
+
+function accidentChanceForSpeed(speed){
+  /* speed 1 => 0.15, speed 5 => 0.55 */
+  return 0.15 + 0.10*(clamp(speed,1,5)-1);
+}
+
+function openEvent(){
+  if(!state.job) return;
+  if($("eventModal").style.display==="flex") return;
+
+  const acc = Math.random() < accidentChanceForSpeed(state.speed);
+  const pool = acc ? EVENT_POOL.accident : EVENT_POOL.normal;
+  const e = pool[Math.floor(Math.random()*pool.length)];
+
+  const rows=[];
+  rows.push(`<div class="vrow"><span>${e.t}</span><span></span></div>`);
+  rows.push(`<div class="vrow"><span style="opacity:.85">${e.d}</span><span></span></div>`);
+  if(e.mins!==0) rows.push(`<div class="vrow"><span>Time</span><span>${e.mins>0?"+":""}${e.mins}m</span></div>`);
+  if(e.energy!==0) rows.push(`<div class="vrow"><span>Energy</span><span>${e.energy>0?"+":""}${e.energy}%</span></div>`);
+
+  $("eventList").innerHTML=rows.join("");
+
+  if(e.mins!==0) advanceMinutes(e.mins);
+  if(e.energy!==0){
+    state.energy=clamp(state.energy+e.energy,0,100);
+    syncSpeed();
+  }
+
+  updateTimeDialFromDeadline();
+  renderTop();
+
+  $("eventModal").style.display="flex";
+  saveState(true);
+}
+
+function closeEvent(){
+  $("eventModal").style.display="none";
+  renderTop();
+  saveState(true);
+}
+
+$("closeEvent").onclick=()=>{ closeEvent(); };
+
+function maybeTriggerRandomEvent(dtMin){
+  if(!state.job) return;
+  if($("eventModal").style.display==="flex") return;
+
+  const now=nowAbsPrecise();
+  const minGap=3; // minutes
+  if((now - state.lastEventAbs) < minGap) return;
+
+  const lambda=lambdaForSpeed(state.speed);
+  const p=chanceFromLambda(lambda, dtMin);
+
+  if(Math.random() < p){
+    state.lastEventAbs = now;
+    openEvent();
+  }
 }
 
 function tick(ts){
   state.raf=requestAnimationFrame(tick);
+
+  /* pause simulation while modal is open */
+  if($("eventModal").style.display==="flex" || $("energyModal").style.display==="flex" || $("restModal").style.display==="flex"){
+    state.lastTs=ts;
+    return;
+  }
+
   const dtSec=(ts-state.lastTs)/1000;
   state.lastTs=ts;
 
@@ -1259,7 +1479,11 @@ function tick(ts){
 
   updateTimeDialFromDeadline();
 
+  maybeTriggerRandomEvent(dtMin);
+
   renderTop();
+  saveState();
+
   if(p>=1) finish();
 }
 
@@ -1301,43 +1525,8 @@ function finish(){
 
   setMode("result");
   renderTop();
+  saveState(true);
 }
-
-/* Event (placeholder modal + small time/energy consequence) */
-const EVENTS=[
-  {t:"Red light gamble", d:"You gun it through a late amber. Lose 6% energy.", energy:-6, mins:0},
-  {t:"Stairwell detour", d:"Lift is out. Lose 4 minutes.", energy:0, mins:4},
-  {t:"Tailwind stretch", d:"Clear road. Gain 2 minutes.", energy:0, mins:-2},
-  {t:"Loose strap", d:"Bag strap slips. Lose 3% energy and 2 minutes.", energy:-3, mins:2}
-];
-
-function openEvent(){
-  if(!state.job) return;
-
-  const e=EVENTS[Math.floor(Math.random()*EVENTS.length)];
-  const rows=[];
-  rows.push(`<div class="vrow"><span>${e.t}</span><span></span></div>`);
-  rows.push(`<div class="vrow"><span style="opacity:.85">${e.d}</span><span></span></div>`);
-
-  if(e.mins!==0) rows.push(`<div class="vrow"><span>Time</span><span>${e.mins>0?"+":""}${e.mins}m</span></div>`);
-  if(e.energy!==0) rows.push(`<div class="vrow"><span>Energy</span><span>${e.energy>0?"+":""}${e.energy}%</span></div>`);
-
-  $("eventList").innerHTML=rows.join("");
-
-  if(e.mins!==0) advanceMinutes(e.mins);
-  if(e.energy!==0) state.energy=clamp(state.energy+e.energy,0,100);
-
-  updateTimeDialFromDeadline();
-  renderTop();
-
-  $("eventModal").style.display="flex";
-}
-function closeEvent(){
-  $("eventModal").style.display="none";
-}
-
-$("eventBtn").onclick=()=>{ openEvent(); };
-$("closeEvent").onclick=()=>{ closeEvent(); };
 
 /* UI wiring */
 
@@ -1352,27 +1541,30 @@ $("goJobs").onclick=()=>{
   }
   setMode("board");
   renderTop();
+  saveState(true);
 };
 
 $("refreshJobs").onclick=()=>{
   genJobs();
   renderJobs();
   jobsInitialised=true;
+  saveState(true);
 };
 
-$("backHub").onclick=()=>{setMode("hub");renderTop();};
+$("backHub").onclick=()=>{setMode("hub");renderTop();saveState(true);};
 
 $("offerBack").onclick=()=>{
   selectedOffer=null;
   setMode("board");
   renderTop();
+  saveState(true);
 };
 
 $("offerAccept").onclick=()=>{
   if(!selectedOffer) return;
   const o=selectedOffer;
   selectedOffer=null;
-  startJob(o);
+  startJob(o,false);
 };
 
 $("backBoard").onclick=()=>{
@@ -1380,14 +1572,16 @@ $("backBoard").onclick=()=>{
   renderJobs();
   setMode("board");
   renderTop();
+  saveState(true);
 };
 
 $("goShop").onclick=()=>{
   updateShopUI();
   setMode("shop");
   renderTop();
+  saveState(true);
 };
-$("backHub2").onclick=()=>{setMode("hub");renderTop();};
+$("backHub2").onclick=()=>{setMode("hub");renderTop();saveState(true);};
 
 $("cancel").onclick=()=>{
   cancelAnimationFrame(state.raf);
@@ -1421,6 +1615,7 @@ $("cancel").onclick=()=>{
 
   setMode("result");
   renderTop();
+  saveState(true);
 };
 
 /* Consumables */
@@ -1438,9 +1633,10 @@ function updateConsumablesModal(){
 $("openConsumables").onclick=()=>{
   updateConsumablesModal();
   $("energyModal").style.display="flex";
+  saveState(true);
 };
 
-$("closeEnergy").onclick=()=>{$("energyModal").style.display="none";};
+$("closeEnergy").onclick=()=>{$("energyModal").style.display="none";saveState(true);};
 
 $("drinkBtn").onclick=()=>{
   if(state.drinks<=0) return;
@@ -1453,10 +1649,12 @@ $("drinkBtn").onclick=()=>{
     state.energy=clamp(state.energy-10,0,100);
     clearDrinkFx();
     renderTop();
+    saveState(true);
   },15000)};
 
   $("energyModal").style.display="none";
   renderTop();
+  saveState(true);
 };
 
 $("snackBtn").onclick=()=>{
@@ -1481,13 +1679,16 @@ $("snackBtn").onclick=()=>{
 
       ticks++;
       renderTop();
+      saveState();
       if(ticks>=15 || state.snackFx.remaining<=0){
         clearSnackFx();
+        saveState(true);
       }
     },1000);
   },15000);
 
   $("energyModal").style.display="none";
+  saveState(true);
 };
 
 /* Shop */
@@ -1511,6 +1712,7 @@ $("buyDrink").onclick=()=>{
   state.drinks++;
   updateShopUI();
   renderTop();
+  saveState(true);
 };
 
 $("buySnack").onclick=()=>{
@@ -1520,6 +1722,7 @@ $("buySnack").onclick=()=>{
   state.snacks++;
   updateShopUI();
   renderTop();
+  saveState(true);
 };
 
 /* Rest */
@@ -1534,10 +1737,12 @@ function openRest(){
   btn.disabled=!allowed;
   btn.style.display=allowed ? "block" : "none";
   $("restModal").style.display="flex";
+  saveState(true);
 }
 
 function closeRest(){
   $("restModal").style.display="none";
+  saveState(true);
 }
 
 /* boosted 4h and 8h */
@@ -1554,6 +1759,7 @@ function restHours(h){
   renderJobs();
   renderTop();
   closeRest();
+  saveState(true);
 }
 
 function restUntilMorning(){
@@ -1572,6 +1778,7 @@ function restUntilMorning(){
   renderJobs();
   renderTop();
   closeRest();
+  saveState(true);
 }
 
 $("restOpen").onclick=()=>{ openRest(); };
@@ -1595,12 +1802,78 @@ $("confirmEnd").onclick=()=>{
 
   setMode("hub");
   renderTop();
+  saveState(true);
 };
 
+/* Reset game */
+function hardResetGame(){
+  cancelAnimationFrame(state.raf);
+  clearSnackFx();
+  clearDrinkFx();
+
+  $("eventModal").style.display="none";
+  $("energyModal").style.display="none";
+  $("restModal").style.display="none";
+
+  state.day=1;
+  state.cash=0;
+  state.time=15*60;
+  state.energy=100;
+  state.speed=3;
+
+  state.snacks=1;
+  state.drinks=1;
+
+  state.jobsDone=0;
+  state.dayEarnings=0;
+
+  state.offers=[];
+  state.job=null;
+
+  state.elapsed=0;
+  state.progress=0;
+  state.hiddenDuration=0;
+  state.startEnergy=100;
+  state.energySpentJob=0;
+
+  state.jobStartAbs=0;
+  state.pendingEndOfDay=false;
+  state.eod=null;
+  state.lastEventAbs=-1e9;
+
+  selectedOffer=null;
+  jobsInitialised=false;
+
+  wipeSave();
+  renderTop();
+  setMode("hub");
+  saveState(true);
+}
+
+$("resetGame").onclick=()=>{ hardResetGame(); };
+
+/* boot */
 buildSpeed();
+
+/* load save if present */
+const loaded = loadState();
+
 renderTop();
-setMode("hub");
 document.title="Courier v"+VERSION;
+
+if(state.job){
+  /* resume in-progress job */
+  startJob(state.job, true);
+}else{
+  setMode("hub");
+}
+
+/* ensure we have jobs when entering board */
+if(loaded && Array.isArray(state.offers) && state.offers.length>0){
+  pruneOffers();
+  renderJobs();
+  saveState(true);
+}
 </script>
 </body>
 </html>

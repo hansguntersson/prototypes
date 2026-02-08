@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.31</title>
+  <title>Courier v1.0.32</title>
   <style>
     :root{
       color-scheme: dark;
@@ -501,6 +501,18 @@
     .vlist{display:grid;gap:8px;}
     .vrow{display:flex;justify-content:space-between;font-family:var(--mono);font-weight:800;color:var(--accent);}
     .vrow.total{border-top:var(--stroke) solid var(--accent);padding-top:10px;margin-top:6px;}
+
+    /* Shop cash line */
+    .shopCash{
+      text-align:center;
+      font-family:var(--mono);
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:.5px;
+      margin:2px 0 14px;
+      opacity:.95;
+      color:var(--accent);
+    }
   </style>
 </head>
 
@@ -517,7 +529,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.31</div>
+      <div class="kpiMid" id="versionText">v1.0.32</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -548,9 +560,7 @@
       <!-- Equipment (was Kit) -->
       <button class="btnOutline hubBtn" disabled aria-label="Equipment">
         <svg viewBox="0 0 24 24">
-          <!-- wrench -->
           <path d="M14.5 5.2a3.7 3.7 0 0 0-4.9 4.9L4.4 15.3a2 2 0 0 0 2.8 2.8l5.2-5.2a3.7 3.7 0 0 0 4.9-4.9l-2 2-2-2 2-2Z"></path>
-          <!-- small bolt -->
           <path d="M18.5 15.5l1.6 1.6"></path>
           <path d="M17.3 16.7l1.6-1.6"></path>
         </svg>
@@ -560,7 +570,6 @@
       <!-- Vehicles (was Bag) -->
       <button class="btnOutline hubBtn" disabled aria-label="Vehicles">
         <svg viewBox="0 0 24 24">
-          <!-- simple bike -->
           <circle cx="7" cy="17" r="3"></circle>
           <circle cx="17" cy="17" r="3"></circle>
           <path d="M9 17l3-7h3l2 4"></path>
@@ -594,6 +603,7 @@
   <!-- SHOP -->
   <div class="screen hidden" id="shop">
     <div class="jobTitle pageTitle">Shop</div>
+    <div class="shopCash" id="shopCash">CASH — £0</div>
 
     <button class="btn btnIcon" id="buyDrink">
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -722,6 +732,7 @@
 <div class="jobControls hidden" id="jobControls">
   <div class="jobControlsWrap">
     <button class="btnOutline btnMini" id="cancel">Abort</button>
+    <button class="btnOutline btnMini" id="eventBtn" disabled>Event</button>
     <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
   </div>
 </div>
@@ -762,7 +773,7 @@
     <div class="resultBox" style="margin-top:0">
       <div class="vlist" id="eventList"></div>
     </div>
-    <button class="btnOutline" id="closeEvent">Continue</button>
+    <button class="btn" id="closeEvent">Continue</button>
   </div>
 </div>
 
@@ -779,7 +790,7 @@
 </div>
 
 <script>
-const VERSION="1.0.31";
+const VERSION="1.0.32";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -806,7 +817,29 @@ const JOBS=[
   {name:"Escape room props",dist:2.7},
   {name:"Do not bend book",dist:3.9},
   {name:"Iguana meds dash",dist:6.4},
-  {name:"Band merch panic",dist:4.1}
+  {name:"Band merch panic",dist:4.1},
+
+  /* +20 jobs */
+  {name:"Late rent envelope",dist:2.4},
+  {name:"Urgent hard drive",dist:6.1},
+  {name:"Wedding cake box",dist:5.1},
+  {name:"Press pass handoff",dist:4.4},
+  {name:"Lab sample rush",dist:5.9},
+  {name:"Film reel transfer",dist:6.6},
+  {name:"Council documents",dist:3.7},
+  {name:"Vintage vinyl swap",dist:2.5},
+  {name:"Festival wristbands",dist:4.8},
+  {name:"Legal bundle",dist:5.4},
+  {name:"Tattoo stencil",dist:2.1},
+  {name:"Forgotten passport",dist:6.9},
+  {name:"Custom cake topper",dist:3.4},
+  {name:"Spare theatre keys",dist:4.0},
+  {name:"Kitchen knife set",dist:3.1},
+  {name:"Pharmacy pickup",dist:2.8},
+  {name:"Charity raffle box",dist:4.7},
+  {name:"Bike lock rescue",dist:2.2},
+  {name:"Sash window parts",dist:5.8},
+  {name:"Lost phone return",dist:3.6}
 ];
 
 const ROUTES=["Easy","Mid","Tricky","Hellish"];
@@ -836,20 +869,53 @@ const GIVERS=[
   "Gus from ‘Gus’s Very Serious Fish’"
 ];
 
-/* Events: accidents weighted up at higher speeds */
+/* Events:
+   - AUTO events: accidents weighted up at higher speeds (as before)
+   - PROMPT events: optional via timed Event button; NOT speed-weighted (neutral mix)
+*/
 const EVENT_POOL = {
   normal: [
+    {t:"Red light gamble", d:"You gun it through a late amber. Lose 6% energy.", energy:-6, mins:0},
     {t:"Stairwell detour", d:"Lift is out. Lose 4 minutes.", energy:0, mins:4},
     {t:"Tailwind stretch", d:"Clear road. Gain 2 minutes.", energy:0, mins:-2},
     {t:"Loose strap", d:"Bag strap slips. Lose 3% energy and 2 minutes.", energy:-3, mins:2},
-    {t:"Shortcut gamble", d:"You cut through a back alley. Gain 1 minute, lose 2% energy.", energy:-2, mins:-1}
+
+    /* +10 normal-ish */
+    {t:"Quiet cut-through", d:"A calm side street. Gain 1 minute.", energy:0, mins:-1},
+    {t:"Coffee queue", d:"You get stuck behind a crowd. Lose 3 minutes.", energy:0, mins:3},
+    {t:"Helpful doorman", d:"Someone holds the door. Gain 1 minute.", energy:0, mins:-1},
+    {t:"Wrong buzzer", d:"You buzz the wrong flat. Lose 2 minutes.", energy:0, mins:2},
+    {t:"Cobbles", d:"Rattly cobbles drain you. Lose 2% energy.", energy:-2, mins:0},
+    {t:"Green wave", d:"Every light goes green. Gain 3 minutes.", energy:0, mins:-3},
+    {t:"Roadworks shuffle", d:"Cones everywhere. Lose 5 minutes.", energy:0, mins:5},
+    {t:"Unexpected shortcut", d:"A signed cut-through. Gain 2 minutes.", energy:0, mins:-2},
+    {t:"Bag re-pack", d:"You re-pack on the move. Lose 1 minute, save 1% energy.", energy:+1, mins:1},
+    {t:"Steep ramp", d:"A long ramp saps you. Lose 4% energy.", energy:-4, mins:0}
   ],
   accident: [
     {t:"Near miss", d:"Hard brake. You wobble it out. Lose 8% energy and 3 minutes.", energy:-8, mins:3},
     {t:"Minor spill", d:"You clip a curb. Lose 12% energy and 6 minutes.", energy:-12, mins:6},
-    {t:"Impact scare", d:"Close call with a car door. Lose 10% energy and 4 minutes.", energy:-10, mins:4}
+    {t:"Impact scare", d:"Close call with a car door. Lose 10% energy and 4 minutes.", energy:-10, mins:4},
+
+    /* +6 accidents */
+    {t:"Chain slip", d:"Chain slips under load. Lose 6% energy and 3 minutes.", energy:-6, mins:3},
+    {t:"Skid", d:"Painted lines in drizzle. Lose 9% energy and 2 minutes.", energy:-9, mins:2},
+    {t:"Kerb strike", d:"Wheel bangs a kerb. Lose 7% energy and 5 minutes.", energy:-7, mins:5},
+    {t:"Handlebar clip", d:"You clip a bollard. Lose 11% energy and 4 minutes.", energy:-11, mins:4},
+    {t:"Foot slip", d:"Foot slips off pedal. Lose 5% energy and 2 minutes.", energy:-5, mins:2},
+    {t:"Bag spill", d:"Something shifts. Lose 8% energy and 6 minutes.", energy:-8, mins:6}
   ]
 };
+
+/* Prompt/optional events: NOT speed-weighted.
+   Mix good/bad; outcomes same model (mins, energy).
+   +4 here (to reach +20 total new events overall = 10 normal + 6 accident + 4 prompt) */
+const PROMPT_EVENTS=[
+  {t:"Shortcut sign", d:"A gated cut-through is ajar. Could save time.", energy:0, mins:-2},
+  {t:"Dodgy alley", d:"You cut through anyway. Bad vibe. Lose time.", energy:0, mins:3},
+  {t:"Perfect slipstream", d:"You tuck in behind a smooth rider. Gain time.", energy:0, mins:-2},
+  {t:"Puddle blast", d:"You hit a deep puddle. Lose energy and time.", energy:-5, mins:2}
+];
 
 const SAVE_KEY="courier_save";
 const SAVE_SCHEMA=1;
@@ -887,6 +953,11 @@ const state={
 
   /* random event control */
   lastEventAbs:-1e9,
+
+  /* prompt event control (optional) */
+  promptActive:false,
+  promptEndMs:0,
+  lastPromptAbs:-1e9,
 
   lastTs:0,
   raf:0
@@ -1023,7 +1094,10 @@ function saveState(force=false){
       jobStartAbs:state.jobStartAbs,
       pendingEndOfDay:state.pendingEndOfDay,
       eod:state.eod,
-      lastEventAbs:state.lastEventAbs
+      lastEventAbs:state.lastEventAbs,
+      promptActive:state.promptActive,
+      promptEndMs:state.promptEndMs,
+      lastPromptAbs:state.lastPromptAbs
     }
   };
 
@@ -1070,6 +1144,16 @@ function loadState(){
 
   state.lastEventAbs = (typeof s.lastEventAbs==="number") ? s.lastEventAbs : -1e9;
 
+  state.promptActive = !!s.promptActive;
+  state.promptEndMs = (typeof s.promptEndMs==="number") ? s.promptEndMs : 0;
+  state.lastPromptAbs = (typeof s.lastPromptAbs==="number") ? s.lastPromptAbs : -1e9;
+
+  /* if prompt window already expired (reload), cancel it */
+  if(state.promptActive && Date.now() > state.promptEndMs){
+    state.promptActive=false;
+    state.promptEndMs=0;
+  }
+
   /* do not restore in-flight consumable timers (safer) */
   state.snackFx=null;
   state.drinkFx=null;
@@ -1101,6 +1185,23 @@ function renderEnergyBar(){
       seg.style.opacity="0";
     }
     bar.appendChild(seg);
+  }
+}
+
+function updateEventBtnUI(){
+  const b=$("eventBtn");
+  if(!b) return;
+
+  if(state.promptActive){
+    b.disabled=false;
+    b.classList.remove("btnOutline");
+    b.classList.add("btn");
+    b.style.opacity="1";
+  }else{
+    b.disabled=true;
+    b.classList.remove("btn");
+    b.classList.add("btnOutline");
+    b.style.opacity="1";
   }
 }
 
@@ -1139,6 +1240,11 @@ function renderTop(){
   $("versionText").textContent="v"+VERSION;
   $("dayText").textContent="Day "+state.day;
   renderEnergyBar();
+
+  const shopCash=$("shopCash");
+  if(shopCash) shopCash.textContent="CASH — £"+state.cash;
+
+  updateEventBtnUI();
 }
 
 function setMode(m){
@@ -1338,14 +1444,20 @@ function abortPenalty(){
 
 function startJob(o, resume=false){
   state.job=o;
+
   if(!resume){
     state.elapsed=0;
     state.progress=0;
     state.hiddenDuration=o.hidden;
     state.startEnergy=state.energy;
     state.energySpentJob=0;
+
     state.jobStartAbs = nowAbsPrecise();
+
     state.lastEventAbs = -1e9;
+    state.lastPromptAbs = -1e9;
+    state.promptActive=false;
+    state.promptEndMs=0;
   }
 
   $("jobName").textContent=o.name.toUpperCase();
@@ -1368,6 +1480,7 @@ function startJob(o, resume=false){
   cancelAnimationFrame(state.raf);
   state.raf=requestAnimationFrame(tick);
 
+  renderTop();
   saveState(true);
 }
 
@@ -1379,7 +1492,7 @@ function chanceFromLambda(lambdaPerMin, dtMin){
 }
 
 function lambdaForSpeed(speed){
-  /* per in-game minute */
+  /* auto events per in-game minute (speed-weighted) */
   const bySpeed=[0, 0.010, 0.014, 0.020, 0.028, 0.038]; // 1..5
   return bySpeed[clamp(speed,1,5)];
 }
@@ -1389,17 +1502,17 @@ function accidentChanceForSpeed(speed){
   return 0.15 + 0.10*(clamp(speed,1,5)-1);
 }
 
-function openEvent(){
-  if(!state.job) return;
-  if($("eventModal").style.display==="flex") return;
+/* prompt events (optional) — NOT speed-weighted */
+function lambdaPrompt(){
+  /* prompts per in-game minute */
+  return 0.020;
+}
 
-  const acc = Math.random() < accidentChanceForSpeed(state.speed);
-  const pool = acc ? EVENT_POOL.accident : EVENT_POOL.normal;
-  const e = pool[Math.floor(Math.random()*pool.length)];
-
+function openEventFromObj(e){
   const rows=[];
   rows.push(`<div class="vrow"><span>${e.t}</span><span></span></div>`);
   rows.push(`<div class="vrow"><span style="opacity:.85">${e.d}</span><span></span></div>`);
+
   if(e.mins!==0) rows.push(`<div class="vrow"><span>Time</span><span>${e.mins>0?"+":""}${e.mins}m</span></div>`);
   if(e.energy!==0) rows.push(`<div class="vrow"><span>Energy</span><span>${e.energy>0?"+":""}${e.energy}%</span></div>`);
 
@@ -1418,28 +1531,78 @@ function openEvent(){
   saveState(true);
 }
 
+function openAutoEvent(){
+  if(!state.job) return;
+  if($("eventModal").style.display==="flex") return;
+
+  const acc = Math.random() < accidentChanceForSpeed(state.speed);
+  const pool = acc ? EVENT_POOL.accident : EVENT_POOL.normal;
+  const e = pool[Math.floor(Math.random()*pool.length)];
+
+  openEventFromObj(e);
+}
+
+function openPromptEvent(){
+  if(!state.job) return;
+  if($("eventModal").style.display==="flex") return;
+
+  const e = PROMPT_EVENTS[Math.floor(Math.random()*PROMPT_EVENTS.length)];
+  openEventFromObj(e);
+}
+
 function closeEvent(){
   $("eventModal").style.display="none";
   renderTop();
   saveState(true);
 }
-
 $("closeEvent").onclick=()=>{ closeEvent(); };
 
-function maybeTriggerRandomEvent(dtMin){
+function maybeTriggerAutoEvent(dtMin){
   if(!state.job) return;
   if($("eventModal").style.display==="flex") return;
+
+  /* don't auto-trigger while prompt window is active */
+  if(state.promptActive) return;
 
   const now=nowAbsPrecise();
   const minGap=3; // minutes
   if((now - state.lastEventAbs) < minGap) return;
+  if((now - state.lastPromptAbs) < minGap) return;
 
   const lambda=lambdaForSpeed(state.speed);
   const p=chanceFromLambda(lambda, dtMin);
 
   if(Math.random() < p){
     state.lastEventAbs = now;
-    openEvent();
+    openAutoEvent();
+  }
+}
+
+function maybeStartPromptWindow(dtMin){
+  if(!state.job) return;
+  if($("eventModal").style.display==="flex") return;
+
+  /* expire if needed */
+  if(state.promptActive && Date.now() > state.promptEndMs){
+    state.promptActive=false;
+    state.promptEndMs=0;
+    updateEventBtnUI();
+    saveState(true);
+  }
+
+  if(state.promptActive) return;
+
+  const now=nowAbsPrecise();
+  const minGap=4; // minutes between prompts (and away from auto events)
+  if((now - state.lastPromptAbs) < minGap) return;
+  if((now - state.lastEventAbs) < minGap) return;
+
+  const p=chanceFromLambda(lambdaPrompt(), dtMin);
+  if(Math.random() < p){
+    state.promptActive=true;
+    state.promptEndMs = Date.now() + (3000 + Math.random()*2000); // 3–5 seconds
+    updateEventBtnUI();
+    saveState(true);
   }
 }
 
@@ -1450,6 +1613,14 @@ function tick(ts){
   if($("eventModal").style.display==="flex" || $("energyModal").style.display==="flex" || $("restModal").style.display==="flex"){
     state.lastTs=ts;
     return;
+  }
+
+  /* prompt window expiry (real time) */
+  if(state.promptActive && Date.now() > state.promptEndMs){
+    state.promptActive=false;
+    state.promptEndMs=0;
+    updateEventBtnUI();
+    saveState(true);
   }
 
   const dtSec=(ts-state.lastTs)/1000;
@@ -1479,7 +1650,9 @@ function tick(ts){
 
   updateTimeDialFromDeadline();
 
-  maybeTriggerRandomEvent(dtMin);
+  /* prompt window + auto events */
+  maybeStartPromptWindow(dtMin);
+  maybeTriggerAutoEvent(dtMin);
 
   renderTop();
   saveState();
@@ -1490,6 +1663,10 @@ function tick(ts){
 function finish(){
   cancelAnimationFrame(state.raf);
   applyPendingEffects();
+
+  /* clear prompt on job end */
+  state.promptActive=false;
+  state.promptEndMs=0;
 
   const timeTaken=Math.max(1,Math.ceil(state.elapsed));
   const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
@@ -1587,6 +1764,9 @@ $("cancel").onclick=()=>{
   cancelAnimationFrame(state.raf);
   applyPendingEffects();
 
+  state.promptActive=false;
+  state.promptEndMs=0;
+
   const timeTaken=Math.max(1,Math.ceil(state.elapsed));
   const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
 
@@ -1616,6 +1796,24 @@ $("cancel").onclick=()=>{
   setMode("result");
   renderTop();
   saveState(true);
+};
+
+/* Optional prompted Event button */
+$("eventBtn").onclick=()=>{
+  if(!state.job) return;
+  if(!state.promptActive) return;
+  if($("eventModal").style.display==="flex") return;
+
+  state.promptActive=false;
+  state.promptEndMs=0;
+
+  state.lastPromptAbs = nowAbsPrecise();
+  state.lastEventAbs = state.lastPromptAbs; // avoid immediate auto event after prompt
+
+  updateEventBtnUI();
+  saveState(true);
+
+  openPromptEvent();
 };
 
 /* Consumables */
@@ -1697,6 +1895,7 @@ function updateShopUI(){
   $("snackPrice").textContent=PRICES.snack;
   $("drinkCount").textContent=state.drinks;
   $("snackCount").textContent=state.snacks;
+  $("shopCash").textContent="CASH — £"+state.cash;
 
   const buyDrink=$("buyDrink");
   const buySnack=$("buySnack");
@@ -1840,6 +2039,10 @@ function hardResetGame(){
   state.pendingEndOfDay=false;
   state.eod=null;
   state.lastEventAbs=-1e9;
+
+  state.promptActive=false;
+  state.promptEndMs=0;
+  state.lastPromptAbs=-1e9;
 
   selectedOffer=null;
   jobsInitialised=false;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.32</title>
+  <title>Courier v1.0.33</title>
   <style>
     :root{
       color-scheme: dark;
@@ -529,7 +529,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.32</div>
+      <div class="kpiMid" id="versionText">v1.0.33</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -790,7 +790,7 @@
 </div>
 
 <script>
-const VERSION="1.0.32";
+const VERSION="1.0.33";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -870,46 +870,42 @@ const GIVERS=[
 ];
 
 /* Events:
-   - AUTO events: accidents weighted up at higher speeds (as before)
-   - PROMPT events: optional via timed Event button; NOT speed-weighted (neutral mix)
+   - AUTO events: accidents + negative-weighting influenced by speed AND route difficulty
+   - PROMPT events: optional via timed Event button; NOT speed-weighted
 */
 const EVENT_POOL = {
   normal: [
-    {t:"Red light gamble", d:"You gun it through a late amber. Lose 6% energy.", energy:-6, mins:0},
-    {t:"Stairwell detour", d:"Lift is out. Lose 4 minutes.", energy:0, mins:4},
-    {t:"Tailwind stretch", d:"Clear road. Gain 2 minutes.", energy:0, mins:-2},
-    {t:"Loose strap", d:"Bag strap slips. Lose 3% energy and 2 minutes.", energy:-3, mins:2},
+    {t:"Red light gamble", d:"You gun it through a late amber. Lose 6% energy.", energy:-6, mins:0, mood:"bad"},
+    {t:"Stairwell detour", d:"Lift is out. Lose 4 minutes.", energy:0, mins:4, mood:"bad"},
+    {t:"Tailwind stretch", d:"Clear road. Gain 2 minutes.", energy:0, mins:-2, mood:"good"},
+    {t:"Loose strap", d:"Bag strap slips. Lose 3% energy and 2 minutes.", energy:-3, mins:2, mood:"bad"},
 
-    /* +10 normal-ish */
-    {t:"Quiet cut-through", d:"A calm side street. Gain 1 minute.", energy:0, mins:-1},
-    {t:"Coffee queue", d:"You get stuck behind a crowd. Lose 3 minutes.", energy:0, mins:3},
-    {t:"Helpful doorman", d:"Someone holds the door. Gain 1 minute.", energy:0, mins:-1},
-    {t:"Wrong buzzer", d:"You buzz the wrong flat. Lose 2 minutes.", energy:0, mins:2},
-    {t:"Cobbles", d:"Rattly cobbles drain you. Lose 2% energy.", energy:-2, mins:0},
-    {t:"Green wave", d:"Every light goes green. Gain 3 minutes.", energy:0, mins:-3},
-    {t:"Roadworks shuffle", d:"Cones everywhere. Lose 5 minutes.", energy:0, mins:5},
-    {t:"Unexpected shortcut", d:"A signed cut-through. Gain 2 minutes.", energy:0, mins:-2},
-    {t:"Bag re-pack", d:"You re-pack on the move. Lose 1 minute, save 1% energy.", energy:+1, mins:1},
-    {t:"Steep ramp", d:"A long ramp saps you. Lose 4% energy.", energy:-4, mins:0}
+    {t:"Quiet cut-through", d:"A calm side street. Gain 1 minute.", energy:0, mins:-1, mood:"good"},
+    {t:"Coffee queue", d:"You get stuck behind a crowd. Lose 3 minutes.", energy:0, mins:3, mood:"bad"},
+    {t:"Helpful doorman", d:"Someone holds the door. Gain 1 minute.", energy:0, mins:-1, mood:"good"},
+    {t:"Wrong buzzer", d:"You buzz the wrong flat. Lose 2 minutes.", energy:0, mins:2, mood:"bad"},
+    {t:"Cobbles", d:"Rattly cobbles drain you. Lose 2% energy.", energy:-2, mins:0, mood:"bad"},
+    {t:"Green wave", d:"Every light goes green. Gain 3 minutes.", energy:0, mins:-3, mood:"good"},
+    {t:"Roadworks shuffle", d:"Cones everywhere. Lose 5 minutes.", energy:0, mins:5, mood:"bad"},
+    {t:"Unexpected shortcut", d:"A signed cut-through. Gain 2 minutes.", energy:0, mins:-2, mood:"good"},
+    {t:"Bag re-pack", d:"You re-pack on the move. Lose 1 minute, save 1% energy.", energy:+1, mins:1, mood:"neutral"},
+    {t:"Steep ramp", d:"A long ramp saps you. Lose 4% energy.", energy:-4, mins:0, mood:"bad"}
   ],
   accident: [
-    {t:"Near miss", d:"Hard brake. You wobble it out. Lose 8% energy and 3 minutes.", energy:-8, mins:3},
-    {t:"Minor spill", d:"You clip a curb. Lose 12% energy and 6 minutes.", energy:-12, mins:6},
-    {t:"Impact scare", d:"Close call with a car door. Lose 10% energy and 4 minutes.", energy:-10, mins:4},
+    {t:"Near miss", d:"Hard brake. You wobble it out. Lose 8% energy and 3 minutes.", energy:-8, mins:3, mood:"bad"},
+    {t:"Minor spill", d:"You clip a curb. Lose 12% energy and 6 minutes.", energy:-12, mins:6, mood:"bad"},
+    {t:"Impact scare", d:"Close call with a car door. Lose 10% energy and 4 minutes.", energy:-10, mins:4, mood:"bad"},
 
-    /* +6 accidents */
-    {t:"Chain slip", d:"Chain slips under load. Lose 6% energy and 3 minutes.", energy:-6, mins:3},
-    {t:"Skid", d:"Painted lines in drizzle. Lose 9% energy and 2 minutes.", energy:-9, mins:2},
-    {t:"Kerb strike", d:"Wheel bangs a kerb. Lose 7% energy and 5 minutes.", energy:-7, mins:5},
-    {t:"Handlebar clip", d:"You clip a bollard. Lose 11% energy and 4 minutes.", energy:-11, mins:4},
-    {t:"Foot slip", d:"Foot slips off pedal. Lose 5% energy and 2 minutes.", energy:-5, mins:2},
-    {t:"Bag spill", d:"Something shifts. Lose 8% energy and 6 minutes.", energy:-8, mins:6}
+    {t:"Chain slip", d:"Chain slips under load. Lose 6% energy and 3 minutes.", energy:-6, mins:3, mood:"bad"},
+    {t:"Skid", d:"Painted lines in drizzle. Lose 9% energy and 2 minutes.", energy:-9, mins:2, mood:"bad"},
+    {t:"Kerb strike", d:"Wheel bangs a kerb. Lose 7% energy and 5 minutes.", energy:-7, mins:5, mood:"bad"},
+    {t:"Handlebar clip", d:"You clip a bollard. Lose 11% energy and 4 minutes.", energy:-11, mins:4, mood:"bad"},
+    {t:"Foot slip", d:"Foot slips off pedal. Lose 5% energy and 2 minutes.", energy:-5, mins:2, mood:"bad"},
+    {t:"Bag spill", d:"Something shifts. Lose 8% energy and 6 minutes.", energy:-8, mins:6, mood:"bad"}
   ]
 };
 
-/* Prompt/optional events: NOT speed-weighted.
-   Mix good/bad; outcomes same model (mins, energy).
-   +4 here (to reach +20 total new events overall = 10 normal + 6 accident + 4 prompt) */
+/* Prompt/optional events: NOT speed-weighted and NOT route-weighted (neutral mix as per prior note). */
 const PROMPT_EVENTS=[
   {t:"Shortcut sign", d:"A gated cut-through is ajar. Could save time.", energy:0, mins:-2},
   {t:"Dodgy alley", d:"You cut through anyway. Bad vibe. Lose time.", energy:0, mins:3},
@@ -1188,20 +1184,21 @@ function renderEnergyBar(){
   }
 }
 
+/* Event button: hidden unless prompt is active */
 function updateEventBtnUI(){
   const b=$("eventBtn");
   if(!b) return;
 
   if(state.promptActive){
+    b.style.display="";
     b.disabled=false;
     b.classList.remove("btnOutline");
     b.classList.add("btn");
-    b.style.opacity="1";
   }else{
     b.disabled=true;
     b.classList.remove("btn");
     b.classList.add("btnOutline");
-    b.style.opacity="1";
+    b.style.display="none";
   }
 }
 
@@ -1497,15 +1494,49 @@ function lambdaForSpeed(speed){
   return bySpeed[clamp(speed,1,5)];
 }
 
-function accidentChanceForSpeed(speed){
-  /* speed 1 => 0.15, speed 5 => 0.55 */
-  return 0.15 + 0.10*(clamp(speed,1,5)-1);
+function routeTier(route){
+  if(route==="Easy") return 0;
+  if(route==="Mid") return 1;
+  if(route==="Tricky") return 2;
+  if(route==="Hellish") return 3;
+  return 1;
 }
 
-/* prompt events (optional) — NOT speed-weighted */
+/* route influences negativity:
+   - accident chance multiplier
+   - normal pool bad-vs-good weighting
+*/
+function routeAccidentMult(route){
+  const t=routeTier(route);
+  return [0.75, 1.0, 1.25, 1.6][t];
+}
+function routeBadWeight(route){
+  const t=routeTier(route);
+  return [0.75, 1.0, 1.35, 1.75][t];
+}
+
+function accidentChanceForSpeedAndRoute(speed, route){
+  /* base from speed then scaled by route */
+  const base = 0.15 + 0.10*(clamp(speed,1,5)-1); // 0.15..0.55
+  const mult = routeAccidentMult(route);
+  return clamp(base*mult, 0.05, 0.90);
+}
+
 function lambdaPrompt(){
   /* prompts per in-game minute */
   return 0.020;
+}
+
+function pickWeighted(list, weightFn){
+  let sum=0;
+  for(const it of list) sum += Math.max(0, weightFn(it));
+  if(sum<=0) return list[Math.floor(Math.random()*list.length)];
+  let r=Math.random()*sum;
+  for(const it of list){
+    r -= Math.max(0, weightFn(it));
+    if(r<=0) return it;
+  }
+  return list[list.length-1];
 }
 
 function openEventFromObj(e){
@@ -1535,10 +1566,22 @@ function openAutoEvent(){
   if(!state.job) return;
   if($("eventModal").style.display==="flex") return;
 
-  const acc = Math.random() < accidentChanceForSpeed(state.speed);
-  const pool = acc ? EVENT_POOL.accident : EVENT_POOL.normal;
-  const e = pool[Math.floor(Math.random()*pool.length)];
+  const route = state.job.route || "Mid";
+  const acc = Math.random() < accidentChanceForSpeedAndRoute(state.speed, route);
 
+  if(acc){
+    const pool = EVENT_POOL.accident;
+    const e = pool[Math.floor(Math.random()*pool.length)];
+    openEventFromObj(e);
+    return;
+  }
+
+  const badW = routeBadWeight(route);
+  const e = pickWeighted(EVENT_POOL.normal, (x)=>{
+    if(x.mood==="bad") return 1.0*badW;
+    if(x.mood==="good") return 1.0;
+    return 0.9; // neutral
+  });
   openEventFromObj(e);
 }
 

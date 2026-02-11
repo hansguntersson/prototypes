@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.42</title>
+  <title>Courier v1.0.43</title>
   <style>
     :root{
       color-scheme: dark;
@@ -84,14 +84,14 @@
     }
     .btnMini.btnIcon svg{width:18px;height:18px;}
 
-    /* HUB: all buttons same size/layout as Rest (inline icon) */
+    /* HUB: tighter vertical spacing between buttons */
     .hubGrid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:12px;
       margin-top:18px;
     }
-    .hubGrid .btn, .hubGrid .btnOutline{ margin-top:0; } /* tighter vertical spacing */
+    .hubGrid .btn, .hubGrid .btnOutline{ margin-top:0; }
     .hubBtn{
       display:flex;
       align-items:center;
@@ -160,7 +160,6 @@
       margin-top:14px;text-align:center;font-family:var(--mono);font-size:16px;
       font-weight:900;cursor:pointer;user-select:none;color:var(--accent);
     }
-    .bottomRight{margin-top:14px;display:flex;justify-content:flex-end;}
 
     /* Top row for screens (title left, back right) */
     .pageTopRow{
@@ -655,7 +654,7 @@
 <script>
 "use strict";
 
-const VERSION="1.0.42";
+const VERSION="1.0.43";
 const WEEKLY_TARGET=500;
 
 const PRICES={drink:12,snack:6};
@@ -679,7 +678,7 @@ const QUOTES=[
 const REQUESTORS=["Sam Patel","Rosa Klein","Aisha Rahman","Tom Weaver"];
 const REPUTATION={"Sam Patel":7,"Rosa Klein":8,"Aisha Rahman":9,"Tom Weaver":6};
 
-/* ===== AVATARS (unique per requestor) ===== */
+/* ===== UNIQUE AVATARS (vectors) ===== */
 function avatarSvg(who, color="currentColor"){
   if(who==="Sam Patel"){
     return `
@@ -704,6 +703,7 @@ function avatarSvg(who, color="currentColor"){
         <path d="M19.8 8.2l-3 3"></path>
       </svg>`;
   }
+  /* Tom Weaver */
   return `
     <svg viewBox="0 0 24 24" aria-hidden="true" style="color:${color}">
       <rect x="5" y="6" width="14" height="12" rx="2"></rect>
@@ -724,6 +724,9 @@ function setResultAvatar(who){
   if(!el) return;
   el.innerHTML = avatarSvg(who, "#000");
 }
+function logoHtmlForJobRow(who){
+  return `<div class="jobLogo" aria-hidden="true">${avatarSvg(who,"currentColor")}</div>`;
+}
 
 function fbPack(topic){
   return {
@@ -734,91 +737,98 @@ function fbPack(topic){
   };
 }
 
-const JOB_CATALOG=[
-  {id:"sam_01", who:"Sam Patel", name:"Hot food drop", dist:2.0, seq:1, repeat:true,  fb:fbPack("that hot drop")},
-  {id:"sam_02", who:"Sam Patel", name:"Parcel run", dist:3.5, seq:1, repeat:true,  fb:fbPack("the parcel")},
-  {id:"sam_03", who:"Sam Patel", name:"Groceries", dist:4.2, seq:1, repeat:true,  fb:fbPack("the groceries")},
-  {id:"sam_04", who:"Sam Patel", name:"Fragile item", dist:5.0, seq:1, repeat:false, fb:fbPack("the fragile item")},
-  {id:"sam_05", who:"Sam Patel", name:"Rush SLA", dist:6.0, seq:2, repeat:true,  fb:fbPack("the rush SLA")},
-  {id:"sam_06", who:"Sam Patel", name:"Late rent env", dist:2.4, seq:2, repeat:false, fb:fbPack("the rent envelope")},
-  {id:"sam_07", who:"Sam Patel", name:"Urgent drive", dist:6.1, seq:2, repeat:true,  fb:fbPack("the hard drive")},
-  {id:"sam_08", who:"Sam Patel", name:"Council docs", dist:3.7, seq:2, repeat:true,  fb:fbPack("the council docs")},
-  {id:"sam_09", who:"Sam Patel", name:"Legal bundle", dist:5.4, seq:3, repeat:true,  fb:fbPack("the legal bundle")},
-  {id:"sam_10", who:"Sam Patel", name:"Press pass", dist:4.4, seq:3, repeat:false, fb:fbPack("the press pass")},
-  {id:"sam_11", who:"Sam Patel", name:"Lab sample", dist:5.9, seq:3, repeat:true,  fb:fbPack("the lab sample")},
-  {id:"sam_12", who:"Sam Patel", name:"Film reel", dist:6.6, seq:3, repeat:false, fb:fbPack("the film reel")},
-  {id:"sam_13", who:"Sam Patel", name:"Vintage vinyl", dist:2.5, seq:4, repeat:true,  fb:fbPack("the vinyl swap")},
-  {id:"sam_14", who:"Sam Patel", name:"Wristbands", dist:4.8, seq:4, repeat:true,  fb:fbPack("the wristbands")},
-  {id:"sam_15", who:"Sam Patel", name:"Passport return", dist:6.9, seq:4, repeat:false, fb:fbPack("the passport")},
-  {id:"sam_16", who:"Sam Patel", name:"Theatre keys", dist:4.0, seq:4, repeat:true,  fb:fbPack("those keys")},
-  {id:"sam_17", who:"Sam Patel", name:"Knife set", dist:3.1, seq:5, repeat:true,  fb:fbPack("the knife set")},
-  {id:"sam_18", who:"Sam Patel", name:"Sash parts", dist:5.8, seq:5, repeat:false, fb:fbPack("the window parts")},
-  {id:"sam_19", who:"Sam Patel", name:"Phone return", dist:3.6, seq:5, repeat:true,  fb:fbPack("that phone")},
-  {id:"sam_20", who:"Sam Patel", name:"Bike lock", dist:2.2, seq:5, repeat:true,  fb:fbPack("the lock rescue")},
+const JOB_CATALOG = /* unchanged catalog */ (function(){
+  return window.__JOB_CATALOG__ || (window.__JOB_CATALOG__ = ([
+    /* --- same catalog as you pasted (80 jobs) --- */
+    /* Sam Patel (20) */
+    {id:"sam_01", who:"Sam Patel", name:"Hot food drop", dist:2.0, seq:1, repeat:true,  fb:fbPack("that hot drop")},
+    {id:"sam_02", who:"Sam Patel", name:"Parcel run", dist:3.5, seq:1, repeat:true,  fb:fbPack("the parcel")},
+    {id:"sam_03", who:"Sam Patel", name:"Groceries", dist:4.2, seq:1, repeat:true,  fb:fbPack("the groceries")},
+    {id:"sam_04", who:"Sam Patel", name:"Fragile item", dist:5.0, seq:1, repeat:false, fb:fbPack("the fragile item")},
+    {id:"sam_05", who:"Sam Patel", name:"Rush SLA", dist:6.0, seq:2, repeat:true,  fb:fbPack("the rush SLA")},
+    {id:"sam_06", who:"Sam Patel", name:"Late rent env", dist:2.4, seq:2, repeat:false, fb:fbPack("the rent envelope")},
+    {id:"sam_07", who:"Sam Patel", name:"Urgent drive", dist:6.1, seq:2, repeat:true,  fb:fbPack("the hard drive")},
+    {id:"sam_08", who:"Sam Patel", name:"Council docs", dist:3.7, seq:2, repeat:true,  fb:fbPack("the council docs")},
+    {id:"sam_09", who:"Sam Patel", name:"Legal bundle", dist:5.4, seq:3, repeat:true,  fb:fbPack("the legal bundle")},
+    {id:"sam_10", who:"Sam Patel", name:"Press pass", dist:4.4, seq:3, repeat:false, fb:fbPack("the press pass")},
+    {id:"sam_11", who:"Sam Patel", name:"Lab sample", dist:5.9, seq:3, repeat:true,  fb:fbPack("the lab sample")},
+    {id:"sam_12", who:"Sam Patel", name:"Film reel", dist:6.6, seq:3, repeat:false, fb:fbPack("the film reel")},
+    {id:"sam_13", who:"Sam Patel", name:"Vintage vinyl", dist:2.5, seq:4, repeat:true,  fb:fbPack("the vinyl swap")},
+    {id:"sam_14", who:"Sam Patel", name:"Wristbands", dist:4.8, seq:4, repeat:true,  fb:fbPack("the wristbands")},
+    {id:"sam_15", who:"Sam Patel", name:"Passport return", dist:6.9, seq:4, repeat:false, fb:fbPack("the passport")},
+    {id:"sam_16", who:"Sam Patel", name:"Theatre keys", dist:4.0, seq:4, repeat:true,  fb:fbPack("those keys")},
+    {id:"sam_17", who:"Sam Patel", name:"Knife set", dist:3.1, seq:5, repeat:true,  fb:fbPack("the knife set")},
+    {id:"sam_18", who:"Sam Patel", name:"Sash parts", dist:5.8, seq:5, repeat:false, fb:fbPack("the window parts")},
+    {id:"sam_19", who:"Sam Patel", name:"Phone return", dist:3.6, seq:5, repeat:true,  fb:fbPack("that phone")},
+    {id:"sam_20", who:"Sam Patel", name:"Bike lock", dist:2.2, seq:5, repeat:true,  fb:fbPack("the lock rescue")},
 
-  {id:"rosa_01", who:"Rosa Klein", name:"VIP sushi", dist:3.2, seq:1, repeat:true,  fb:fbPack("the sushi")},
-  {id:"rosa_02", who:"Rosa Klein", name:"Cake rescue", dist:5.6, seq:1, repeat:true,  fb:fbPack("the cake")},
-  {id:"rosa_03", who:"Rosa Klein", name:"Props drop", dist:2.7, seq:1, repeat:true,  fb:fbPack("the props")},
-  {id:"rosa_04", who:"Rosa Klein", name:"Do not bend", dist:3.9, seq:1, repeat:false, fb:fbPack("the book")},
-  {id:"rosa_05", who:"Rosa Klein", name:"Band merch", dist:4.1, seq:2, repeat:true,  fb:fbPack("the merch")},
-  {id:"rosa_06", who:"Rosa Klein", name:"Tattoo stencil", dist:2.1, seq:2, repeat:true,  fb:fbPack("the stencil")},
-  {id:"rosa_07", who:"Rosa Klein", name:"Cake topper", dist:3.4, seq:2, repeat:true,  fb:fbPack("the topper")},
-  {id:"rosa_08", who:"Rosa Klein", name:"Charity box", dist:4.7, seq:2, repeat:false, fb:fbPack("the raffle box")},
-  {id:"rosa_09", who:"Rosa Klein", name:"Poster tubes", dist:4.9, seq:3, repeat:true,  fb:fbPack("the posters")},
-  {id:"rosa_10", who:"Rosa Klein", name:"Lens rental", dist:5.5, seq:3, repeat:true,  fb:fbPack("the lens")},
-  {id:"rosa_11", who:"Rosa Klein", name:"Studio keys", dist:3.1, seq:3, repeat:false, fb:fbPack("studio keys")},
-  {id:"rosa_12", who:"Rosa Klein", name:"Afterparty bands", dist:4.2, seq:3, repeat:true,  fb:fbPack("the bands")},
-  {id:"rosa_13", who:"Rosa Klein", name:"Set list", dist:2.0, seq:4, repeat:true,  fb:fbPack("the set list")},
-  {id:"rosa_14", who:"Rosa Klein", name:"Wardrobe pins", dist:2.8, seq:4, repeat:true,  fb:fbPack("wardrobe pins")},
-  {id:"rosa_15", who:"Rosa Klein", name:"Makeup kit", dist:3.6, seq:4, repeat:false, fb:fbPack("the makeup kit")},
-  {id:"rosa_16", who:"Rosa Klein", name:"USB master", dist:5.7, seq:4, repeat:true,  fb:fbPack("the USB master")},
-  {id:"rosa_17", who:"Rosa Klein", name:"Signed vinyl", dist:3.8, seq:5, repeat:false, fb:fbPack("the signed vinyl")},
-  {id:"rosa_18", who:"Rosa Klein", name:"Green room", dist:2.6, seq:5, repeat:true,  fb:fbPack("green room snacks")},
-  {id:"rosa_19", who:"Rosa Klein", name:"Ticket stubs", dist:3.0, seq:5, repeat:true,  fb:fbPack("ticket stubs")},
-  {id:"rosa_20", who:"Rosa Klein", name:"Stage pass", dist:4.4, seq:5, repeat:true,  fb:fbPack("the stage pass")},
+    /* Rosa Klein (20) */
+    {id:"rosa_01", who:"Rosa Klein", name:"VIP sushi", dist:3.2, seq:1, repeat:true,  fb:fbPack("the sushi")},
+    {id:"rosa_02", who:"Rosa Klein", name:"Cake rescue", dist:5.6, seq:1, repeat:true,  fb:fbPack("the cake")},
+    {id:"rosa_03", who:"Rosa Klein", name:"Props drop", dist:2.7, seq:1, repeat:true,  fb:fbPack("the props")},
+    {id:"rosa_04", who:"Rosa Klein", name:"Do not bend", dist:3.9, seq:1, repeat:false, fb:fbPack("the book")},
+    {id:"rosa_05", who:"Rosa Klein", name:"Band merch", dist:4.1, seq:2, repeat:true,  fb:fbPack("the merch")},
+    {id:"rosa_06", who:"Rosa Klein", name:"Tattoo stencil", dist:2.1, seq:2, repeat:true,  fb:fbPack("the stencil")},
+    {id:"rosa_07", who:"Rosa Klein", name:"Cake topper", dist:3.4, seq:2, repeat:true,  fb:fbPack("the topper")},
+    {id:"rosa_08", who:"Rosa Klein", name:"Charity box", dist:4.7, seq:2, repeat:false, fb:fbPack("the raffle box")},
+    {id:"rosa_09", who:"Rosa Klein", name:"Poster tubes", dist:4.9, seq:3, repeat:true,  fb:fbPack("the posters")},
+    {id:"rosa_10", who:"Rosa Klein", name:"Lens rental", dist:5.5, seq:3, repeat:true,  fb:fbPack("the lens")},
+    {id:"rosa_11", who:"Rosa Klein", name:"Studio keys", dist:3.1, seq:3, repeat:false, fb:fbPack("studio keys")},
+    {id:"rosa_12", who:"Rosa Klein", name:"Afterparty bands", dist:4.2, seq:3, repeat:true,  fb:fbPack("the bands")},
+    {id:"rosa_13", who:"Rosa Klein", name:"Set list", dist:2.0, seq:4, repeat:true,  fb:fbPack("the set list")},
+    {id:"rosa_14", who:"Rosa Klein", name:"Wardrobe pins", dist:2.8, seq:4, repeat:true,  fb:fbPack("wardrobe pins")},
+    {id:"rosa_15", who:"Rosa Klein", name:"Makeup kit", dist:3.6, seq:4, repeat:false, fb:fbPack("the makeup kit")},
+    {id:"rosa_16", who:"Rosa Klein", name:"USB master", dist:5.7, seq:4, repeat:true,  fb:fbPack("the USB master")},
+    {id:"rosa_17", who:"Rosa Klein", name:"Signed vinyl", dist:3.8, seq:5, repeat:false, fb:fbPack("the signed vinyl")},
+    {id:"rosa_18", who:"Rosa Klein", name:"Green room", dist:2.6, seq:5, repeat:true,  fb:fbPack("green room snacks")},
+    {id:"rosa_19", who:"Rosa Klein", name:"Ticket stubs", dist:3.0, seq:5, repeat:true,  fb:fbPack("ticket stubs")},
+    {id:"rosa_20", who:"Rosa Klein", name:"Stage pass", dist:4.4, seq:5, repeat:true,  fb:fbPack("the stage pass")},
 
-  {id:"aisha_01", who:"Aisha Rahman", name:"Pharmacy pickup", dist:2.8, seq:1, repeat:true,  fb:fbPack("the pickup")},
-  {id:"aisha_02", who:"Aisha Rahman", name:"Iguana meds", dist:6.4, seq:1, repeat:true,  fb:fbPack("the meds")},
-  {id:"aisha_03", who:"Aisha Rahman", name:"Clinic forms", dist:3.2, seq:1, repeat:true,  fb:fbPack("those forms")},
-  {id:"aisha_04", who:"Aisha Rahman", name:"Blood kit", dist:4.1, seq:1, repeat:false, fb:fbPack("the kit")},
-  {id:"aisha_05", who:"Aisha Rahman", name:"Lab rush", dist:5.9, seq:2, repeat:true,  fb:fbPack("the rush sample")},
-  {id:"aisha_06", who:"Aisha Rahman", name:"X-ray disc", dist:4.6, seq:2, repeat:false, fb:fbPack("the disc")},
-  {id:"aisha_07", who:"Aisha Rahman", name:"Care package", dist:3.9, seq:2, repeat:true,  fb:fbPack("the package")},
-  {id:"aisha_08", who:"Aisha Rahman", name:"Vaccine docs", dist:3.4, seq:2, repeat:true,  fb:fbPack("the docs")},
-  {id:"aisha_09", who:"Aisha Rahman", name:"Specimen box", dist:5.2, seq:3, repeat:true,  fb:fbPack("the specimen")},
-  {id:"aisha_10", who:"Aisha Rahman", name:"Allergy results", dist:3.7, seq:3, repeat:true,  fb:fbPack("the results")},
-  {id:"aisha_11", who:"Aisha Rahman", name:"Dental mould", dist:4.8, seq:3, repeat:false, fb:fbPack("the mould")},
-  {id:"aisha_12", who:"Aisha Rahman", name:"Stitch kit", dist:2.9, seq:3, repeat:true,  fb:fbPack("the kit")},
-  {id:"aisha_13", who:"Aisha Rahman", name:"Cold chain", dist:6.6, seq:4, repeat:true,  fb:fbPack("cold chain")},
-  {id:"aisha_14", who:"Aisha Rahman", name:"Urgent referral", dist:6.0, seq:4, repeat:false, fb:fbPack("the referral")},
-  {id:"aisha_15", who:"Aisha Rahman", name:"Ward swap", dist:4.0, seq:4, repeat:true,  fb:fbPack("the ward swap")},
-  {id:"aisha_16", who:"Aisha Rahman", name:"Therapy notes", dist:3.1, seq:4, repeat:true,  fb:fbPack("the notes")},
-  {id:"aisha_17", who:"Aisha Rahman", name:"Consent forms", dist:3.6, seq:5, repeat:true,  fb:fbPack("consent forms")},
-  {id:"aisha_18", who:"Aisha Rahman", name:"Path slides", dist:5.8, seq:5, repeat:false, fb:fbPack("the slides")},
-  {id:"aisha_19", who:"Aisha Rahman", name:"IV supplies", dist:4.4, seq:5, repeat:true,  fb:fbPack("IV supplies")},
-  {id:"aisha_20", who:"Aisha Rahman", name:"Hosp keys", dist:3.3, seq:5, repeat:false, fb:fbPack("those keys")},
+    /* Aisha Rahman (20) */
+    {id:"aisha_01", who:"Aisha Rahman", name:"Pharmacy pickup", dist:2.8, seq:1, repeat:true,  fb:fbPack("the pickup")},
+    {id:"aisha_02", who:"Aisha Rahman", name:"Iguana meds", dist:6.4, seq:1, repeat:true,  fb:fbPack("the meds")},
+    {id:"aisha_03", who:"Aisha Rahman", name:"Clinic forms", dist:3.2, seq:1, repeat:true,  fb:fbPack("those forms")},
+    {id:"aisha_04", who:"Aisha Rahman", name:"Blood kit", dist:4.1, seq:1, repeat:false, fb:fbPack("the kit")},
+    {id:"aisha_05", who:"Aisha Rahman", name:"Lab rush", dist:5.9, seq:2, repeat:true,  fb:fbPack("the rush sample")},
+    {id:"aisha_06", who:"Aisha Rahman", name:"X-ray disc", dist:4.6, seq:2, repeat:false, fb:fbPack("the disc")},
+    {id:"aisha_07", who:"Aisha Rahman", name:"Care package", dist:3.9, seq:2, repeat:true,  fb:fbPack("the package")},
+    {id:"aisha_08", who:"Aisha Rahman", name:"Vaccine docs", dist:3.4, seq:2, repeat:true,  fb:fbPack("the docs")},
+    {id:"aisha_09", who:"Aisha Rahman", name:"Specimen box", dist:5.2, seq:3, repeat:true,  fb:fbPack("the specimen")},
+    {id:"aisha_10", who:"Aisha Rahman", name:"Allergy results", dist:3.7, seq:3, repeat:true,  fb:fbPack("the results")},
+    {id:"aisha_11", who:"Aisha Rahman", name:"Dental mould", dist:4.8, seq:3, repeat:false, fb:fbPack("the mould")},
+    {id:"aisha_12", who:"Aisha Rahman", name:"Stitch kit", dist:2.9, seq:3, repeat:true,  fb:fbPack("the kit")},
+    {id:"aisha_13", who:"Aisha Rahman", name:"Cold chain", dist:6.6, seq:4, repeat:true,  fb:fbPack("cold chain")},
+    {id:"aisha_14", who:"Aisha Rahman", name:"Urgent referral", dist:6.0, seq:4, repeat:false, fb:fbPack("the referral")},
+    {id:"aisha_15", who:"Aisha Rahman", name:"Ward swap", dist:4.0, seq:4, repeat:true,  fb:fbPack("the ward swap")},
+    {id:"aisha_16", who:"Aisha Rahman", name:"Therapy notes", dist:3.1, seq:4, repeat:true,  fb:fbPack("the notes")},
+    {id:"aisha_17", who:"Aisha Rahman", name:"Consent forms", dist:3.6, seq:5, repeat:true,  fb:fbPack("consent forms")},
+    {id:"aisha_18", who:"Aisha Rahman", name:"Path slides", dist:5.8, seq:5, repeat:false, fb:fbPack("the slides")},
+    {id:"aisha_19", who:"Aisha Rahman", name:"IV supplies", dist:4.4, seq:5, repeat:true,  fb:fbPack("IV supplies")},
+    {id:"aisha_20", who:"Aisha Rahman", name:"Hosp keys", dist:3.3, seq:5, repeat:false, fb:fbPack("those keys")},
 
-  {id:"tom_01", who:"Tom Weaver", name:"Office keys", dist:2.2, seq:1, repeat:true,  fb:fbPack("the keys")},
-  {id:"tom_02", who:"Tom Weaver", name:"Laptop charger", dist:3.0, seq:1, repeat:true,  fb:fbPack("the charger")},
-  {id:"tom_03", who:"Tom Weaver", name:"Contract copies", dist:4.1, seq:1, repeat:true,  fb:fbPack("the contracts")},
-  {id:"tom_04", who:"Tom Weaver", name:"Signed NDA", dist:3.6, seq:1, repeat:false, fb:fbPack("the NDA")},
-  {id:"tom_05", who:"Tom Weaver", name:"Meeting pack", dist:4.8, seq:2, repeat:true,  fb:fbPack("the pack")},
-  {id:"tom_06", who:"Tom Weaver", name:"Printer toner", dist:2.7, seq:2, repeat:true,  fb:fbPack("the toner")},
-  {id:"tom_07", who:"Tom Weaver", name:"Client gift", dist:5.0, seq:2, repeat:false, fb:fbPack("the gift")},
-  {id:"tom_08", who:"Tom Weaver", name:"Board papers", dist:5.6, seq:2, repeat:true,  fb:fbPack("the board papers")},
-  {id:"tom_09", who:"Tom Weaver", name:"Proto demo", dist:6.2, seq:3, repeat:true,  fb:fbPack("the demo")},
-  {id:"tom_10", who:"Tom Weaver", name:"Finance pack", dist:4.9, seq:3, repeat:true,  fb:fbPack("the finance pack")},
-  {id:"tom_11", who:"Tom Weaver", name:"Share cert", dist:3.4, seq:3, repeat:false, fb:fbPack("the certificate")},
-  {id:"tom_12", who:"Tom Weaver", name:"Courier samples", dist:5.3, seq:3, repeat:true,  fb:fbPack("the samples")},
-  {id:"tom_13", who:"Tom Weaver", name:"Spare badge", dist:2.6, seq:4, repeat:true,  fb:fbPack("the badge")},
-  {id:"tom_14", who:"Tom Weaver", name:"Server dongle", dist:6.1, seq:4, repeat:false, fb:fbPack("the dongle")},
-  {id:"tom_15", who:"Tom Weaver", name:"Audit files", dist:5.8, seq:4, repeat:true,  fb:fbPack("the audit files")},
-  {id:"tom_16", who:"Tom Weaver", name:"Client minutes", dist:3.9, seq:4, repeat:true,  fb:fbPack("those minutes")},
-  {id:"tom_17", who:"Tom Weaver", name:"Pitch deck", dist:4.6, seq:5, repeat:true,  fb:fbPack("the deck")},
-  {id:"tom_18", who:"Tom Weaver", name:"Signed contract", dist:5.2, seq:5, repeat:false, fb:fbPack("the contract")},
-  {id:"tom_19", who:"Tom Weaver", name:"Data stick", dist:3.3, seq:5, repeat:true,  fb:fbPack("the data stick")},
-  {id:"tom_20", who:"Tom Weaver", name:"Late invoice", dist:3.8, seq:5, repeat:true,  fb:fbPack("the invoice")}
-];
+    /* Tom Weaver (20) */
+    {id:"tom_01", who:"Tom Weaver", name:"Office keys", dist:2.2, seq:1, repeat:true,  fb:fbPack("the keys")},
+    {id:"tom_02", who:"Tom Weaver", name:"Laptop charger", dist:3.0, seq:1, repeat:true,  fb:fbPack("the charger")},
+    {id:"tom_03", who:"Tom Weaver", name:"Contract copies", dist:4.1, seq:1, repeat:true,  fb:fbPack("the contracts")},
+    {id:"tom_04", who:"Tom Weaver", name:"Signed NDA", dist:3.6, seq:1, repeat:false, fb:fbPack("the NDA")},
+    {id:"tom_05", who:"Tom Weaver", name:"Meeting pack", dist:4.8, seq:2, repeat:true,  fb:fbPack("the pack")},
+    {id:"tom_06", who:"Tom Weaver", name:"Printer toner", dist:2.7, seq:2, repeat:true,  fb:fbPack("the toner")},
+    {id:"tom_07", who:"Tom Weaver", name:"Client gift", dist:5.0, seq:2, repeat:false, fb:fbPack("the gift")},
+    {id:"tom_08", who:"Tom Weaver", name:"Board papers", dist:5.6, seq:2, repeat:true,  fb:fbPack("the board papers")},
+    {id:"tom_09", who:"Tom Weaver", name:"Proto demo", dist:6.2, seq:3, repeat:true,  fb:fbPack("the demo")},
+    {id:"tom_10", who:"Tom Weaver", name:"Finance pack", dist:4.9, seq:3, repeat:true,  fb:fbPack("the finance pack")},
+    {id:"tom_11", who:"Tom Weaver", name:"Share cert", dist:3.4, seq:3, repeat:false, fb:fbPack("the certificate")},
+    {id:"tom_12", who:"Tom Weaver", name:"Courier samples", dist:5.3, seq:3, repeat:true,  fb:fbPack("the samples")},
+    {id:"tom_13", who:"Tom Weaver", name:"Spare badge", dist:2.6, seq:4, repeat:true,  fb:fbPack("the badge")},
+    {id:"tom_14", who:"Tom Weaver", name:"Server dongle", dist:6.1, seq:4, repeat:false, fb:fbPack("the dongle")},
+    {id:"tom_15", who:"Tom Weaver", name:"Audit files", dist:5.8, seq:4, repeat:true,  fb:fbPack("the audit files")},
+    {id:"tom_16", who:"Tom Weaver", name:"Client minutes", dist:3.9, seq:4, repeat:true,  fb:fbPack("those minutes")},
+    {id:"tom_17", who:"Tom Weaver", name:"Pitch deck", dist:4.6, seq:5, repeat:true,  fb:fbPack("the deck")},
+    {id:"tom_18", who:"Tom Weaver", name:"Signed contract", dist:5.2, seq:5, repeat:false, fb:fbPack("the contract")},
+    {id:"tom_19", who:"Tom Weaver", name:"Data stick", dist:3.3, seq:5, repeat:true,  fb:fbPack("the data stick")},
+    {id:"tom_20", who:"Tom Weaver", name:"Late invoice", dist:3.8, seq:5, repeat:true,  fb:fbPack("the invoice")}
+  ]));
+})();
 
 const EVENT_POOL = {
   normal: [
@@ -874,19 +884,7 @@ const state={
   clientSeq:{},
   completedOneOffs:{},
   clientStats:{},
-  stats:{
-    miles:0,
-    minutes:0,
-    made:0,
-    spent:0,
-    accepted:0,
-    completed:0,
-    aborted:0,
-    early:0,
-    late:0,
-    snacks:0,
-    events:0
-  },
+  stats:{miles:0,minutes:0,made:0,spent:0,accepted:0,completed:0,aborted:0,early:0,late:0,snacks:0,events:0},
   snackCdUntil:0,
   drinkCdUntil:0,
   lastTs:0,raf:0
@@ -1303,8 +1301,923 @@ function renderTop(){
   updateConsumablesModal();
 }
 
-/* ---- remainder of JS unchanged from v1.0.41 (logic, events, job flow, rest, reset, boot) ---- */
-/* To keep this response within limits, the rest of the script is identical to the prior apply except VERSION/title. */
+function snapshotEOD(){
+  state.eod={dayEnded: state.day-1, jobs: state.jobsDone, earnings: state.dayEarnings, rent: COSTS.rent, food: COSTS.food};
+}
+function showEndOfDay(){
+  if(!state.eod) snapshotEOD();
+  const deductions=state.eod.rent+state.eod.food;
+  const net=state.eod.earnings-deductions;
+  elText("endTitle","End of day (Day "+state.eod.dayEnded+")");
+  const endList=$("endList");
+  if(endList){
+    endList.innerHTML=`
+      <div class="vrow"><span>Jobs</span><span>${state.eod.jobs}</span></div>
+      <div class="vrow"><span>Earnings</span><span>£${state.eod.earnings}</span></div>
+      <div class="vrow"><span>Rent</span><span>-£${state.eod.rent}</span></div>
+      <div class="vrow"><span>Food</span><span>-£${state.eod.food}</span></div>
+      <div class="vrow total"><span>Net</span><span>£${net}</span></div>
+    `;
+  }
+  setMode("end");
+  renderTop();
+  saveState(true);
+}
+function onMidnightRollover(){
+  if(!state.eod) snapshotEOD();
+  if(state.job){ state.pendingEndOfDay=true; saveState(true); return; }
+  showEndOfDay();
+}
+function advanceMinutes(mins){
+  state.time += mins;
+  let rolled=0;
+  while(state.time>=1440){ state.time -= 1440; state.day++; rolled++; }
+  while(state.time<0){ state.time += 1440; state.day = Math.max(1, state.day-1); }
+  if(rolled>0) onMidnightRollover();
+}
+
+/* Offer pruning with feasibility buffer (speed 5 theoretical max) */
+function minutesToCompleteAtSpeed5(dist){
+  const mph = 8 * SPEEDS[5].mult;
+  return (dist / mph) * 60;
+}
+function pruneOffers(){
+  const now=nowAbs();
+  state.offers = state.offers.filter(o=>{
+    const left = o.deadlineAbs - now;
+    return left > minutesToCompleteAtSpeed5(o.dist);
+  });
+}
+
+/* ===== JOB GEN ===== */
+function eligibleCatalog(){
+  initClientsIfNeeded();
+  return JOB_CATALOG.filter(j=>{
+    const seq=state.clientSeq[j.who] || 1;
+    if(j.seq > seq) return false;
+    if(!j.repeat && state.completedOneOffs[j.id]) return false;
+    return true;
+  });
+}
+function genOffers(){
+  const base=nowAbs();
+  const eligible = eligibleCatalog();
+  const shuffled=[...eligible].sort(()=>Math.random()-.5);
+
+  const picked=[];
+  const usedWho=new Set();
+  for(const j of shuffled){
+    if(picked.length>=5) break;
+    if(!usedWho.has(j.who)){ picked.push(j); usedWho.add(j.who); }
+  }
+  for(const j of shuffled){
+    if(picked.length>=5) break;
+    if(!picked.find(x=>x.id===j.id)) picked.push(j);
+  }
+
+  state.offers = picked.map(j=>{
+    const avg=(j.dist/8)*60;
+    const slow=avg/SPEEDS[1].mult;
+    const fast=avg/SPEEDS[5].mult;
+    const hidden=fast+(slow-fast)*(.15+Math.random()*.7);
+    const slack = Math.round(Math.random()*2*60);
+
+    return{
+      id:j.id, who:j.who, seq:j.seq, repeat:!!j.repeat, fb:j.fb,
+      name:j.name, dist:j.dist,
+      quote: QUOTES[Math.floor(Math.random()*QUOTES.length)],
+      hidden:Math.round(hidden),
+      pay:Math.round(j.dist*12+Math.random()*6),
+      route: ROUTES[Math.floor(Math.random()*ROUTES.length)],
+      deadlineAbs: base + Math.round(avg) + slack
+    };
+  });
+
+  pruneOffers();
+  saveState(true);
+}
+
+function openOffer(o){
+  selectedOffer=o;
+  elText("offerTitle",o.name.toUpperCase());
+  elText("ofOrg",o.who);
+  elText("ofQuote","“"+o.quote+"”");
+  elText("ofDistance",o.dist.toFixed(1)+" mi");
+  elText("ofRoute",o.route);
+  elText("ofPay","£"+o.pay);
+  elText("ofDeadline",fmtClock(o.deadlineAbs % 1440));
+
+  setOfferAvatar(o.who);
+
+  setMode("offer");
+  renderTop();
+}
+
+function renderJobs(){
+  pruneOffers();
+  const wrap=$("jobs");
+  if(!wrap) return;
+  wrap.innerHTML="";
+  const noEnergy=state.energy<=0;
+
+  state.offers.forEach(o=>{
+    const r=document.createElement("div");
+    r.className="jobRow";
+    r.innerHTML=`
+      <div class="jobLeft">
+        ${logoHtmlForJobRow(o.who)}
+        <div class="jobTitle">${o.name}</div>
+      </div>
+      <div class="jobPay">£${o.pay}</div>
+    `;
+    r.addEventListener("click", ()=>{ if(!noEnergy) openOffer(o); });
+    if(noEnergy) r.style.opacity=".4";
+    wrap.appendChild(r);
+  });
+}
+
+function maxSpeed(){
+  if(state.energy<=5) return 1;
+  if(state.energy<=10) return 2;
+  if(state.energy<=15) return 3;
+  if(state.energy<=20) return 4;
+  return 5;
+}
+function buildSpeed(){
+  const seg=$("speedSeg");
+  if(!seg) return;
+  seg.innerHTML="";
+  for(let i=1;i<=5;i++){
+    const b=document.createElement("button");
+    b.textContent=i;
+    b.addEventListener("click", ()=>{ state.speed=Math.min(i,maxSpeed()); syncSpeed(); saveState(true); });
+    seg.appendChild(b);
+  }
+  syncSpeed();
+}
+function syncSpeed(){
+  const seg=$("speedSeg");
+  if(!seg) return;
+  const max=maxSpeed();
+  if(state.speed>max) state.speed=max;
+  [...seg.children].forEach((b,i)=>{
+    const s=i+1;
+    b.classList.toggle("active",s===state.speed);
+    b.disabled=s>max;
+  });
+  elText("speedLabel",SPEEDS[state.speed].name);
+}
+
+function clearSnackFx(){
+  if(!state.snackFx) return;
+  if(state.snackFx.delayId) clearTimeout(state.snackFx.delayId);
+  if(state.snackFx.intervalId) clearInterval(state.snackFx.intervalId);
+  state.snackFx=null;
+}
+function clearDrinkFx(){
+  if(!state.drinkFx) return;
+  if(state.drinkFx.timeoutId) clearTimeout(state.drinkFx.timeoutId);
+  state.drinkFx=null;
+}
+function applyPendingEffects(){
+  if(state.snackFx){
+    state.energy=clamp(state.energy+state.snackFx.remaining,0,100);
+    clearSnackFx();
+  }
+  if(state.drinkFx){
+    state.energy=clamp(state.energy-10,0,100);
+    clearDrinkFx();
+  }
+}
+
+/* tips unchanged; late penalties harsher */
+function tipPenaltyForFinish(){
+  const now=nowAbsPrecise();
+  const delta = state.job.deadlineAbs - now;
+
+  if(delta>0){
+    const raw = Math.floor(delta/10);
+    const cap = Math.max(1, Math.floor(state.job.pay*0.30));
+    return Math.min(raw, cap);
+  }else if(delta<0){
+    const late = Math.ceil(Math.abs(delta)/5);
+    const raw = -(late*4);
+    return Math.max(raw, -state.job.pay);
+  }
+  return 0;
+}
+function abortPenalty(){ return -Math.max(5, Math.round(state.job.pay*0.35)); }
+
+function showFeedback(who, text){
+  const wrap=$("feedbackWrap");
+  if(!wrap) return;
+  setResultAvatar(who);
+  elText("feedbackWho", who.toUpperCase()+" — FEEDBACK");
+  elText("feedbackText", text);
+  wrap.classList.remove("hidden");
+}
+function hideFeedback(){
+  const wrap=$("feedbackWrap");
+  if(!wrap) return;
+  wrap.classList.add("hidden");
+  elText("feedbackWho","—");
+  elText("feedbackText","—");
+  const av=$("resultAvatar"); if(av) av.innerHTML="";
+}
+function feedbackForOutcome(job, tp, aborted=false){
+  if(!job || !job.fb) return "";
+  if(aborted) return job.fb.aborted;
+  if(tp>0) return job.fb.early;
+  if(tp<0) return job.fb.late;
+  return job.fb.ontime;
+}
+
+function startJob(o, resume=false){
+  state.job=o;
+
+  if(!resume){
+    initClientsIfNeeded();
+
+    state.stats.accepted++;
+    recordClientAccept(o);
+
+    state.elapsed=0; state.progress=0; state.hiddenDuration=o.hidden;
+    state.startEnergy=state.energy; state.energySpentJob=0;
+    state.jobStartAbs = nowAbsPrecise();
+    state.lastEventAbs=-1e9; state.lastPromptAbs=-1e9;
+    state.promptActive=false; state.promptEndMs=0;
+
+    state.snackCdUntil=0;
+    state.drinkCdUntil=0;
+  }
+
+  elText("jobName", o.name.toUpperCase());
+
+  const p=clamp(state.hiddenDuration>0 ? (state.progress/state.hiddenDuration) : 0,0,1);
+  elText("pct", Math.floor(p*100)+"%");
+  const fill=$("fill"); if(fill) fill.style.width=(p*100)+"%";
+
+  elText("milesDone",(o.dist*p).toFixed(1)+" mi");
+  elText("milesLeft",(o.dist-(o.dist*p)).toFixed(1)+" mi");
+  elText("mph",Math.round(8*SPEEDS[state.speed].mult)+" mph");
+
+  updateTimeDialFromDeadline();
+  syncSpeed();
+  setMode("job");
+
+  state.lastTs=performance.now();
+  cancelAnimationFrame(state.raf);
+  state.raf=requestAnimationFrame(tick);
+
+  renderTop();
+  saveState(true);
+}
+
+/* ===== EVENTS ===== */
+function chanceFromLambda(lambdaPerMin, dtMin){
+  const x = lambdaPerMin * Math.max(0,dtMin);
+  return 1 - Math.exp(-x);
+}
+function lambdaForSpeed(speed){
+  const bySpeed=[0, 0.010, 0.014, 0.020, 0.028, 0.038];
+  return bySpeed[clamp(speed,1,5)];
+}
+function routeTier(route){
+  if(route==="Easy") return 0;
+  if(route==="Mid") return 1;
+  if(route==="Tricky") return 2;
+  if(route==="Hellish") return 3;
+  return 1;
+}
+function routeAccidentMult(route){ return [0.75, 1.0, 1.25, 1.6][routeTier(route)]; }
+function routeBadWeight(route){ return [0.75, 1.0, 1.35, 1.75][routeTier(route)]; }
+function accidentChanceForSpeedAndRoute(speed, route){
+  const base = 0.15 + 0.10*(clamp(speed,1,5)-1);
+  return clamp(base*routeAccidentMult(route), 0.05, 0.90);
+}
+function lambdaPrompt(){ return 0.020; }
+
+function pickWeighted(list, weightFn){
+  let sum=0;
+  for(const it of list) sum += Math.max(0, weightFn(it));
+  if(sum<=0) return list[Math.floor(Math.random()*list.length)];
+  let r=Math.random()*sum;
+  for(const it of list){
+    r -= Math.max(0, weightFn(it));
+    if(r<=0) return it;
+  }
+  return list[list.length-1];
+}
+
+function openEventFromObj(e){
+  initClientsIfNeeded();
+  state.stats.events++;
+
+  const list=$("eventList");
+  if(!list) return;
+
+  const rows=[];
+  rows.push(`<div class="vrow"><span>${e.t}</span><span></span></div>`);
+  rows.push(`<div class="vrow"><span style="opacity:.85">${e.d}</span><span></span></div>`);
+  if(e.mins!==0) rows.push(`<div class="vrow"><span>Time</span><span>${e.mins>0?"+":""}${e.mins}m</span></div>`);
+  if(e.energy!==0) rows.push(`<div class="vrow"><span>Energy</span><span>${e.energy>0?"+":""}${e.energy}%</span></div>`);
+  list.innerHTML=rows.join("");
+
+  if(e.mins!==0) advanceMinutes(e.mins);
+  if(e.energy!==0){
+    state.energy=clamp(state.energy+e.energy,0,100);
+    syncSpeed();
+  }
+
+  updateTimeDialFromDeadline();
+  renderTop();
+
+  const modal=$("eventModal");
+  if(modal) modal.style.display="flex";
+  saveState(true);
+}
+
+function openAutoEvent(){
+  if(!state.job) return;
+  const modal=$("eventModal");
+  if(modal && modal.style.display==="flex") return;
+
+  const route = state.job.route || "Mid";
+  const acc = Math.random() < accidentChanceForSpeedAndRoute(state.speed, route);
+
+  if(acc){
+    openEventFromObj(EVENT_POOL.accident[Math.floor(Math.random()*EVENT_POOL.accident.length)]);
+    return;
+  }
+
+  const badW = routeBadWeight(route);
+  openEventFromObj(pickWeighted(EVENT_POOL.normal, (x)=>{
+    if(x.mood==="bad") return 1.0*badW;
+    if(x.mood==="good") return 1.0;
+    return 0.9;
+  }));
+}
+
+function openPromptEvent(){
+  if(!state.job) return;
+  openEventFromObj(PROMPT_EVENTS[Math.floor(Math.random()*PROMPT_EVENTS.length)]);
+}
+
+function closeEvent(){
+  const modal=$("eventModal");
+  if(modal) modal.style.display="none";
+  renderTop();
+  saveState(true);
+}
+
+function maybeTriggerAutoEvent(dtMin){
+  if(!state.job) return;
+  const modal=$("eventModal");
+  if(modal && modal.style.display==="flex") return;
+  if(state.promptActive) return;
+
+  const now=nowAbsPrecise();
+  if((now - state.lastEventAbs) < 3) return;
+  if((now - state.lastPromptAbs) < 3) return;
+
+  const p=chanceFromLambda(lambdaForSpeed(state.speed), dtMin);
+  if(Math.random() < p){
+    state.lastEventAbs = now;
+    openAutoEvent();
+  }
+}
+
+function maybeStartPromptWindow(dtMin){
+  if(!state.job) return;
+  const modal=$("eventModal");
+  if(modal && modal.style.display==="flex") return;
+
+  if(state.promptActive && Date.now() > state.promptEndMs){
+    state.promptActive=false;
+    state.promptEndMs=0;
+    updateEventBtnUI();
+    saveState(true);
+  }
+  if(state.promptActive) return;
+
+  const now=nowAbsPrecise();
+  if((now - state.lastPromptAbs) < 4) return;
+  if((now - state.lastEventAbs) < 4) return;
+
+  const p=chanceFromLambda(lambdaPrompt(), dtMin);
+  if(Math.random() < p){
+    state.promptActive=true;
+    state.promptEndMs = Date.now() + (3000 + Math.random()*2000);
+    updateEventBtnUI();
+    saveState(true);
+  }
+}
+
+function tick(ts){
+  state.raf=requestAnimationFrame(tick);
+
+  const em=$("eventModal"), cm=$("energyModal"), rm=$("restModal");
+  if((em && em.style.display==="flex") || (cm && cm.style.display==="flex") || (rm && rm.style.display==="flex")){
+    state.lastTs=ts; return;
+  }
+
+  if(state.promptActive && Date.now() > state.promptEndMs){
+    state.promptActive=false; state.promptEndMs=0;
+    updateEventBtnUI(); saveState(true);
+  }
+
+  const dtSec=(ts-state.lastTs)/1000;
+  state.lastTs=ts;
+
+  const dtMin=dtSec;
+  const mult=SPEEDS[state.speed].mult;
+
+  state.elapsed += dtMin;
+  state.progress += dtMin * mult;
+
+  advanceMinutes(dtMin);
+
+  const drain = 0.65*mult*mult*dtMin;
+  state.energySpentJob += drain;
+  state.energy=clamp(state.energy-drain,0,100);
+  syncSpeed();
+
+  const p=clamp(state.progress/state.hiddenDuration,0,1);
+  elText("pct", Math.floor(p*100)+"%");
+  const fill=$("fill"); if(fill) fill.style.width=(p*100)+"%";
+
+  elText("milesDone",(state.job.dist*p).toFixed(1)+" mi");
+  elText("milesLeft",(state.job.dist-(state.job.dist*p)).toFixed(1)+" mi");
+  elText("mph", Math.round(8*mult)+" mph");
+
+  updateTimeDialFromDeadline();
+  maybeStartPromptWindow(dtMin);
+  maybeTriggerAutoEvent(dtMin);
+
+  renderTop();
+  saveState();
+
+  if(p>=1) finish();
+}
+
+function finish(){
+  cancelAnimationFrame(state.raf);
+  applyPendingEffects();
+
+  state.promptActive=false; state.promptEndMs=0;
+
+  const timeTaken=Math.max(1,Math.ceil(state.elapsed));
+  const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
+  const avgSpeed = (state.job.dist * 60) / timeTaken;
+
+  const tp = tipPenaltyForFinish();
+  const total = Math.max(0, state.job.pay + tp);
+
+  initClientsIfNeeded();
+
+  state.cash += total;
+  state.dayEarnings += total;
+  state.jobsDone++;
+
+  state.stats.completed++;
+  state.stats.minutes += timeTaken;
+  state.stats.miles += state.job.dist;
+  state.stats.made += total;
+  if(tp>0) state.stats.early++;
+  if(tp<0) state.stats.late++;
+
+  recordClientComplete(state.job, tp, total);
+
+  elText("resultTitle","Job complete");
+  const rl=$("resultList");
+  if(rl){
+    rl.innerHTML=`
+      <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
+      <div class="vrow"><span>Average speed</span><span>${avgSpeed.toFixed(1)} mph</span></div>
+      <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>
+      <div class="vrow"><span>Pay</span><span>£${state.job.pay}</span></div>
+      <div class="vrow"><span>Tip / penalty</span><span>${tp>=0 ? "£"+tp : "-£"+Math.abs(tp)}</span></div>
+      <div class="vrow total"><span>Total</span><span>£${total}</span></div>
+    `;
+  }
+
+  hideFeedback();
+  showFeedback(state.job.who, feedbackForOutcome(state.job, tp, false));
+
+  state.job=null;
+  pruneOffers();
+  renderJobs();
+
+  if(state.pendingEndOfDay){
+    state.pendingEndOfDay=false;
+    showEndOfDay();
+    return;
+  }
+
+  setMode("result");
+  renderTop();
+  saveState(true);
+}
+
+/* UI wiring */
+on("closeEvent","click", closeEvent);
+
+on("goJobs","click", ()=>{
+  if(!jobsInitialised){
+    initClientsIfNeeded();
+    genOffers();
+    renderJobs();
+    jobsInitialised=true;
+  }else{
+    pruneOffers();
+    renderJobs();
+  }
+  setMode("board");
+  renderTop();
+  saveState(true);
+});
+
+on("refreshJobs","click", ()=>{
+  initClientsIfNeeded();
+  genOffers();
+  renderJobs();
+  jobsInitialised=true;
+  saveState(true);
+});
+
+on("backHub","click", ()=>{ setMode("hub"); renderTop(); saveState(true); });
+
+on("goClients","click", ()=>{
+  renderClients();
+  setMode("clients");
+  renderTop();
+  saveState(true);
+});
+on("backHubClients","click", ()=>{ setMode("hub"); renderTop(); saveState(true); });
+
+on("goStats","click", ()=>{
+  renderStats();
+  setMode("stats");
+  renderTop();
+  saveState(true);
+});
+on("backHubStats","click", ()=>{ setMode("hub"); renderTop(); saveState(true); });
+
+on("offerBack","click", ()=>{
+  selectedOffer=null;
+  setMode("board");
+  renderTop();
+  saveState(true);
+});
+on("offerAccept","click", ()=>{
+  if(!selectedOffer) return;
+  const o=selectedOffer;
+  selectedOffer=null;
+  startJob(o,false);
+});
+
+on("backBoard","click", ()=>{
+  pruneOffers();
+  renderJobs();
+  setMode("board");
+  renderTop();
+  saveState(true);
+});
+
+/* Shop */
+function updateShopUI(){
+  elText("drinkPrice", PRICES.drink);
+  elText("snackPrice", PRICES.snack);
+  elText("drinkCount", state.drinks);
+  elText("snackCount", state.snacks);
+
+  const bd=$("buyDrink");
+  const bs=$("buySnack");
+  if(bd) bd.disabled = (state.drinks>=5) || (state.cash<PRICES.drink);
+  if(bs) bs.disabled = (state.snacks>=5) || (state.cash<PRICES.snack);
+}
+
+on("goShop","click", ()=>{
+  updateShopUI();
+  setMode("shop");
+  renderTop();
+  saveState(true);
+});
+on("backHub2","click", ()=>{ setMode("hub"); renderTop(); saveState(true); });
+
+on("buyDrink","click", ()=>{
+  if(state.drinks>=5) return;
+  if(state.cash<PRICES.drink) return;
+  initClientsIfNeeded();
+  state.cash-=PRICES.drink;
+  state.stats.spent += PRICES.drink;
+  state.drinks++;
+  updateShopUI();
+  renderTop();
+  saveState(true);
+});
+
+on("buySnack","click", ()=>{
+  if(state.snacks>=5) return;
+  if(state.cash<PRICES.snack) return;
+  initClientsIfNeeded();
+  state.cash-=PRICES.snack;
+  state.stats.spent += PRICES.snack;
+  state.snacks++;
+  updateShopUI();
+  renderTop();
+  saveState(true);
+});
+
+/* Consumables cooldown */
+function cooldownMs(){ return 5000 + Math.floor(Math.random()*5001); } // 5–10s
+
+on("openConsumables","click", ()=>{
+  updateConsumablesModal();
+  const m=$("energyModal"); if(m) m.style.display="flex";
+  saveState(true);
+});
+on("closeEnergy","click", ()=>{
+  const m=$("energyModal"); if(m) m.style.display="none";
+  saveState(true);
+});
+
+on("drinkBtn","click", ()=>{
+  const now=Date.now();
+  if(state.drinks<=0) return;
+  if(now < state.drinkCdUntil) return;
+
+  state.drinks--;
+  state.drinkCdUntil = now + cooldownMs();
+
+  state.energy=clamp(state.energy+20,0,100);
+
+  clearDrinkFx();
+  state.drinkFx={timeoutId:setTimeout(()=>{
+    state.energy=clamp(state.energy-10,0,100);
+    clearDrinkFx();
+    renderTop();
+    saveState(true);
+  },15000)};
+
+  const m=$("energyModal"); if(m) m.style.display="none";
+  renderTop();
+  saveState(true);
+});
+
+on("snackBtn","click", ()=>{
+  const now=Date.now();
+  if(state.snacks<=0) return;
+  if(now < state.snackCdUntil) return;
+
+  initClientsIfNeeded();
+  state.stats.snacks++;
+
+  state.snacks--;
+  state.snackCdUntil = now + cooldownMs();
+
+  clearSnackFx();
+  state.snackFx={remaining:20,delayId:0,intervalId:0};
+
+  state.snackFx.delayId=setTimeout(()=>{
+    if(!state.snackFx) return;
+    let ticks=0;
+    state.snackFx.intervalId=setInterval(()=>{
+      if(!state.snackFx) return;
+
+      const inc=20/15;
+      const before=state.energy;
+      state.energy=clamp(state.energy+inc,0,100);
+      const gained=state.energy-before;
+
+      state.snackFx.remaining=clamp(state.snackFx.remaining-gained,0,20);
+
+      ticks++;
+      renderTop();
+      saveState();
+      if(ticks>=15 || state.snackFx.remaining<=0){
+        clearSnackFx();
+        saveState(true);
+      }
+    },1000);
+  },15000);
+
+  const m=$("energyModal"); if(m) m.style.display="none";
+  renderTop();
+  saveState(true);
+});
+
+/* Abort */
+on("cancel","click", ()=>{
+  cancelAnimationFrame(state.raf);
+
+  state.promptActive=false;
+  state.promptEndMs=0;
+
+  const timeTaken=Math.max(1,Math.ceil(state.elapsed));
+  const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
+
+  const pen = abortPenalty();
+  const penAbs = Math.abs(pen);
+
+  const frac=clamp(state.hiddenDuration>0 ? (state.progress/state.hiddenDuration) : 0, 0, 1);
+  const miles = state.job ? (state.job.dist * frac) : 0;
+
+  initClientsIfNeeded();
+
+  state.cash += pen;
+  state.dayEarnings += pen;
+
+  state.stats.aborted++;
+  state.stats.minutes += timeTaken;
+  state.stats.miles += miles;
+  state.stats.made += pen;
+
+  if(state.job) recordClientAbort(state.job, penAbs);
+
+  elText("resultTitle","Job aborted");
+  const rl=$("resultList");
+  if(rl){
+    rl.innerHTML=`
+      <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
+      <div class="vrow"><span>Average speed</span><span>${(timeTaken>0 ? ((miles*60)/timeTaken) : 0).toFixed(1)} mph</span></div>
+      <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>
+      <div class="vrow"><span>Penalty</span><span>-£${penAbs}</span></div>
+      <div class="vrow total"><span>Total</span><span>-£${penAbs}</span></div>
+    `;
+  }
+
+  if(state.job){
+    hideFeedback();
+    showFeedback(state.job.who, feedbackForOutcome(state.job, 0, true));
+  }
+
+  state.job=null;
+
+  pruneOffers();
+  renderJobs();
+
+  if(state.pendingEndOfDay){
+    state.pendingEndOfDay=false;
+    showEndOfDay();
+    return;
+  }
+
+  setMode("result");
+  renderTop();
+  saveState(true);
+});
+
+/* Optional prompted Event button */
+on("eventBtn","click", ()=>{
+  if(!state.job) return;
+  if(!state.promptActive) return;
+
+  state.promptActive=false;
+  state.promptEndMs=0;
+
+  state.lastPromptAbs = nowAbsPrecise();
+  state.lastEventAbs = state.lastPromptAbs;
+
+  updateEventBtnUI();
+  saveState(true);
+
+  openPromptEvent();
+});
+
+/* Rest */
+function canUntilMorning(){
+  const m=minutesOfDay();
+  return (m>=18*60 || m<6*60);
+}
+function openRest(){
+  const btn=$("restMorning");
+  const allowed=canUntilMorning();
+  if(btn){
+    btn.disabled=!allowed;
+    btn.style.display=allowed ? "block" : "none";
+  }
+  const rm=$("restModal"); if(rm) rm.style.display="flex";
+  saveState(true);
+}
+function closeRest(){
+  const rm=$("restModal"); if(rm) rm.style.display="none";
+  saveState(true);
+}
+function restGainChoice(hours){
+  if(hours===4) return 18;
+  if(hours===8) return 40;
+  return hours;
+}
+function restHours(h){
+  advanceMinutes(h*60);
+  state.energy = clamp(state.energy + restGainChoice(h), 0, 100);
+  pruneOffers();
+  renderJobs();
+  renderTop();
+  closeRest();
+  saveState(true);
+}
+function restUntilMorning(){
+  if(!canUntilMorning()) return;
+  const before=nowAbs();
+  const m=minutesOfDay();
+  if(m<6*60) advanceMinutes((6*60)-m);
+  else advanceMinutes((1440-m)+(6*60));
+  const after=nowAbs();
+  const sleptHours=Math.max(0,(after-before)/60);
+  state.energy = clamp(state.energy + sleptHours, 0, 100);
+  pruneOffers();
+  renderJobs();
+  renderTop();
+  closeRest();
+  saveState(true);
+}
+on("restOpen","click", openRest);
+on("closeRest","click", closeRest);
+on("rest2","click", ()=>restHours(2));
+on("rest4","click", ()=>restHours(4));
+on("rest8","click", ()=>restHours(8));
+on("restMorning","click", restUntilMorning);
+
+on("confirmEnd","click", ()=>{
+  if(!state.eod) snapshotEOD();
+  const deductions=state.eod.rent+state.eod.food;
+
+  initClientsIfNeeded();
+  state.stats.spent += deductions;
+
+  state.cash -= deductions;
+
+  state.jobsDone=0;
+  state.dayEarnings=0;
+  state.eod=null;
+
+  state.energy=100;
+  state.time = 6*60;
+
+  setMode("hub");
+  renderTop();
+  saveState(true);
+});
+
+/* Reset */
+function hardResetGame(){
+  cancelAnimationFrame(state.raf);
+  clearSnackFx();
+  clearDrinkFx();
+
+  const em=$("eventModal"); if(em) em.style.display="none";
+  const cm=$("energyModal"); if(cm) cm.style.display="none";
+  const rm=$("restModal"); if(rm) rm.style.display="none";
+
+  state.day=1; state.cash=0; state.time=15*60; state.energy=100; state.speed=3;
+  state.snacks=1; state.drinks=1;
+
+  state.jobsDone=0; state.dayEarnings=0;
+  state.offers=[]; state.job=null;
+
+  state.elapsed=0; state.progress=0; state.hiddenDuration=0; state.startEnergy=100; state.energySpentJob=0;
+  state.jobStartAbs=0; state.pendingEndOfDay=false; state.eod=null;
+  state.lastEventAbs=-1e9;
+
+  state.promptActive=false; state.promptEndMs=0; state.lastPromptAbs=-1e9;
+
+  state.clientSeq={}; state.completedOneOffs={}; state.clientStats={};
+  state.stats={miles:0,minutes:0,made:0,spent:0,accepted:0,completed:0,aborted:0,early:0,late:0,snacks:0,events:0};
+
+  state.snackCdUntil=0;
+  state.drinkCdUntil=0;
+
+  selectedOffer=null; jobsInitialised=false;
+
+  wipeSave();
+  initClientsIfNeeded();
+  renderTop();
+  setMode("hub");
+  saveState(true);
+}
+on("resetGame","click", hardResetGame);
+
+/* Boot */
+initClientsIfNeeded();
+buildSpeed();
+
+const loaded = loadState();
+renderTop();
+document.title="Courier v"+VERSION;
+
+if(state.job){
+  startJob(state.job, true);
+}else{
+  setMode("hub");
+}
+
+if(loaded && Array.isArray(state.offers) && state.offers.length>0){
+  pruneOffers();
+  renderJobs();
+  saveState(true);
+}
 </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.33</title>
+  <title>Courier v1.0.34</title>
   <style>
     :root{
       color-scheme: dark;
@@ -502,6 +502,18 @@
     .vrow{display:flex;justify-content:space-between;font-family:var(--mono);font-weight:800;color:var(--accent);}
     .vrow.total{border-top:var(--stroke) solid var(--accent);padding-top:10px;margin-top:6px;}
 
+    .feedbackLine{
+      margin-top:12px;
+      padding-top:12px;
+      border-top:var(--stroke) solid var(--accent);
+      font-family:var(--mono);
+      font-weight:900;
+      color:var(--accent);
+      opacity:.95;
+    }
+    .feedbackWho{opacity:.8;margin-bottom:6px;}
+    .feedbackText{line-height:1.25;}
+
     /* Shop cash line */
     .shopCash{
       text-align:center;
@@ -529,7 +541,7 @@
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.33</div>
+      <div class="kpiMid" id="versionText">v1.0.34</div>
       <div class="kpiRight" id="cashText">£0</div>
     </div>
     <div class="divider"></div>
@@ -713,6 +725,10 @@
     <div class="jobTitle pageTitle" id="resultTitle">Job complete</div>
     <div class="resultBox">
       <div class="vlist" id="resultList"></div>
+      <div class="feedbackLine hidden" id="feedbackWrap">
+        <div class="feedbackWho" id="feedbackWho">—</div>
+        <div class="feedbackText" id="feedbackText">—</div>
+      </div>
     </div>
     <div style="height:30px"></div>
     <button class="btn" id="backBoard">Back to job board</button>
@@ -790,7 +806,7 @@
 </div>
 
 <script>
-const VERSION="1.0.33";
+const VERSION="1.0.34";
 
 const PRICES={drink:12,snack:6};
 const COSTS={rent:35,food:15};
@@ -803,43 +819,98 @@ const SPEEDS={
   5:{name:"very fast",mult:1.55}
 };
 
-/* JOBS — all names <= 20 chars */
-const JOBS=[
-  {name:"Hot food drop",dist:2},
-  {name:"Parcel run",dist:3.5},
-  {name:"Groceries",dist:4.2},
-  {name:"Fragile item",dist:5},
-  {name:"Rush SLA",dist:6},
+/* REQUESTORS + JOBS
+   - ~20 jobs per requestor
+   - each job has: id, name (<= 20 chars), dist, sequence, repeatable, feedback variants
+*/
+const REQUESTORS = [
+  {
+    name:"Sam Patel",
+    jobs:[
+      {id:"sam_01",name:"Hot food drop",dist:2.0,sequence:1,repeatable:true,feedback:{success:"Good. Clean handoff. Keep that pace.",early:"That’s what I call urgent. Nice.",late:"Bit shaky on timing. Don’t make it a habit.",aborted:"I needed that. Don’t accept if you can’t run it."}},
+      {id:"sam_02",name:"Groceries",dist:4.2,sequence:1,repeatable:true,feedback:{success:"Client’s happy. No drama.",early:"Early and intact. Ideal.",late:"Too late for chilled stuff. Tighten up.",aborted:"You left me holding the bag. Literally."}},
+      {id:"sam_03",name:"Council docs",dist:3.7,sequence:1,repeatable:false,feedback:{success:"Filed. Signed. Done. Nice.",early:"You beat the desk closing. Perfect.",late:"They nearly locked up. Watch the clock.",aborted:"Now I’m the one doing it."}},
+      {id:"sam_04",name:"Bike lock rescue",dist:2.2,sequence:1,repeatable:true,feedback:{success:"Sorted. You saved the afternoon.",early:"Quick save. Respect.",late:"They waited around. Not great.",aborted:"They’re stuck. That’s on you."}},
 
-  {name:"Mysterious briefcase",dist:4.8}, /* 20 */
-  {name:"VIP sushi apology",dist:3.2},
-  {name:"Cake rescue mission",dist:5.6},
-  {name:"Escape room props",dist:2.7},
-  {name:"Do not bend book",dist:3.9},
-  {name:"Iguana meds dash",dist:6.4},
-  {name:"Band merch panic",dist:4.1},
+      {id:"sam_05",name:"Parcel run",dist:3.5,sequence:2,repeatable:true,feedback:{success:"That’s how you run parcels.",early:"Early drop. Smooth.",late:"Late drop. Customer complained.",aborted:"Don’t start what you won’t finish."}},
+      {id:"sam_06",name:"Do not bend book",dist:3.9,sequence:2,repeatable:false,feedback:{success:"No creases. You understood the brief.",early:"Early and pristine. Great.",late:"It arrived late. Still intact though.",aborted:"Now it’s someone else’s problem."}},
+      {id:"sam_07",name:"Legal bundle",dist:5.4,sequence:2,repeatable:false,feedback:{success:"Signed and stamped. Good work.",early:"You saved a hearing. Seriously.",late:"It was touch-and-go. Tight margins.",aborted:"You bailed on a legal run?"}},
+      {id:"sam_08",name:"Lab sample rush",dist:5.9,sequence:2,repeatable:false,feedback:{success:"Sample arrived. You kept it stable.",early:"Early delivery. Lab’s impressed.",late:"Late. They had to rerun checks.",aborted:"That’s a failed chain-of-custody."}},
 
-  /* +20 jobs */
-  {name:"Late rent envelope",dist:2.4},
-  {name:"Urgent hard drive",dist:6.1},
-  {name:"Wedding cake box",dist:5.1},
-  {name:"Press pass handoff",dist:4.4},
-  {name:"Lab sample rush",dist:5.9},
-  {name:"Film reel transfer",dist:6.6},
-  {name:"Council documents",dist:3.7},
-  {name:"Vintage vinyl swap",dist:2.5},
-  {name:"Festival wristbands",dist:4.8},
-  {name:"Legal bundle",dist:5.4},
-  {name:"Tattoo stencil",dist:2.1},
-  {name:"Forgotten passport",dist:6.9},
-  {name:"Custom cake topper",dist:3.4},
-  {name:"Spare theatre keys",dist:4.0},
-  {name:"Kitchen knife set",dist:3.1},
-  {name:"Pharmacy pickup",dist:2.8},
-  {name:"Charity raffle box",dist:4.7},
-  {name:"Bike lock rescue",dist:2.2},
-  {name:"Sash window parts",dist:5.8},
-  {name:"Lost phone return",dist:3.6}
+      {id:"sam_09",name:"Urgent hard drive",dist:6.1,sequence:3,repeatable:false,feedback:{success:"Data’s safe. You did the job.",early:"That saved hours. Nice one.",late:"They lost time. Don’t repeat.",aborted:"You abandoned a data run?"}},
+      {id:"sam_10",name:"Film reel transfer",dist:6.6,sequence:3,repeatable:false,feedback:{success:"Reel arrived intact. Good hands.",early:"You beat the edit window. Great.",late:"Late means overtime. Not ideal.",aborted:"Now the shoot schedule’s broken."}},
+      {id:"sam_11",name:"Press pass handoff",dist:4.4,sequence:3,repeatable:true,feedback:{success:"Press got in. You’re useful.",early:"Early handoff. Cleaner than most.",late:"Late handoff. Stressful.",aborted:"They missed access because of you."}},
+      {id:"sam_12",name:"Festival bands",dist:4.8,sequence:3,repeatable:true,feedback:{success:"Bands delivered. Crowd gets in.",early:"You beat gates. Perfect.",late:"Late bands = queue chaos.",aborted:"Now I’m explaining it to security."}},
+
+      {id:"sam_13",name:"Forgotten passport",dist:6.9,sequence:4,repeatable:false,feedback:{success:"They made the flight. Barely.",early:"Absolute lifesaver. Seriously.",late:"Too late. That’s brutal.",aborted:"That’s an abandoned passport run."}},
+      {id:"sam_14",name:"Wedding cake box",dist:5.1,sequence:4,repeatable:false,feedback:{success:"Cake survived. Miracle worker.",early:"Early arrival. Calm hands.",late:"Late = panic. Keep it tighter.",aborted:"You dropped a wedding run?"}},
+      {id:"sam_15",name:"Sash parts",dist:5.8,sequence:4,repeatable:true,feedback:{success:"Parts arrived. Builder’s moving.",early:"Early delivery. Keeps trades happy.",late:"Late means wasted labour.",aborted:"Trades are waiting because of you."}},
+      {id:"sam_16",name:"Kitchen knife set",dist:3.1,sequence:4,repeatable:true,feedback:{success:"Delivered. No issues.",early:"Early drop. Good.",late:"Late drop. Customer annoyed.",aborted:"You left a paid delivery hanging."}},
+
+      {id:"sam_17",name:"VIP sushi apology",dist:3.2,sequence:5,repeatable:true,feedback:{success:"They forgave us. Barely.",early:"You saved the account. Nice.",late:"Late sushi is dead sushi.",aborted:"You just burned a VIP client."}},
+      {id:"sam_18",name:"Rush SLA",dist:6.0,sequence:5,repeatable:true,feedback:{success:"SLA met. Don’t get cocky.",early:"Ahead of SLA. That’s rare.",late:"SLA breach. That hurts us.",aborted:"You quit an SLA run? Wow."}},
+      {id:"sam_19",name:"Mysterious case",dist:4.8,sequence:5,repeatable:false,feedback:{success:"Package received. No questions.",early:"Fast and quiet. Good.",late:"Late delivery. Eyes on us now.",aborted:"You don’t walk away from that."}},
+      {id:"sam_20",name:"VIP keys drop",dist:4.0,sequence:5,repeatable:true,feedback:{success:"Keys delivered. Lock-up sorted.",early:"Early keys. Site secured.",late:"Late keys = risk. Don’t.",aborted:"Now the place is unsecured."}}
+    ]
+  },
+  {
+    name:"Rosa Klein",
+    jobs:[
+      {id:"rosa_01",name:"Tattoo stencil",dist:2.1,sequence:1,repeatable:true,feedback:{success:"Artist’s happy. Clean run.",early:"Early. Studio’s ready.",late:"Late. Appointment slipped.",aborted:"Now I’m rescheduling clients."}},
+      {id:"rosa_02",name:"Vintage vinyl",dist:2.5,sequence:1,repeatable:true,feedback:{success:"No warps. Nicely handled.",early:"Early drop. Great.",late:"Late. Buyer got twitchy.",aborted:"You bailed on a collector?"}},
+      {id:"rosa_03",name:"Charity raffle",dist:4.7,sequence:1,repeatable:false,feedback:{success:"All tickets accounted for.",early:"You saved the setup.",late:"Late means fewer sales.",aborted:"That’s a big hit for them."}},
+      {id:"rosa_04",name:"Pharmacy pickup",dist:2.8,sequence:1,repeatable:true,feedback:{success:"Meds delivered. Good.",early:"Early meds. Perfect.",late:"Late meds. Not acceptable.",aborted:"Don’t drop health runs."}},
+
+      {id:"rosa_05",name:"Escape props",dist:2.7,sequence:2,repeatable:true,feedback:{success:"Props arrived. Show runs.",early:"Early = no panic. Nice.",late:"Late = angry manager.",aborted:"They had to cancel a slot."}},
+      {id:"rosa_06",name:"Band merch",dist:4.1,sequence:2,repeatable:true,feedback:{success:"Merch table’s up. Great.",early:"Early = smooth sales.",late:"Late = missed sales.",aborted:"You ditched a gig run?"}},
+      {id:"rosa_07",name:"Cake topper",dist:3.4,sequence:2,repeatable:false,feedback:{success:"Topper intact. Cute.",early:"Early. Baker’s relieved.",late:"Late. Cake went out bare.",aborted:"Now it’s ruined."}},
+      {id:"rosa_08",name:"Lost phone return",dist:3.6,sequence:2,repeatable:false,feedback:{success:"Phone returned. Good deed.",early:"Fast return. Respect.",late:"Late return. Stressful.",aborted:"That’s nasty. Don’t."}},
+
+      {id:"rosa_09",name:"Spare theatre keys",dist:4.0,sequence:3,repeatable:true,feedback:{success:"Keys arrived. Doors open.",early:"Early keys. Smooth.",late:"Late keys. Tech crew fuming.",aborted:"You left them locked out."}},
+      {id:"rosa_10",name:"Wedding flowers",dist:5.3,sequence:3,repeatable:false,feedback:{success:"Flowers survived. Nice.",early:"Early. Cooler stayed cold.",late:"Late. Wilting risk.",aborted:"That’s a wedding disaster."}},
+      {id:"rosa_11",name:"Gallery invoice",dist:3.0,sequence:3,repeatable:true,feedback:{success:"Paperwork done. Thanks.",early:"Early. Office calm.",late:"Late. Payment delayed.",aborted:"Now we’re chasing."}},
+      {id:"rosa_12",name:"Fragile item",dist:5.0,sequence:3,repeatable:true,feedback:{success:"No cracks. Solid.",early:"Early and safe. Good.",late:"Late. Customer tense.",aborted:"That’s a broken promise."}},
+
+      {id:"rosa_13",name:"Custom frame",dist:4.6,sequence:4,repeatable:true,feedback:{success:"Frame delivered. Great.",early:"Early. Installer’s ready.",late:"Late. Installer waited.",aborted:"You just wasted labour."}},
+      {id:"rosa_14",name:"Caterer ice",dist:6.2,sequence:4,repeatable:true,feedback:{success:"Ice arrived. Service saved.",early:"Early = perfect.",late:"Late = melted. Bad.",aborted:"You dropped a service run."}},
+      {id:"rosa_15",name:"Handmade rings",dist:5.7,sequence:4,repeatable:false,feedback:{success:"Rings received. Relief.",early:"Early. No nerves.",late:"Late. Panic mode.",aborted:"That’s unforgivable."}},
+      {id:"rosa_16",name:"Urgent script",dist:4.9,sequence:4,repeatable:true,feedback:{success:"Script’s in. Rehearsal on.",early:"Early. Director’s happy.",late:"Late. Wasted rehearsal time.",aborted:"That’s amateur hour."}},
+
+      {id:"rosa_17",name:"VIP art courier",dist:6.4,sequence:5,repeatable:false,feedback:{success:"Piece delivered. No scratches.",early:"Early. Collector’s pleased.",late:"Late. Security upset.",aborted:"You don’t abort art."}},
+      {id:"rosa_18",name:"Rush wardrobe",dist:5.8,sequence:5,repeatable:true,feedback:{success:"Wardrobe arrived. Show saved.",early:"Early. Quick change ready.",late:"Late. Nearly missed cue.",aborted:"You bailed on a live show."}},
+      {id:"rosa_19",name:"Last call tickets",dist:3.8,sequence:5,repeatable:true,feedback:{success:"Tickets delivered. Good.",early:"Early. Easy entry.",late:"Late. Door almost closed.",aborted:"They missed the event."}},
+      {id:"rosa_20",name:"Backstage pass",dist:4.2,sequence:5,repeatable:true,feedback:{success:"Pass delivered. Clean.",early:"Early. No fuss.",late:"Late. Security got strict.",aborted:"Now it’s a mess at the door."}}
+    ]
+  },
+  {
+    name:"Aisha Rahman",
+    jobs:[
+      {id:"aisha_01",name:"Late rent env",dist:2.4,sequence:1,repeatable:true,feedback:{success:"Rent’s in. Crisis averted.",early:"Early rent. Nice.",late:"Late rent. Fees risk.",aborted:"That’s someone’s home. Don’t."}},
+      {id:"aisha_02",name:"Coffee beans",dist:3.3,sequence:1,repeatable:true,feedback:{success:"Beans arrived. Service runs.",early:"Early restock. Great.",late:"Late restock. Bad look.",aborted:"Now we’re out all day."}},
+      {id:"aisha_03",name:"Client contract",dist:4.5,sequence:1,repeatable:false,feedback:{success:"Signed. Sent. Done.",early:"Early. Legal’s impressed.",late:"Late. Deal nearly slipped.",aborted:"You just blew a contract."}},
+      {id:"aisha_04",name:"Hot meal drop",dist:3.1,sequence:1,repeatable:true,feedback:{success:"Hot on arrival. Good.",early:"Early and hot. Perfect.",late:"Late and cold. Not good.",aborted:"You accepted a meal run then quit?"}},
+
+      {id:"aisha_05",name:"Press kit",dist:4.1,sequence:2,repeatable:true,feedback:{success:"Kit delivered. Coverage secured.",early:"Early kit. Smooth.",late:"Late kit. Missed window.",aborted:"You dropped a press run."}},
+      {id:"aisha_06",name:"VIP meeting notes",dist:5.2,sequence:2,repeatable:false,feedback:{success:"Notes received. Helpful.",early:"Early = prepared meeting.",late:"Late = wasted time.",aborted:"That’s a bad look."}},
+      {id:"aisha_07",name:"Spare laptop",dist:6.0,sequence:2,repeatable:true,feedback:{success:"Laptop’s in. Work resumes.",early:"Early. Saved the day.",late:"Late. Lost hours.",aborted:"Now they can’t work."}},
+      {id:"aisha_08",name:"Pharmacy repeat",dist:2.6,sequence:2,repeatable:true,feedback:{success:"Delivered. Thank you.",early:"Early meds. Great.",late:"Late meds. Not okay.",aborted:"Don’t abandon essentials."}},
+
+      {id:"aisha_09",name:"Court filing",dist:6.3,sequence:3,repeatable:false,feedback:{success:"Filed. On record.",early:"Early filing. Excellent.",late:"Late filing. Risky.",aborted:"You can’t abort filings."}},
+      {id:"aisha_10",name:"Confidential docs",dist:5.5,sequence:3,repeatable:false,feedback:{success:"Delivered discreetly. Good.",early:"Early and quiet. Perfect.",late:"Late. Eyes were on us.",aborted:"That’s a breach of trust."}},
+      {id:"aisha_11",name:"Repro graphics",dist:4.7,sequence:3,repeatable:true,feedback:{success:"Prints arrived. Meeting saved.",early:"Early prints. Great.",late:"Late prints. Scramble.",aborted:"Now we present nothing."}},
+      {id:"aisha_12",name:"Catering run",dist:5.9,sequence:3,repeatable:true,feedback:{success:"Catering arrived. Sorted.",early:"Early setup. Great.",late:"Late setup. Awkward.",aborted:"You ditched a client lunch."}},
+
+      {id:"aisha_13",name:"Emergency charger",dist:3.9,sequence:4,repeatable:true,feedback:{success:"Charger delivered. Good.",early:"Early. No battery panic.",late:"Late. They died mid-call.",aborted:"You left them stranded."}},
+      {id:"aisha_14",name:"Exhibit paperwork",dist:6.1,sequence:4,repeatable:false,feedback:{success:"Paperwork cleared. Thanks.",early:"Early submission. Smooth.",late:"Late submission. Risky.",aborted:"Now it’s delayed."}},
+      {id:"aisha_15",name:"Key handover",dist:4.0,sequence:4,repeatable:true,feedback:{success:"Keys handed over. Great.",early:"Early handover. Clean.",late:"Late handover. Stress.",aborted:"Now nobody can access."}},
+      {id:"aisha_16",name:"Prototype parts",dist:6.5,sequence:4,repeatable:true,feedback:{success:"Parts arrived. Build continues.",early:"Early parts. Nice.",late:"Late parts. Lost hours.",aborted:"You stalled a build."}},
+
+      {id:"aisha_17",name:"CEO gift bag",dist:4.8,sequence:5,repeatable:true,feedback:{success:"Delivered. No fuss.",early:"Early delivery. Great.",late:"Late. Embarrassing.",aborted:"You dropped a VIP run."}},
+      {id:"aisha_18",name:"Last-minute deck",dist:5.6,sequence:5,repeatable:true,feedback:{success:"Deck delivered. Pitch ready.",early:"Early deck. Strong.",late:"Late deck. Panic edits.",aborted:"You sank a pitch."}},
+      {id:"aisha_19",name:"Secure access card",dist:6.7,sequence:5,repeatable:true,feedback:{success:"Card delivered. Site open.",early:"Early. No downtime.",late:"Late. Downtime cost money.",aborted:"That’s a security failure."}},
+      {id:"aisha_20",name:"Urgent injunction",dist:6.9,sequence:5,repeatable:false,feedback:{success:"Filed and served. Huge.",early:"Early service. Excellent.",late:"Late service. Damage done.",aborted:"That’s catastrophic."}}
+    ]
+  }
 ];
 
 const ROUTES=["Easy","Mid","Tricky","Hellish"];
@@ -848,25 +919,6 @@ const QUOTES=[
   "We’ve had two riders drop this already. Needs doing before the deadline.",
   "Client is calling every 2 minutes. Keep it moving.",
   "Estate drop. Stairs. No lift. Don’t be late."
-];
-
-const GIVERS=[
-  "Sam Patel",
-  "Rosa Klein",
-  "Aisha Rahman",
-  "Tom Weaver",
-  "Mike O’Donnell",
-  "Leah Brooks",
-  "Dan Cho",
-
-  "Countess Von Deliverance",
-  "DJ Deadline",
-  "Chef Enzo ‘Two-Minute’ Marino",
-  "Professor Hargreaves",
-  "Theatre Stage Manager: ‘We’re LIVE’",
-  "Nadia ‘No Small Talk’ Novak",
-  "Balthazar, Boutique Cryptid Curator",
-  "Gus from ‘Gus’s Very Serious Fish’"
 ];
 
 /* Events:
@@ -954,6 +1006,10 @@ const state={
   promptActive:false,
   promptEndMs:0,
   lastPromptAbs:-1e9,
+
+  /* progression */
+  requestorSeq:{},            // { [requestorName]: number }
+  completedOneOff:{},         // { [jobId]: true }
 
   lastTs:0,
   raf:0
@@ -1056,6 +1112,31 @@ function setAccentFromTime(){
   }
 }
 
+/* ===== PROGRESSION ===== */
+
+function ensureProgressionDefaults(){
+  if(!state.requestorSeq || typeof state.requestorSeq!=="object") state.requestorSeq={};
+  if(!state.completedOneOff || typeof state.completedOneOff!=="object") state.completedOneOff={};
+  for(const r of REQUESTORS){
+    if(typeof state.requestorSeq[r.name]!=="number" || state.requestorSeq[r.name]<1){
+      state.requestorSeq[r.name]=1;
+    }
+  }
+}
+
+function currentSeqFor(requestorName){
+  ensureProgressionDefaults();
+  return state.requestorSeq[requestorName] || 1;
+}
+
+function markOneOffCompleted(jobId){
+  state.completedOneOff[jobId]=true;
+}
+
+function isOneOffCompleted(jobId){
+  return !!state.completedOneOff[jobId];
+}
+
 /* ===== SAVE / LOAD ===== */
 
 function safeJsonParse(s){
@@ -1093,7 +1174,10 @@ function saveState(force=false){
       lastEventAbs:state.lastEventAbs,
       promptActive:state.promptActive,
       promptEndMs:state.promptEndMs,
-      lastPromptAbs:state.lastPromptAbs
+      lastPromptAbs:state.lastPromptAbs,
+
+      requestorSeq:state.requestorSeq,
+      completedOneOff:state.completedOneOff
     }
   };
 
@@ -1143,6 +1227,11 @@ function loadState(){
   state.promptActive = !!s.promptActive;
   state.promptEndMs = (typeof s.promptEndMs==="number") ? s.promptEndMs : 0;
   state.lastPromptAbs = (typeof s.lastPromptAbs==="number") ? s.lastPromptAbs : -1e9;
+
+  state.requestorSeq = (s.requestorSeq && typeof s.requestorSeq==="object") ? s.requestorSeq : {};
+  state.completedOneOff = (s.completedOneOff && typeof s.completedOneOff==="object") ? s.completedOneOff : {};
+
+  ensureProgressionDefaults();
 
   /* if prompt window already expired (reload), cancel it */
   if(state.promptActive && Date.now() > state.promptEndMs){
@@ -1307,9 +1396,30 @@ function pruneOffers(){
   state.offers = state.offers.filter(o => o.deadlineAbs > now);
 }
 
+function eligibleJobsPool(){
+  ensureProgressionDefaults();
+
+  const pool=[];
+  for(const r of REQUESTORS){
+    const seq=currentSeqFor(r.name);
+    for(const j of r.jobs){
+      if(j.sequence>seq) continue;
+      if(!j.repeatable && isOneOffCompleted(j.id)) continue;
+      pool.push({requestor:r.name, job:j});
+    }
+  }
+  return pool;
+}
+
 function genJobs(){
+  ensureProgressionDefaults();
+
   const base=nowAbs();
-  state.offers=[...JOBS].sort(()=>Math.random()-.5).slice(0,5).map(j=>{
+  const pool=eligibleJobsPool().sort(()=>Math.random()-.5);
+
+  const picks=pool.slice(0,5).map(p=>{
+    const j=p.job;
+
     const avg=(j.dist/8)*60;
     const slow=avg/SPEEDS[1].mult;
     const fast=avg/SPEEDS[5].mult;
@@ -1318,8 +1428,14 @@ function genJobs(){
     const slack = Math.round(Math.random()*2*60);
 
     return{
-      ...j,
-      giver: GIVERS[Math.floor(Math.random()*GIVERS.length)],
+      id:j.id,
+      name:j.name,
+      dist:j.dist,
+      sequence:j.sequence,
+      repeatable:j.repeatable,
+      feedback:j.feedback,
+
+      giver:p.requestor,
       quote: QUOTES[Math.floor(Math.random()*QUOTES.length)],
       hidden:Math.round(hidden),
       pay:Math.round(j.dist*12+Math.random()*6),
@@ -1327,6 +1443,8 @@ function genJobs(){
       deadlineAbs: base + Math.round(avg) + slack
     };
   });
+
+  state.offers=picks;
   pruneOffers();
   saveState(true);
 }
@@ -1437,6 +1555,23 @@ function tipPenaltyForFinish(){
 
 function abortPenalty(){
   return -Math.max(5, Math.round(state.job.pay*0.35));
+}
+
+function showFeedback(requestorName, text){
+  const w=$("feedbackWrap");
+  const who=$("feedbackWho");
+  const t=$("feedbackText");
+  if(!w || !who || !t) return;
+
+  if(!requestorName || !text){
+    w.classList.add("hidden");
+    who.textContent="—";
+    t.textContent="—";
+    return;
+  }
+  who.textContent=requestorName;
+  t.textContent="“"+text+"”";
+  w.classList.remove("hidden");
 }
 
 function startJob(o, resume=false){
@@ -1703,6 +1838,19 @@ function tick(ts){
   if(p>=1) finish();
 }
 
+function maybeAdvanceSequenceOnSuccess(job){
+  if(!job || !job.giver) return;
+
+  ensureProgressionDefaults();
+
+  const cur=currentSeqFor(job.giver);
+  const completedSeq = (typeof job.sequence==="number") ? job.sequence : 1;
+
+  if(completedSeq>=cur){
+    state.requestorSeq[job.giver]=cur+1;
+  }
+}
+
 function finish(){
   cancelAnimationFrame(state.raf);
   applyPendingEffects();
@@ -1718,16 +1866,33 @@ function finish(){
   const tp = tipPenaltyForFinish();
   const total = Math.max(0, state.job.pay + tp);
 
+  const completedJob = state.job;
+
   state.cash += total;
   state.dayEarnings += total;
   state.jobsDone++;
+
+  /* completion flags + sequence progression */
+  if(completedJob && !completedJob.repeatable){
+    markOneOffCompleted(completedJob.id);
+  }
+  maybeAdvanceSequenceOnSuccess(completedJob);
+
+  /* feedback */
+  let fbText="";
+  if(completedJob && completedJob.feedback){
+    if(tp>0) fbText = completedJob.feedback.early || completedJob.feedback.success || "";
+    else if(tp<0) fbText = completedJob.feedback.late || completedJob.feedback.success || "";
+    else fbText = completedJob.feedback.success || "";
+  }
+  showFeedback(completedJob ? completedJob.giver : "", fbText);
 
   $("resultTitle").textContent="Job complete";
   $("resultList").innerHTML=`
     <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
     <div class="vrow"><span>Average speed</span><span>${avgSpeed.toFixed(1)} mph</span></div>
     <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>
-    <div class="vrow"><span>Pay</span><span>£${state.job.pay}</span></div>
+    <div class="vrow"><span>Pay</span><span>£${completedJob.pay}</span></div>
     <div class="vrow"><span>Tip / penalty</span><span>${tp>=0 ? "£"+tp : "-£"+Math.abs(tp)}</span></div>
     <div class="vrow total"><span>Total</span><span>£${total}</span></div>
   `;
@@ -1751,6 +1916,7 @@ function finish(){
 /* UI wiring */
 
 $("goJobs").onclick=()=>{
+  ensureProgressionDefaults();
   if(!jobsInitialised){
     genJobs();
     renderJobs();
@@ -1816,6 +1982,14 @@ $("cancel").onclick=()=>{
   const pen = abortPenalty();
   state.cash += pen;
   state.dayEarnings += pen;
+
+  /* aborted feedback */
+  const abortedJob = state.job;
+  let fbText="";
+  if(abortedJob && abortedJob.feedback){
+    fbText = abortedJob.feedback.aborted || abortedJob.feedback.late || abortedJob.feedback.success || "";
+  }
+  showFeedback(abortedJob ? abortedJob.giver : "", fbText);
 
   $("resultTitle").textContent="Job aborted";
   $("resultList").innerHTML=`
@@ -2087,6 +2261,10 @@ function hardResetGame(){
   state.promptEndMs=0;
   state.lastPromptAbs=-1e9;
 
+  state.requestorSeq={};
+  state.completedOneOff={};
+  ensureProgressionDefaults();
+
   selectedOffer=null;
   jobsInitialised=false;
 
@@ -2099,6 +2277,7 @@ function hardResetGame(){
 $("resetGame").onclick=()=>{ hardResetGame(); };
 
 /* boot */
+ensureProgressionDefaults();
 buildSpeed();
 
 /* load save if present */

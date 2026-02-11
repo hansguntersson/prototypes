@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.37</title>
+  <title>Courier v1.0.39</title>
   <style>
     :root{
       color-scheme: dark;
@@ -36,16 +36,16 @@
 
     .divider{height:4px;background:var(--accent);margin:14px 0;}
 
+    /* KPI: left cash/target, right weekday */
     .kpiRow{
       display:grid;
-      grid-template-columns:1fr 1fr 1fr;
+      grid-template-columns:1fr 1fr;
       font-family:var(--mono);
       font-weight:900;
       color:var(--accent);
       padding:0 8px;
     }
     .kpiLeft{ text-align:left; }
-    .kpiMid{ text-align:center; }
     .kpiRight{ text-align:right; }
 
     .screen{display:block;}
@@ -75,22 +75,30 @@
     }
     .btnMini.btnIcon svg{width:18px;height:18px;}
 
-    .hubGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px;}
-    .hubGrid .btn,.hubGrid .btnOutline{padding:28px 12px;font-size:20px;margin-top:0;}
-
+    /* HUB: all buttons same size/layout as Rest (inline icon) */
+    .hubGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:20px;
+    }
     .hubBtn{
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      gap:10px;text-align:center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      text-align:center;
     }
     .hubBtn svg{
-      width:44px;height:44px;stroke:currentColor;fill:none;stroke-width:2;
-      stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;
+      width:34px;
+      height:34px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      flex:0 0 auto;
     }
-    .hubBtnInline{flex-direction:row;justify-content:center;gap:12px;}
-    .hubBtnInline svg{width:34px;height:34px;}
-
-    .hubRow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;}
-    .hubRow .btn,.hubRow .btnOutline{margin-top:0;}
 
     .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;}
     .jobs{display:grid;gap:12px;margin-top:12px;}
@@ -237,12 +245,7 @@
     }
 
     /* Clients */
-    .clientsTopBar{
-      display:flex;
-      justify-content:flex-end;
-      margin-top:6px;
-      margin-bottom:8px;
-    }
+    .clientsTopBar{display:flex;justify-content:flex-end;margin-top:6px;margin-bottom:8px;}
     .clientCard{border:var(--stroke) solid var(--accent);border-radius:var(--r2);padding:12px;}
     .clientName{font-size:20px;font-weight:950;margin-bottom:10px;color:var(--accent);}
     .clientGrid{
@@ -273,9 +276,8 @@
   <!-- KPI shown only on hub -->
   <div id="kpiWrap">
     <div class="kpiRow">
-      <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.37</div>
-      <div class="kpiRight" id="cashText">£0 / £500</div>
+      <div class="kpiLeft" id="kpiCashTarget">£0 / £500 due by friday</div>
+      <div class="kpiRight" id="kpiWeekday">monday</div>
     </div>
     <div class="divider"></div>
   </div>
@@ -303,16 +305,16 @@
         Shop
       </button>
 
-      <button class="btnOutline hubBtn" disabled aria-label="Equipment">
+      <button class="btnOutline hubBtn" disabled aria-label="Kit">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M14.5 5.2a3.7 3.7 0 0 0-4.9 4.9L4.4 15.3a2 2 0 0 0 2.8 2.8l5.2-5.2a3.7 3.7 0 0 0 4.9-4.9l-2 2-2-2 2-2Z"></path>
           <path d="M18.5 15.5l1.6 1.6"></path>
           <path d="M17.3 16.7l1.6-1.6"></path>
         </svg>
-        Equipment
+        Kit
       </button>
 
-      <button class="btnOutline hubBtn" disabled aria-label="Vehicles">
+      <button class="btnOutline hubBtn" disabled aria-label="Rides">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="7" cy="17" r="3"></circle>
           <circle cx="17" cy="17" r="3"></circle>
@@ -320,7 +322,7 @@
           <path d="M12 10l-2-3H7"></path>
           <path d="M12 10h4"></path>
         </svg>
-        Vehicles
+        Rides
       </button>
 
       <button class="btn hubBtn" id="goClients" aria-label="Clients">
@@ -342,10 +344,8 @@
         </svg>
         Stats
       </button>
-    </div>
 
-    <div class="hubRow">
-      <button class="btnOutline hubBtn hubBtnInline" id="resetGame" aria-label="Reset">
+      <button class="btnOutline hubBtn" id="resetGame" aria-label="Reset">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
           <path d="M21 3v6h-6"></path>
@@ -355,7 +355,7 @@
         Reset
       </button>
 
-      <button class="btn hubBtn hubBtnInline" id="restOpen" aria-label="Rest">
+      <button class="btn hubBtn" id="restOpen" aria-label="Rest">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4 12V8a2 2 0 0 1 2-2h11a3 3 0 0 1 3 3v3"></path>
           <path d="M4 12h17a2 2 0 0 1 2 2v4H2v-4a2 2 0 0 1 2-2Z"></path>
@@ -577,7 +577,7 @@
 <script>
 "use strict";
 
-const VERSION="1.0.37";
+const VERSION="1.0.39";
 const WEEKLY_TARGET=500;
 
 const PRICES={drink:12,snack:6};
@@ -760,7 +760,7 @@ const state={
 
   clientSeq:{},
   completedOneOffs:{},
-  clientStats:{}, /* includes accepted for filtering */
+  clientStats:{},
 
   stats:{
     miles:0,
@@ -867,7 +867,7 @@ function setAccentFromTime(){
   }
 }
 
-/* ===== CLIENTS ===== */
+/* ===== CLIENTS / STATS ===== */
 function initClientsIfNeeded(){
   for(const who of REQUESTORS){
     if(typeof state.clientSeq[who] !== "number") state.clientSeq[who]=1;
@@ -949,10 +949,7 @@ function renderClients(){
   }
 }
 
-/* ===== STATS ===== */
-function weekNumber(){
-  return Math.floor((state.day-1)/7)+1;
-}
+function weekNumber(){ return Math.floor((state.day-1)/7)+1; }
 function avgSpeedOverall(){
   if(state.stats.minutes<=0) return 0;
   return (state.stats.miles * 60) / state.stats.minutes;
@@ -1143,6 +1140,11 @@ function updateTimeDialFromDeadline(){
   rem.textContent=Math.max(0,Math.ceil(left))+"m";
 }
 
+function weekdayName(){
+  const days=["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+  return days[(state.day-1)%7];
+}
+
 function setMode(m){
   ["hub","clients","stats","shop","board","offer","job","result","end"].forEach(s=>{
     const el=$(s);
@@ -1154,19 +1156,38 @@ function setMode(m){
   saveState();
 }
 
+function updateConsumablesModal(){
+  const d=$("drinkBtn");
+  const s=$("snackBtn");
+
+  const now=Date.now();
+  const drinkCdLeft=Math.max(0, state.drinkCdUntil - now);
+  const snackCdLeft=Math.max(0, state.snackCdUntil - now);
+
+  if(d){
+    const cdText = drinkCdLeft>0 ? ` (cooldown ${Math.ceil(drinkCdLeft/1000)}s)` : "";
+    d.innerHTML=`Energy Drink x ${state.drinks}<span class="sub">+20% energy immediately then 10% crash after 15s${cdText}</span>`;
+    d.disabled = (state.drinks<=0) || (drinkCdLeft>0);
+  }
+  if(s){
+    const cdText = snackCdLeft>0 ? ` (cooldown ${Math.ceil(snackCdLeft/1000)}s)` : "";
+    s.innerHTML=`Snack x ${state.snacks}<span class="sub">15s delay, then + energy each second for 15s${cdText}</span>`;
+    s.disabled = (state.snacks<=0) || (snackCdLeft>0);
+  }
+}
+
 function renderTop(){
   setAccentFromTime();
-  elText("cashText","£"+state.cash+" / £"+WEEKLY_TARGET);
   elText("headerClock",fmtClock(minutesOfDay()));
-  elText("versionText","v"+VERSION);
-  elText("dayText","Day "+state.day);
+  elText("kpiCashTarget","£"+state.cash+" / £"+WEEKLY_TARGET+" due by friday");
+  elText("kpiWeekday",weekdayName());
   renderEnergyBar();
 
   const sc=$("shopCash");
   if(sc) sc.textContent="CASH — £"+state.cash;
 
   updateEventBtnUI();
-  updateConsumablesModal(); /* keep cooldown text/disabled accurate if modal open */
+  updateConsumablesModal();
 }
 
 function snapshotEOD(){
@@ -1203,9 +1224,18 @@ function advanceMinutes(mins){
   while(state.time<0){ state.time += 1440; state.day = Math.max(1, state.day-1); }
   if(rolled>0) onMidnightRollover();
 }
+
+/* Offer pruning with feasibility buffer (speed 5 theoretical max) */
+function minutesToCompleteAtSpeed5(dist){
+  const mph = 8 * SPEEDS[5].mult;
+  return (dist / mph) * 60;
+}
 function pruneOffers(){
   const now=nowAbs();
-  state.offers = state.offers.filter(o => o.deadlineAbs > now);
+  state.offers = state.offers.filter(o=>{
+    const left = o.deadlineAbs - now;
+    return left > minutesToCompleteAtSpeed5(o.dist);
+  });
 }
 
 /* ===== JOB GEN ===== */
@@ -1351,7 +1381,7 @@ function tipPenaltyForFinish(){
     return Math.min(raw, cap);
   }else if(delta<0){
     const late = Math.ceil(Math.abs(delta)/5);
-    const raw = -(late*4); /* was *2 */
+    const raw = -(late*4);
     return Math.max(raw, -state.job.pay);
   }
   return 0;
@@ -1437,12 +1467,8 @@ function routeTier(route){
   if(route==="Hellish") return 3;
   return 1;
 }
-function routeAccidentMult(route){
-  return [0.75, 1.0, 1.25, 1.6][routeTier(route)];
-}
-function routeBadWeight(route){
-  return [0.75, 1.0, 1.35, 1.75][routeTier(route)];
-}
+function routeAccidentMult(route){ return [0.75, 1.0, 1.25, 1.6][routeTier(route)]; }
+function routeBadWeight(route){ return [0.75, 1.0, 1.35, 1.75][routeTier(route)]; }
 function accidentChanceForSpeedAndRoute(speed, route){
   const base = 0.15 + 0.10*(clamp(speed,1,5)-1);
   return clamp(base*routeAccidentMult(route), 0.05, 0.90);
@@ -1671,7 +1697,7 @@ function finish(){
   saveState(true);
 }
 
-/* ===== UI WIRING ===== */
+/* UI wiring */
 on("closeEvent","click", closeEvent);
 
 on("goJobs","click", ()=>{
@@ -1785,26 +1811,6 @@ on("buySnack","click", ()=>{
 /* Consumables cooldown */
 function cooldownMs(){ return 5000 + Math.floor(Math.random()*5001); } // 5–10s
 
-function updateConsumablesModal(){
-  const d=$("drinkBtn");
-  const s=$("snackBtn");
-
-  const now=Date.now();
-  const drinkCdLeft=Math.max(0, state.drinkCdUntil - now);
-  const snackCdLeft=Math.max(0, state.snackCdUntil - now);
-
-  if(d){
-    const cdText = drinkCdLeft>0 ? ` (cooldown ${Math.ceil(drinkCdLeft/1000)}s)` : "";
-    d.innerHTML=`Energy Drink x ${state.drinks}<span class="sub">+20% energy immediately then 10% crash after 15s${cdText}</span>`;
-    d.disabled = (state.drinks<=0) || (drinkCdLeft>0);
-  }
-  if(s){
-    const cdText = snackCdLeft>0 ? ` (cooldown ${Math.ceil(snackCdLeft/1000)}s)` : "";
-    s.innerHTML=`Snack x ${state.snacks}<span class="sub">15s delay, then + energy each second for 15s${cdText}</span>`;
-    s.disabled = (state.snacks<=0) || (snackCdLeft>0);
-  }
-}
-
 on("openConsumables","click", ()=>{
   updateConsumablesModal();
   const m=$("energyModal"); if(m) m.style.display="flex";
@@ -1883,7 +1889,6 @@ on("snackBtn","click", ()=>{
 /* Abort */
 on("cancel","click", ()=>{
   cancelAnimationFrame(state.raf);
-  applyPendingEffects();
 
   state.promptActive=false;
   state.promptEndMs=0;
@@ -1894,7 +1899,6 @@ on("cancel","click", ()=>{
   const pen = abortPenalty();
   const penAbs = Math.abs(pen);
 
-  /* partial miles on abort */
   const frac=clamp(state.hiddenDuration>0 ? (state.progress/state.hiddenDuration) : 0, 0, 1);
   const miles = state.job ? (state.job.dist * frac) : 0;
 
@@ -1906,7 +1910,7 @@ on("cancel","click", ()=>{
   state.stats.aborted++;
   state.stats.minutes += timeTaken;
   state.stats.miles += miles;
-  state.stats.made += pen; /* negative */
+  state.stats.made += pen;
 
   if(state.job) recordClientAbort(state.job, penAbs);
 

@@ -23,12 +23,14 @@
       font-family:var(--sans);
       font-size:18px;
     }
+
     .safe{
       padding: calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 260px);
       max-width:760px;
       margin:0 auto;
     }
 
+    /* HEADER: left Courier, right big clock */
     .top{
       display:flex;
       justify-content:space-between;
@@ -100,6 +102,25 @@
       width:auto;
     }
 
+    .btnIcon{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      text-align:center;
+    }
+    .btnIcon svg{
+      width:22px;
+      height:22px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      flex:0 0 auto;
+    }
+    .btnMini.btnIcon svg{width:18px;height:18px;}
+
     .hubGrid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -112,13 +133,6 @@
       margin-top:0;
     }
 
-    .hubRow{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      margin-top:12px;
-    }
-
     .hubBtn{
       display:flex;
       flex-direction:column;
@@ -127,14 +141,44 @@
       gap:10px;
       text-align:center;
     }
-
-    .jobTitle{font-size:22px;font-weight:950;color:var(--accent);}
-    .pageTitle{
-      text-align:center;
-      margin-top:28px;
-      margin-bottom:12px;
+    /* ensure hub svg icons always render properly */
+    .hubBtn svg{
+      width:44px;
+      height:44px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      flex:0 0 auto;
     }
 
+    /* icon LEFT of text */
+    .hubBtnInline{
+      flex-direction:row;
+      justify-content:center;
+      gap:12px;
+    }
+    .hubBtnInline svg{
+      width:34px;
+      height:34px;
+    }
+
+    /* reset + rest row (side-by-side) */
+    .hubRow{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:12px;
+    }
+    .hubRow .btn,.hubRow .btnOutline{ margin-top:0; }
+
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:12px;
+    }
     .jobs{display:grid;gap:12px;margin-top:12px;}
     .jobRow{
       border:var(--stroke) solid var(--accent);
@@ -151,13 +195,313 @@
     .jobRow .jobTitle,
     .jobRow .jobPay{ color:#000; }
 
-    .jobPay{font-family:var(--mono);font-size:20px;font-weight:950;}
+    .jobTitle{font-size:22px;font-weight:950;color:var(--accent);}
+    .jobPay{font-family:var(--mono);font-size:20px;font-weight:950;color:var(--accent);}
 
+    /* Centered page titles (Job board / Shop / Job complete) */
+    .pageTitle{
+      text-align:center;
+      margin-top:28px;
+      margin-bottom:12px;
+    }
+
+    .refreshText{
+      margin-top:14px;
+      text-align:center;
+      font-family:var(--mono);
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+      color:var(--accent);
+    }
     .bottomRight{
       margin-top:14px;
       display:flex;
       justify-content:flex-end;
     }
+
+    .progressLabel{font-family:var(--mono);font-size:22px;font-weight:950;color:var(--accent);}
+    .progressPct{font-family:var(--mono);font-size:22px;font-weight:950;color:var(--accent);}
+    .bar{
+      height:16px;
+      border:var(--stroke) solid var(--accent);
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:6px;
+    }
+    .fill{height:100%;width:0;background:var(--accent);}
+
+    .progressMeta{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      margin-top:8px;
+      font-family:var(--mono);
+      font-size:14px;
+      font-weight:800;
+      color:var(--accent);
+    }
+    .progressMeta div:nth-child(2){text-align:center;}
+    .progressMeta div:nth-child(3){text-align:right;}
+
+    /* TIME LEFT: circular dial + text (inside) */
+    .timeLeftWrap{
+      margin-top:16px;
+      padding-top:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--accent);
+    }
+    .timeDial{
+      width:176px;
+      height:176px;
+      flex:0 0 auto;
+      display:block;
+    }
+    .timeDial circle,
+    .timeDial path{
+      vector-effect: non-scaling-stroke;
+    }
+    .timeDial text{
+      font-family:var(--mono);
+      fill:var(--accent);
+      text-anchor:middle;
+      dominant-baseline:middle;
+    }
+    .timeDial .dialK{
+      font-size:8px;
+      font-weight:900;
+      letter-spacing:.8px;
+      opacity:.9;
+    }
+    .timeDial .dialV{
+      font-size:12px;
+      font-weight:950;
+    }
+
+    .progressBlock{ margin-top:26px; }
+    .progressHead{ margin-bottom:18px; }
+
+    .jobControls{
+      position:fixed;
+      left:0;right:0;
+      bottom:calc(env(safe-area-inset-bottom) + 64px + 110px);
+      padding:10px 14px;
+      background:var(--bg);
+    }
+    .jobControlsWrap{
+      max-width:760px;
+      margin:0 auto;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .btnMini{
+      width:auto;
+      margin-top:0;
+      padding:12px 14px;
+      font-size:16px;
+      border-radius:14px;
+    }
+
+    .speedbar{
+      position:fixed;
+      left:0;right:0;
+      bottom:calc(env(safe-area-inset-bottom) + 64px);
+      padding:10px 14px 20px;
+      background:var(--bg);
+      border-top:var(--stroke) solid var(--accent);
+    }
+    .speedwrap{max-width:760px;margin:0 auto;}
+    .speedhead{display:flex;justify-content:space-between;margin-bottom:8px;}
+    .speedTitle{
+      font-family:var(--mono);
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.3px;
+      color:var(--accent);
+    }
+    .seg{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:8px;
+    }
+    .seg button{
+      padding:14px 0;
+      border-radius:14px;
+      border:var(--stroke) solid var(--accent);
+      background:var(--bg);
+      color:var(--accent);
+      font-size:16px;
+      font-weight:900;
+      touch-action: manipulation;
+    }
+    .seg button.active{background:var(--accent);color:#000;}
+    .seg button[disabled]{opacity:.35;}
+
+    .energyFooter{
+      position:fixed;
+      left:0;right:0;
+      bottom:0;
+      padding:10px 14px calc(env(safe-area-inset-bottom) + 10px);
+      background:var(--bg);
+      border-top:var(--stroke) solid var(--accent);
+    }
+    .energyWrap{max-width:760px;margin:0 auto;}
+    .energyLabel{
+      font-family:var(--mono);
+      font-size:14px;
+      font-weight:900;
+      margin-bottom:8px;
+      letter-spacing:.3px;
+      color:var(--accent);
+    }
+    .energyBar{
+      display:grid;
+      grid-template-columns:repeat(10,1fr);
+      gap:8px;
+    }
+    .energySeg{
+      height:16px;
+      border:var(--stroke) solid var(--accent);
+      border-radius:6px;
+      background:transparent;
+      opacity:0;
+    }
+
+    /* OFFER SCREEN */
+    .offerHeader{
+      background:var(--accent);
+      color:#000;
+      padding:14px 12px;
+      border-radius:var(--r2);
+      text-align:center;
+      font-family:var(--mono);
+      font-size:22px;
+      font-weight:950;
+      letter-spacing:1px;
+      margin-bottom:18px;
+      text-transform:uppercase;
+    }
+    .offerTop{
+      display:grid;
+      grid-template-columns:120px 1fr;
+      gap:16px;
+      align-items:start;
+      margin-bottom:22px;
+    }
+    .avatar{
+      border:var(--stroke) solid var(--accent);
+      border-radius:16px;
+      height:120px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--accent);
+      opacity:.95;
+    }
+    .avatar svg{
+      width:92px;
+      height:92px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .offerOrg{
+      font-size:28px;
+      font-weight:950;
+      line-height:1.05;
+      color:var(--accent);
+    }
+    .offerRole{
+      font-family:var(--mono);
+      font-size:14px;
+      font-weight:900;
+      margin-top:10px;
+      opacity:.85;
+      color:var(--accent);
+    }
+    .offerFacts{
+      margin-top:18px;
+      border-top:var(--stroke) solid var(--accent);
+      padding-top:14px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      font-family:var(--mono);
+      font-weight:900;
+      color:var(--accent);
+    }
+    .factsCol{display:grid;gap:10px;}
+    .fact .k{opacity:.8;}
+    .fact .v{font-size:28px;margin-top:2px;}
+    .fact.pay .v{font-size:28px;}
+    .offerActions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:18px;
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.7);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .modalBox{
+      border:var(--stroke) solid var(--accent);
+      border-radius:20px;
+      padding:16px;
+      max-width:520px;
+      width:100%;
+      background:var(--bg);
+      color:var(--accent);
+    }
+    .modalTitle{
+      text-align:center;
+      font-family:var(--mono);
+      font-size:18px;
+      font-weight:950;
+      letter-spacing:2px;
+      margin-bottom:10px;
+      color:var(--accent);
+    }
+    .modalBtn{
+      width:100%;
+      text-align:center;
+      padding:18px 12px;
+      border-radius:16px;
+      border:var(--stroke) solid var(--accent);
+      background:var(--bg);
+      color:var(--accent);
+      font-weight:950;
+      font-size:22px;
+      margin-top:12px;
+    }
+    .modalBtn .sub{
+      display:block;
+      margin-top:6px;
+      font-family:var(--mono);
+      font-size:14px;
+      font-weight:900;
+      opacity:.9;
+      color:var(--accent);
+    }
+    .modalBtn[disabled]{opacity:.35;}
+
+    .modalBtnFill{
+      background:var(--accent);
+      color:#000;
+    }
+    .modalBtnFill .sub{ color:#000; }
 
     .resultBox{
       border:var(--stroke) solid var(--accent);
@@ -169,26 +513,71 @@
     .vrow{display:flex;justify-content:space-between;font-family:var(--mono);font-weight:800;color:var(--accent);}
     .vrow.total{border-top:var(--stroke) solid var(--accent);padding-top:10px;margin-top:6px;}
 
-    .feedbackLine{
-      margin-top:12px;
-      padding-top:12px;
-      border-top:var(--stroke) solid var(--accent);
+    /* Shop cash line */
+    .shopCash{
+      text-align:center;
       font-family:var(--mono);
+      font-size:16px;
       font-weight:900;
+      letter-spacing:.5px;
+      margin:2px 0 14px;
+      opacity:.95;
       color:var(--accent);
     }
-    .feedbackWho{opacity:.8;margin-bottom:6px;}
 
+    /* Clients list */
+    .clientsHeaderRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      font-family:var(--mono);
+      font-weight:950;
+      padding:6px 2px 10px;
+      opacity:.95;
+    }
     .clientCard{
       border:var(--stroke) solid var(--accent);
       border-radius:var(--r2);
       padding:12px;
-      margin-top:12px;
     }
-    .clientTitle{
+    .clientName{
       font-size:20px;
       font-weight:950;
+      margin-bottom:10px;
+      color:var(--accent);
+    }
+    .clientGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px 14px;
+      font-family:var(--mono);
+      font-weight:900;
+      color:var(--accent);
+      font-size:14px;
+    }
+    .clientGrid .k{opacity:.8;}
+    .clientGrid .v{font-size:18px;margin-top:2px;}
+    .clientGrid .wide{grid-column:1/-1;}
+    .clientDivider{height:1px;background:var(--accent);opacity:.35;margin:10px 0;}
+
+    /* Result feedback */
+    .feedbackWrap{
+      margin-top:12px;
+      border-top:var(--stroke) solid var(--accent);
+      padding-top:12px;
+    }
+    .feedbackWho{
+      font-family:var(--mono);
+      font-weight:950;
+      letter-spacing:.3px;
+      opacity:.9;
       margin-bottom:8px;
+    }
+    .feedbackText{
+      font-family:var(--mono);
+      font-weight:900;
+      opacity:.95;
+      line-height:1.25;
     }
   </style>
 </head>
@@ -202,6 +591,7 @@
 
   <div class="divider"></div>
 
+  <!-- KPI shown only on hub -->
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
@@ -214,28 +604,135 @@
   <!-- HUB -->
   <div class="screen" id="hub">
     <div class="hubGrid">
-      <button class="btn hubBtn" id="goJobs">Jobs</button>
-      <button class="btn hubBtn" id="goShop">Shop</button>
+      <button class="btn hubBtn" id="goJobs" aria-label="Jobs">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="3.5" width="14" height="17" rx="2"></rect>
+          <line x1="8" y1="8" x2="16" y2="8"></line>
+          <line x1="8" y1="12" x2="16" y2="12"></line>
+          <line x1="8" y1="16" x2="13" y2="16"></line>
+        </svg>
+        Jobs
+      </button>
+      <button class="btn hubBtn" id="goShop" aria-label="Shop">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 8h15l-2 9H8L6 8Z"></path>
+          <path d="M6 8l-2-3H2"></path>
+          <circle cx="9" cy="20" r="1"></circle>
+          <circle cx="18" cy="20" r="1"></circle>
+        </svg>
+        Shop
+      </button>
 
-      <button class="btnOutline hubBtn" disabled>Equipment</button>
-      <button class="btnOutline hubBtn" disabled>Vehicles</button>
+      <!-- Equipment -->
+      <button class="btnOutline hubBtn" disabled aria-label="Equipment">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M14.5 5.2a3.7 3.7 0 0 0-4.9 4.9L4.4 15.3a2 2 0 0 0 2.8 2.8l5.2-5.2a3.7 3.7 0 0 0 4.9-4.9l-2 2-2-2 2-2Z"></path>
+          <path d="M18.5 15.5l1.6 1.6"></path>
+          <path d="M17.3 16.7l1.6-1.6"></path>
+        </svg>
+        Equipment
+      </button>
 
-      <button class="btn hubBtn" id="goClients">Clients</button>
-      <button class="btnOutline hubBtn" disabled>Stats</button>
+      <!-- Vehicles -->
+      <button class="btnOutline hubBtn" disabled aria-label="Vehicles">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="7" cy="17" r="3"></circle>
+          <circle cx="17" cy="17" r="3"></circle>
+          <path d="M9 17l3-7h3l2 4"></path>
+          <path d="M12 10l-2-3H7"></path>
+          <path d="M12 10h4"></path>
+        </svg>
+        Vehicles
+      </button>
+
+      <!-- Clients -->
+      <button class="btn hubBtn" id="goClients" aria-label="Clients">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="9" cy="8" r="3"></circle>
+          <path d="M3.5 20c1.2-4 9.8-4 11 0"></path>
+          <circle cx="17" cy="9" r="2.2"></circle>
+          <path d="M14.5 20c.7-2.7 5.3-2.7 6 0"></path>
+        </svg>
+        Clients
+      </button>
+
+      <!-- Stats -->
+      <button class="btnOutline hubBtn" id="goStats" disabled aria-label="Stats">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 20V6"></path>
+          <path d="M9 20V10"></path>
+          <path d="M14 20V4"></path>
+          <path d="M19 20V13"></path>
+        </svg>
+        Stats
+      </button>
     </div>
 
+    <!-- reset + rest side-by-side -->
     <div class="hubRow">
-      <button class="btnOutline" id="resetGame">Reset</button>
-      <button class="btn" id="restOpen">Rest</button>
+      <button class="btnOutline hubBtn hubBtnInline" id="resetGame" aria-label="Reset">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+          <path d="M21 3v6h-6"></path>
+          <path d="M9 9l6 6"></path>
+          <path d="M15 9l-6 6"></path>
+        </svg>
+        Reset
+      </button>
+
+      <button class="btn hubBtn hubBtnInline" id="restOpen" aria-label="Rest">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 12V8a2 2 0 0 1 2-2h11a3 3 0 0 1 3 3v3"></path>
+          <path d="M4 12h17a2 2 0 0 1 2 2v4H2v-4a2 2 0 0 1 2-2Z"></path>
+          <path d="M7 10h3"></path>
+        </svg>
+        Rest
+      </button>
     </div>
   </div>
 
   <!-- CLIENTS -->
   <div class="screen hidden" id="clients">
     <div class="jobTitle pageTitle">Clients</div>
-    <div id="clientsWrap"></div>
+    <div class="clientsHeaderRow">
+      <div style="opacity:.85">Requestors</div>
+      <div style="opacity:.85">Overview</div>
+    </div>
+    <div class="vlist" id="clientsList"></div>
     <div class="bottomRight">
       <button class="btnOutline btnSmall" id="backHubClients">Back</button>
+    </div>
+  </div>
+
+  <!-- SHOP -->
+  <div class="screen hidden" id="shop">
+    <div class="jobTitle pageTitle">Shop</div>
+    <div class="shopCash" id="shopCash">CASH — £0</div>
+
+    <button class="btn btnIcon" id="buyDrink">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M10 2h4"></path>
+        <path d="M10 2v3"></path>
+        <path d="M14 2v3"></path>
+        <path d="M9 5h6"></path>
+        <path d="M9 5l-1 3v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8l-1-3"></path>
+        <path d="M9 12h6"></path>
+      </svg>
+      <span>Energy drink — £<span id="drinkPrice"></span> (<span id="drinkCount"></span>/5)</span>
+    </button>
+
+    <button class="btn btnIcon" id="buySnack">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="6" y="5" width="12" height="16" rx="2"></rect>
+        <path d="M9 8v10"></path>
+        <path d="M12 8v10"></path>
+        <path d="M15 8v10"></path>
+      </svg>
+      <span>Snack — £<span id="snackPrice"></span> (<span id="snackCount"></span>/5)</span>
+    </button>
+
+    <div class="bottomRight">
+      <button class="btnOutline btnSmall" id="backHub2">Back</button>
     </div>
   </div>
 
@@ -243,8 +740,75 @@
   <div class="screen hidden" id="board">
     <div class="jobTitle pageTitle">Job board</div>
     <div class="jobs" id="jobs"></div>
+    <div class="refreshText" id="refreshJobs">↻ Refresh jobs</div>
     <div class="bottomRight">
       <button class="btnOutline btnSmall" id="backHub">Back</button>
+    </div>
+  </div>
+
+  <!-- OFFER -->
+  <div class="screen hidden" id="offer">
+    <div class="offerHeader" id="offerTitle">—</div>
+
+    <div class="offerTop">
+      <div class="avatar" aria-label="Dispatcher">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.2"></circle>
+          <path d="M5.5 20c1.6-4.4 11.4-4.4 13 0"></path>
+        </svg>
+      </div>
+      <div>
+        <div class="offerOrg" id="ofOrg">—</div>
+        <div class="offerRole" id="ofQuote">—</div>
+      </div>
+    </div>
+
+    <div class="offerFacts">
+      <div class="factsCol">
+        <div class="fact"><div class="k">DISTANCE</div><div class="v" id="ofDistance">—</div></div>
+        <div class="fact"><div class="k">ROUTE</div><div class="v" id="ofRoute">—</div></div>
+      </div>
+      <div class="factsCol">
+        <div class="fact pay"><div class="k">PAY</div><div class="v" id="ofPay">£0</div></div>
+        <div class="fact"><div class="k">DEADLINE</div><div class="v" id="ofDeadline">—</div></div>
+      </div>
+    </div>
+
+    <div class="offerActions">
+      <button class="btnOutline" id="offerBack">Back</button>
+      <button class="btn" id="offerAccept">ACCEPT</button>
+    </div>
+  </div>
+
+  <!-- LIVE JOB -->
+  <div class="screen hidden" id="job">
+    <div class="offerHeader" id="jobName">—</div>
+
+    <div class="timeLeftWrap">
+      <svg class="timeDial" viewBox="0 0 100 100" aria-label="Time left">
+        <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="14" fill="none" opacity="0.18"></circle>
+        <path id="timeArc"
+          stroke="var(--accent)"
+          stroke-width="16"
+          fill="none"
+          stroke-linecap="butt"
+          d=""></path>
+        <text class="dialK" x="50" y="45">TIME LEFT</text>
+        <text class="dialV" id="remaining" x="50" y="57">—</text>
+      </svg>
+    </div>
+
+    <div class="progressBlock">
+      <div class="row progressHead">
+        <div class="progressLabel">Progress</div>
+        <div class="progressPct" id="pct">0%</div>
+      </div>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div class="progressMeta">
+        <div id="milesDone">0.0 mi</div>
+        <div id="mph">0 mph</div>
+        <div id="milesLeft">0.0 mi</div>
+      </div>
     </div>
   </div>
 
@@ -253,126 +817,205 @@
     <div class="jobTitle pageTitle" id="resultTitle">Job complete</div>
     <div class="resultBox">
       <div class="vlist" id="resultList"></div>
-      <div class="feedbackLine hidden" id="feedbackWrap">
-        <div class="feedbackWho" id="feedbackWho"></div>
-        <div id="feedbackText"></div>
+      <div class="feedbackWrap hidden" id="feedbackWrap">
+        <div class="feedbackWho" id="feedbackWho">—</div>
+        <div class="feedbackText" id="feedbackText">—</div>
       </div>
     </div>
+    <div style="height:30px"></div>
     <button class="btn" id="backBoard">Back to job board</button>
+  </div>
+
+  <!-- END DAY -->
+  <div class="screen hidden" id="end">
+    <div class="jobTitle" id="endTitle">End of day</div>
+    <div class="resultBox">
+      <div class="vlist" id="endList"></div>
+    </div>
+    <button class="btn" id="confirmEnd">Start next day</button>
+  </div>
+</div>
+
+<!-- Live job bottom controls -->
+<div class="jobControls hidden" id="jobControls">
+  <div class="jobControlsWrap">
+    <button class="btnOutline btnMini" id="cancel">Abort</button>
+    <button class="btnOutline btnMini" id="eventBtn" disabled>Event</button>
+    <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
+  </div>
+</div>
+
+<!-- Speed controls -->
+<div class="speedbar hidden" id="speedBar">
+  <div class="speedwrap">
+    <div class="speedhead">
+      <div class="speedTitle">SPEED</div>
+      <div class="speedTitle" id="speedLabel">average</div>
+    </div>
+    <div class="seg" id="speedSeg"></div>
+  </div>
+</div>
+
+<!-- Energy footer -->
+<div class="energyFooter" id="energyFooter">
+  <div class="energyWrap">
+    <div class="energyLabel">ENERGY</div>
+    <div class="energyBar" id="energyBar"></div>
+  </div>
+</div>
+
+<!-- Consumables modal -->
+<div class="modal" id="energyModal">
+  <div class="modalBox">
+    <div class="modalTitle">SNACKS</div>
+    <button class="modalBtn" id="drinkBtn"></button>
+    <button class="modalBtn" id="snackBtn"></button>
+    <button class="btnOutline" id="closeEnergy">Cancel</button>
+  </div>
+</div>
+
+<!-- Event modal -->
+<div class="modal" id="eventModal">
+  <div class="modalBox">
+    <div class="modalTitle">EVENT</div>
+    <div class="resultBox" style="margin-top:0">
+      <div class="vlist" id="eventList"></div>
+    </div>
+    <button class="btn" id="closeEvent">Continue</button>
+  </div>
+</div>
+
+<!-- Rest modal -->
+<div class="modal" id="restModal">
+  <div class="modalBox">
+    <div class="modalTitle">REST</div>
+    <button class="modalBtn modalBtnFill" id="rest2">Rest 2 hours</button>
+    <button class="modalBtn modalBtnFill" id="rest4">Rest 4 hours</button>
+    <button class="modalBtn modalBtnFill" id="rest8">Rest 8 hours</button>
+    <button class="modalBtn modalBtnFill" id="restMorning">Until morning</button>
+    <button class="btnOutline" id="closeRest">Cancel</button>
   </div>
 </div>
 
 <script>
+(() => {
+"use strict";
+
 const VERSION="1.0.35";
 const WEEKLY_TARGET=500;
 
-const SAVE_KEY="courier_save";
+const PRICES={drink:12,snack:6};
+const COSTS={rent:35,food:15};
 
-const state={
-  day:1,
-  cash:0,
-  time:15*60,
-  jobsDone:0,
-  job:null,
-  requestorStats:{},
-  requestorSeq:{},
-  completedOneOff:{}
+const SPEEDS={
+  1:{name:"very slow",mult:0.55},
+  2:{name:"slow",mult:0.8},
+  3:{name:"average",mult:1},
+  4:{name:"fast",mult:1.25},
+  5:{name:"very fast",mult:1.55}
 };
 
-const REQUESTORS=["Sam Patel","Rosa Klein","Aisha Rahman"];
-const REPUTATION={
-  "Sam Patel":7,
-  "Rosa Klein":8,
-  "Aisha Rahman":9
-};
+const ROUTES=["Easy","Mid","Tricky","Hellish"];
 
-function ensureStats(){
-  for(const r of REQUESTORS){
-    if(!state.requestorStats[r]){
-      state.requestorStats[r]={
-        completed:0,
-        aborted:0,
-        revenue:0,
-        tips:0,
-        penalties:0
-      };
-    }
-    if(!state.requestorSeq[r]){
-      state.requestorSeq[r]=1;
-    }
-  }
+const QUOTES=[
+  "We’ve had two riders drop this already. Needs doing before the deadline.",
+  "Client is calling every 2 minutes. Keep it moving.",
+  "Estate drop. Stairs. No lift. Don’t be late."
+];
+
+const REQUESTORS=["Sam Patel","Rosa Klein","Aisha Rahman","Tom Weaver"];
+const REPUTATION={"Sam Patel":7,"Rosa Klein":8,"Aisha Rahman":9,"Tom Weaver":6};
+
+function fbPack(topic){
+  return {
+    early:`Saved us on ${topic}. Perfect.`,
+    ontime:`Nice. ${topic} landed on time.`,
+    late:`Too slow. ${topic} was late.`,
+    aborted:`What happened? ${topic} didn’t arrive.`
+  };
 }
 
-function save(){
-  localStorage.setItem(SAVE_KEY,JSON.stringify(state));
-}
-function load(){
-  const raw=localStorage.getItem(SAVE_KEY);
-  if(!raw) return;
-  Object.assign(state,JSON.parse(raw));
-}
+/* 20 jobs per requestor. seq gates offers; repeatable jobs can reappear; one-offs disappear once completed. */
+const JOB_CATALOG=[
+  // Sam (20)
+  {id:"sam_01", who:"Sam Patel", name:"Hot food drop", dist:2.0, seq:1, repeat:true,  fb:fbPack("that hot drop")},
+  {id:"sam_02", who:"Sam Patel", name:"Parcel run", dist:3.5, seq:1, repeat:true,  fb:fbPack("the parcel")},
+  {id:"sam_03", who:"Sam Patel", name:"Groceries", dist:4.2, seq:1, repeat:true,  fb:fbPack("the groceries")},
+  {id:"sam_04", who:"Sam Patel", name:"Fragile item", dist:5.0, seq:1, repeat:false, fb:fbPack("the fragile item")},
+  {id:"sam_05", who:"Sam Patel", name:"Rush SLA", dist:6.0, seq:2, repeat:true,  fb:fbPack("the rush SLA")},
+  {id:"sam_06", who:"Sam Patel", name:"Late rent env", dist:2.4, seq:2, repeat:false, fb:fbPack("the rent envelope")},
+  {id:"sam_07", who:"Sam Patel", name:"Urgent drive", dist:6.1, seq:2, repeat:true,  fb:fbPack("the hard drive")},
+  {id:"sam_08", who:"Sam Patel", name:"Council docs", dist:3.7, seq:2, repeat:true,  fb:fbPack("the council docs")},
+  {id:"sam_09", who:"Sam Patel", name:"Legal bundle", dist:5.4, seq:3, repeat:true,  fb:fbPack("the legal bundle")},
+  {id:"sam_10", who:"Sam Patel", name:"Press pass", dist:4.4, seq:3, repeat:false, fb:fbPack("the press pass")},
+  {id:"sam_11", who:"Sam Patel", name:"Lab sample", dist:5.9, seq:3, repeat:true,  fb:fbPack("the lab sample")},
+  {id:"sam_12", who:"Sam Patel", name:"Film reel", dist:6.6, seq:3, repeat:false, fb:fbPack("the film reel")},
+  {id:"sam_13", who:"Sam Patel", name:"Vintage vinyl", dist:2.5, seq:4, repeat:true,  fb:fbPack("the vinyl swap")},
+  {id:"sam_14", who:"Sam Patel", name:"Wristbands", dist:4.8, seq:4, repeat:true,  fb:fbPack("the wristbands")},
+  {id:"sam_15", who:"Sam Patel", name:"Passport return", dist:6.9, seq:4, repeat:false, fb:fbPack("the passport")},
+  {id:"sam_16", who:"Sam Patel", name:"Theatre keys", dist:4.0, seq:4, repeat:true,  fb:fbPack("those keys")},
+  {id:"sam_17", who:"Sam Patel", name:"Knife set", dist:3.1, seq:5, repeat:true,  fb:fbPack("the knife set")},
+  {id:"sam_18", who:"Sam Patel", name:"Sash parts", dist:5.8, seq:5, repeat:false, fb:fbPack("the window parts")},
+  {id:"sam_19", who:"Sam Patel", name:"Phone return", dist:3.6, seq:5, repeat:true,  fb:fbPack("that phone")},
+  {id:"sam_20", who:"Sam Patel", name:"Bike lock rescue", dist:2.2, seq:5, repeat:true,  fb:fbPack("the lock rescue")},
 
-function renderTop(){
-  document.getElementById("cashText").textContent=
-    "£"+state.cash+" / £"+WEEKLY_TARGET;
-  document.getElementById("versionText").textContent="v"+VERSION;
-  document.getElementById("dayText").textContent="Day "+state.day;
-}
+  // Rosa (20)
+  {id:"rosa_01", who:"Rosa Klein", name:"VIP sushi", dist:3.2, seq:1, repeat:true,  fb:fbPack("the sushi")},
+  {id:"rosa_02", who:"Rosa Klein", name:"Cake rescue", dist:5.6, seq:1, repeat:true,  fb:fbPack("the cake")},
+  {id:"rosa_03", who:"Rosa Klein", name:"Props drop", dist:2.7, seq:1, repeat:true,  fb:fbPack("the props")},
+  {id:"rosa_04", who:"Rosa Klein", name:"Do not bend", dist:3.9, seq:1, repeat:false, fb:fbPack("the book")},
+  {id:"rosa_05", who:"Rosa Klein", name:"Band merch", dist:4.1, seq:2, repeat:true,  fb:fbPack("the merch")},
+  {id:"rosa_06", who:"Rosa Klein", name:"Tattoo stencil", dist:2.1, seq:2, repeat:true,  fb:fbPack("the stencil")},
+  {id:"rosa_07", who:"Rosa Klein", name:"Cake topper", dist:3.4, seq:2, repeat:true,  fb:fbPack("the topper")},
+  {id:"rosa_08", who:"Rosa Klein", name:"Charity box", dist:4.7, seq:2, repeat:false, fb:fbPack("the raffle box")},
+  {id:"rosa_09", who:"Rosa Klein", name:"Custom print", dist:3.3, seq:3, repeat:true,  fb:fbPack("the print")},
+  {id:"rosa_10", who:"Rosa Klein", name:"Wardrobe pin", dist:2.8, seq:3, repeat:true,  fb:fbPack("wardrobe pins")},
+  {id:"rosa_11", who:"Rosa Klein", name:"Makeup kit", dist:3.6, seq:3, repeat:false, fb:fbPack("the makeup kit")},
+  {id:"rosa_12", who:"Rosa Klein", name:"Set list", dist:2.0, seq:3, repeat:true,  fb:fbPack("the set list")},
+  {id:"rosa_13", who:"Rosa Klein", name:"Poster tubes", dist:4.9, seq:4, repeat:true,  fb:fbPack("the posters")},
+  {id:"rosa_14", who:"Rosa Klein", name:"Lens rental", dist:5.5, seq:4, repeat:true,  fb:fbPack("the lens")},
+  {id:"rosa_15", who:"Rosa Klein", name:"Studio keys", dist:3.1, seq:4, repeat:false, fb:fbPack("studio keys")},
+  {id:"rosa_16", who:"Rosa Klein", name:"Afterparty bands", dist:4.2, seq:4, repeat:true,  fb:fbPack("the bands")},
+  {id:"rosa_17", who:"Rosa Klein", name:"Signed vinyl", dist:3.8, seq:5, repeat:false, fb:fbPack("the signed vinyl")},
+  {id:"rosa_18", who:"Rosa Klein", name:"Green room snack", dist:2.6, seq:5, repeat:true,  fb:fbPack("green room snacks")},
+  {id:"rosa_19", who:"Rosa Klein", name:"Ticket stubs", dist:3.0, seq:5, repeat:true,  fb:fbPack("ticket stubs")},
+  {id:"rosa_20", who:"Rosa Klein", name:"USB master", dist:5.7, seq:5, repeat:true,  fb:fbPack("the USB master")},
 
-function setMode(m){
-  ["hub","board","result","clients"].forEach(id=>{
-    document.getElementById(id).classList.toggle("hidden",id!==m);
-  });
-  save();
-}
+  // Aisha (20)
+  {id:"aisha_01", who:"Aisha Rahman", name:"Pharmacy pickup", dist:2.8, seq:1, repeat:true,  fb:fbPack("the pickup")},
+  {id:"aisha_02", who:"Aisha Rahman", name:"Iguana meds", dist:6.4, seq:1, repeat:true,  fb:fbPack("the meds")},
+  {id:"aisha_03", who:"Aisha Rahman", name:"Clinic forms", dist:3.2, seq:1, repeat:true,  fb:fbPack("those forms")},
+  {id:"aisha_04", who:"Aisha Rahman", name:"Blood kit", dist:4.1, seq:1, repeat:false, fb:fbPack("the kit")},
+  {id:"aisha_05", who:"Aisha Rahman", name:"Lab rush", dist:5.9, seq:2, repeat:true,  fb:fbPack("the rush sample")},
+  {id:"aisha_06", who:"Aisha Rahman", name:"X-ray disc", dist:4.6, seq:2, repeat:false, fb:fbPack("the disc")},
+  {id:"aisha_07", who:"Aisha Rahman", name:"Care package", dist:3.9, seq:2, repeat:true,  fb:fbPack("the package")},
+  {id:"aisha_08", who:"Aisha Rahman", name:"Vaccine docs", dist:3.4, seq:2, repeat:true,  fb:fbPack("the docs")},
+  {id:"aisha_09", who:"Aisha Rahman", name:"Dental mould", dist:4.8, seq:3, repeat:false, fb:fbPack("the mould")},
+  {id:"aisha_10", who:"Aisha Rahman", name:"Specimen box", dist:5.2, seq:3, repeat:true,  fb:fbPack("the specimen")},
+  {id:"aisha_11", who:"Aisha Rahman", name:"Allergy results", dist:3.7, seq:3, repeat:true,  fb:fbPack("the results")},
+  {id:"aisha_12", who:"Aisha Rahman", name:"Stitch kit", dist:2.9, seq:3, repeat:true,  fb:fbPack("the kit")},
+  {id:"aisha_13", who:"Aisha Rahman", name:"Urgent referral", dist:6.0, seq:4, repeat:false, fb:fbPack("the referral")},
+  {id:"aisha_14", who:"Aisha Rahman", name:"Cold chain", dist:6.6, seq:4, repeat:true,  fb:fbPack("cold chain")},
+  {id:"aisha_15", who:"Aisha Rahman", name:"Ward swap", dist:4.0, seq:4, repeat:true,  fb:fbPack("the ward swap")},
+  {id:"aisha_16", who:"Aisha Rahman", name:"Therapy notes", dist:3.1, seq:4, repeat:true,  fb:fbPack("the notes")},
+  {id:"aisha_17", who:"Aisha Rahman", name:"Consent forms", dist:3.6, seq:5, repeat:true,  fb:fbPack("consent forms")},
+  {id:"aisha_18", who:"Aisha Rahman", name:"Path slides", dist:5.8, seq:5, repeat:false, fb:fbPack("the slides")},
+  {id:"aisha_19", who:"Aisha Rahman", name:"IV supplies", dist:4.4, seq:5, repeat:true,  fb:fbPack("IV supplies")},
+  {id:"aisha_20", who:"Aisha Rahman", name:"Hosp keys", dist:3.3, seq:5, repeat:false, fb:fbPack("those keys")},
 
-function renderClients(){
-  ensureStats();
-  const wrap=document.getElementById("clientsWrap");
-  wrap.innerHTML="";
-  for(const r of REQUESTORS){
-    const s=state.requestorStats[r];
-    const net=s.revenue + s.tips - s.penalties;
-
-    const div=document.createElement("div");
-    div.className="clientCard";
-    div.innerHTML=`
-      <div class="clientTitle">${r}</div>
-      <div class="vlist">
-        <div class="vrow"><span>Jobs completed</span><span>${s.completed}</span></div>
-        <div class="vrow"><span>Jobs aborted</span><span>${s.aborted}</span></div>
-        <div class="vrow"><span>Total revenue</span><span>£${s.revenue}</span></div>
-        <div class="vrow"><span>Total tips</span><span>£${s.tips}</span></div>
-        <div class="vrow"><span>Total penalties</span><span>£${s.penalties}</span></div>
-        <div class="vrow"><span>Net pay</span><span>£${net}</span></div>
-        <div class="vrow"><span>Sequence</span><span>${state.requestorSeq[r]}</span></div>
-        <div class="vrow"><span>Reputation</span><span>${REPUTATION[r]}/10</span></div>
-      </div>
-    `;
-    wrap.appendChild(div);
-  }
-}
-
-document.getElementById("goClients").onclick=()=>{
-  renderClients();
-  setMode("clients");
-};
-document.getElementById("backHubClients").onclick=()=>{
-  setMode("hub");
-};
-
-document.getElementById("backHub").onclick=()=>setMode("hub");
-document.getElementById("backBoard").onclick=()=>setMode("board");
-
-document.getElementById("resetGame").onclick=()=>{
-  localStorage.removeItem(SAVE_KEY);
-  location.reload();
-};
-
-load();
-ensureStats();
-renderTop();
-setMode("hub");
-</script>
-</body>
-</html>
+  // Tom (20)
+  {id:"tom_01", who:"Tom Weaver", name:"Office keys", dist:2.2, seq:1, repeat:true,  fb:fbPack("the keys")},
+  {id:"tom_02", who:"Tom Weaver", name:"Laptop charger", dist:3.0, seq:1, repeat:true,  fb:fbPack("the charger")},
+  {id:"tom_03", who:"Tom Weaver", name:"Contract copies", dist:4.1, seq:1, repeat:true,  fb:fbPack("the contracts")},
+  {id:"tom_04", who:"Tom Weaver", name:"Signed NDA", dist:3.6, seq:1, repeat:false, fb:fbPack("the NDA")},
+  {id:"tom_05", who:"Tom Weaver", name:"Meeting pack", dist:4.8, seq:2, repeat:true,  fb:fbPack("the pack")},
+  {id:"tom_06", who:"Tom Weaver", name:"Printer toner", dist:2.7, seq:2, repeat:true,  fb:fbPack("the toner")},
+  {id:"tom_07", who:"Tom Weaver", name:"Client gift", dist:5.0, seq:2, repeat:false, fb:fbPack("the gift")},
+  {id:"tom_08", who:"Tom Weaver", name:"Board papers", dist:5.6, seq:2, repeat:true,  fb:fbPack("the board papers")},
+  {id:"tom_09", who:"Tom Weaver", name:"Proto demo", dist:6.2, seq:3, repeat:true,  fb:fbPack("the demo")},
+  {id:"tom_10", who:"Tom Weaver", name:"Finance pack", dist:4.9, seq:3, repeat:true,  fb:fbPack("the finance pack")},
+  {id:"tom_11", who:"Tom Weaver", name:"Share cert", dist:3.4, seq:3, repeat:false, fb:fbPack("the certificate")},
+  {id:"tom_12", who:"Tom Weaver", name:"Courier samples", dist:5.3, seq:3, repeat:true,  fb:fbPack("the samples")},
+  {id:"tom_13", who:"Tom Weaver", name:"Spare badge", dist:2.6, seq:4, repeat:true,  fb:fbPack("the badge")},
+  {id:"tom_14", who:"Tom Weaver", name:"Server dongle", dist:6.1, seq:4, repeat:false, fb:fbPack("the dongle")},
+  {id:"tom_15", who:"Tom Weaver", name:"Audit files", dist:5.8, seq:

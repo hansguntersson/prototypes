@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.41</title>
+  <title>Courier v1.0.39</title>
   <style>
     :root{
       color-scheme: dark;
@@ -29,13 +29,14 @@
       margin:0 auto;
     }
 
+    /* HEADER: left Courier, right big clock */
     .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
     h1{margin:0;font-size:44px;font-weight:900;color:var(--accent);text-align:left;}
     .headerClock{text-align:right;font-family:var(--mono);font-size:44px;font-weight:950;letter-spacing:.2px;color:var(--accent);}
 
     .divider{height:4px;background:var(--accent);margin:14px 0;}
 
-    /* KPI: left cash/target, right weekday + Week c + Day y */
+    /* KPI: left cash/target, right weekday */
     .kpiRow{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -74,6 +75,7 @@
     }
     .btnMini.btnIcon svg{width:18px;height:18px;}
 
+    /* HUB: all buttons same size/layout as Rest (inline icon) */
     .hubGrid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -106,7 +108,7 @@
       padding:12px;
       display:flex;
       justify-content:space-between;
-      align-items:center;
+      align-items:baseline;
       cursor:pointer;
       user-select:none;
       background:var(--accent);
@@ -114,33 +116,7 @@
     }
     .jobRow .jobTitle,.jobRow .jobPay{ color:#000; }
 
-    /* Job menu layout: left = logo, immediately next to it = title */
-    .jobLeft{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:0;
-    }
-    .jobLogo{
-      width:34px;height:34px;display:block;flex:0 0 auto;
-    }
-    .jobLogo svg{
-      width:34px;height:34px;
-      stroke:currentColor;
-      fill:none;
-      stroke-width:2;
-      stroke-linecap:round;
-      stroke-linejoin:round;
-    }
-    .jobTitle{
-      font-size:22px;
-      font-weight:950;
-      color:var(--accent);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width:420px;
-    }
+    .jobTitle{font-size:22px;font-weight:950;color:var(--accent);}
     .jobPay{font-family:var(--mono);font-size:20px;font-weight:950;color:var(--accent);}
 
     .pageTitle{text-align:center;margin-top:28px;margin-bottom:12px;}
@@ -213,6 +189,7 @@
     .energyBar{display:grid;grid-template-columns:repeat(10,1fr);gap:8px;}
     .energySeg{height:16px;border:var(--stroke) solid var(--accent);border-radius:6px;background:transparent;opacity:0;}
 
+    /* OFFER */
     .offerHeader{
       background:var(--accent);color:#000;padding:14px 12px;border-radius:var(--r2);
       text-align:center;font-family:var(--mono);font-size:22px;font-weight:950;
@@ -267,6 +244,7 @@
       letter-spacing:.5px;margin:2px 0 14px;opacity:.95;color:var(--accent);
     }
 
+    /* Clients */
     .clientsTopBar{display:flex;justify-content:flex-end;margin-top:6px;margin-bottom:8px;}
     .clientCard{border:var(--stroke) solid var(--accent);border-radius:var(--r2);padding:12px;}
     .clientName{font-size:20px;font-weight:950;margin-bottom:10px;color:var(--accent);}
@@ -279,19 +257,9 @@
     .clientGrid .wide{grid-column:1/-1;}
     .clientDivider{height:1px;background:var(--accent);opacity:.35;margin:10px 0;}
 
-    /* Job completion feedback: avatar left, name + feedback right */
+    /* Feedback */
     .feedbackWrap{margin-top:12px;border-top:var(--stroke) solid var(--accent);padding-top:12px;}
-    .feedbackRow{display:flex;gap:12px;align-items:flex-start;}
-    .fbAvatar{
-      width:56px;height:56px;border:var(--stroke) solid var(--accent);
-      border-radius:14px;display:flex;align-items:center;justify-content:center;
-      flex:0 0 auto;color:var(--accent);
-    }
-    .fbAvatar svg{
-      width:44px;height:44px;stroke:currentColor;fill:none;stroke-width:2;
-      stroke-linecap:round;stroke-linejoin:round;
-    }
-    .feedbackName{font-family:var(--mono);font-weight:950;letter-spacing:.2px;opacity:.95;margin-bottom:6px;}
+    .feedbackWho{font-family:var(--mono);font-weight:950;letter-spacing:.3px;opacity:.9;margin-bottom:8px;}
     .feedbackText{font-family:var(--mono);font-weight:900;opacity:.95;line-height:1.25;}
   </style>
 </head>
@@ -299,20 +267,22 @@
 <body>
 <div class="safe">
   <div class="top">
-    <h1>Courier v1.0.41</h1>
+    <h1>Courier</h1>
     <div class="headerClock" id="headerClock">15:00</div>
   </div>
 
   <div class="divider"></div>
 
+  <!-- KPI shown only on hub -->
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="kpiCashTarget">£0 / £500 due by friday</div>
-      <div class="kpiRight" id="kpiWeekday">monday · Week 1 · Day 1</div>
+      <div class="kpiRight" id="kpiWeekday">monday</div>
     </div>
     <div class="divider"></div>
   </div>
 
+  <!-- HUB -->
   <div class="screen" id="hub">
     <div class="hubGrid">
       <button class="btn hubBtn" id="goJobs" aria-label="Jobs">
@@ -396,6 +366,7 @@
     </div>
   </div>
 
+  <!-- CLIENTS -->
   <div class="screen hidden" id="clients">
     <div class="jobTitle pageTitle">Clients</div>
     <div class="clientsTopBar">
@@ -404,6 +375,7 @@
     <div class="vlist" id="clientsList"></div>
   </div>
 
+  <!-- STATS -->
   <div class="screen hidden" id="stats">
     <div class="jobTitle pageTitle">Stats</div>
     <div class="clientsTopBar">
@@ -414,6 +386,7 @@
     </div>
   </div>
 
+  <!-- SHOP -->
   <div class="screen hidden" id="shop">
     <div class="jobTitle pageTitle">Shop</div>
     <div class="shopCash" id="shopCash">CASH — £0</div>
@@ -445,6 +418,7 @@
     </div>
   </div>
 
+  <!-- JOB BOARD -->
   <div class="screen hidden" id="board">
     <div class="jobTitle pageTitle">Job board</div>
     <div class="jobs" id="jobs"></div>
@@ -454,12 +428,16 @@
     </div>
   </div>
 
+  <!-- OFFER -->
   <div class="screen hidden" id="offer">
     <div class="offerHeader" id="offerTitle">—</div>
 
     <div class="offerTop">
-      <div class="avatar" aria-label="Requestor">
-        <div id="offerAvatar"></div>
+      <div class="avatar" aria-label="Dispatcher">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.2"></circle>
+          <path d="M5.5 20c1.6-4.4 11.4-4.4 13 0"></path>
+        </svg>
       </div>
       <div>
         <div class="offerOrg" id="ofOrg">—</div>
@@ -484,6 +462,7 @@
     </div>
   </div>
 
+  <!-- LIVE JOB -->
   <div class="screen hidden" id="job">
     <div class="offerHeader" id="jobName">—</div>
 
@@ -510,25 +489,21 @@
     </div>
   </div>
 
+  <!-- RESULT -->
   <div class="screen hidden" id="result">
     <div class="jobTitle pageTitle" id="resultTitle">Job complete</div>
     <div class="resultBox">
       <div class="vlist" id="resultList"></div>
-
       <div class="feedbackWrap hidden" id="feedbackWrap">
-        <div class="feedbackRow">
-          <div class="fbAvatar" id="fbAvatar" aria-label="Client logo"></div>
-          <div>
-            <div class="feedbackName" id="feedbackName">—</div>
-            <div class="feedbackText" id="feedbackText">—</div>
-          </div>
-        </div>
+        <div class="feedbackWho" id="feedbackWho">—</div>
+        <div class="feedbackText" id="feedbackText">—</div>
       </div>
     </div>
     <div style="height:30px"></div>
     <button class="btn" id="backBoard">Back to job board</button>
   </div>
 
+  <!-- END DAY -->
   <div class="screen hidden" id="end">
     <div class="jobTitle" id="endTitle">End of day</div>
     <div class="resultBox">
@@ -538,6 +513,7 @@
   </div>
 </div>
 
+<!-- Live job bottom controls -->
 <div class="jobControls hidden" id="jobControls">
   <div class="jobControlsWrap">
     <button class="btnOutline btnMini" id="cancel">Abort</button>
@@ -546,6 +522,7 @@
   </div>
 </div>
 
+<!-- Speed controls -->
 <div class="speedbar hidden" id="speedBar">
   <div class="speedwrap">
     <div class="speedhead">
@@ -556,6 +533,7 @@
   </div>
 </div>
 
+<!-- Energy footer -->
 <div class="energyFooter" id="energyFooter">
   <div class="energyWrap">
     <div class="energyLabel">ENERGY</div>
@@ -563,6 +541,7 @@
   </div>
 </div>
 
+<!-- Consumables modal -->
 <div class="modal" id="energyModal">
   <div class="modalBox">
     <div class="modalTitle">SNACKS</div>
@@ -572,6 +551,7 @@
   </div>
 </div>
 
+<!-- Event modal -->
 <div class="modal" id="eventModal">
   <div class="modalBox">
     <div class="modalTitle">EVENT</div>
@@ -582,6 +562,7 @@
   </div>
 </div>
 
+<!-- Rest modal -->
 <div class="modal" id="restModal">
   <div class="modalBox">
     <div class="modalTitle">REST</div>
@@ -596,7 +577,7 @@
 <script>
 "use strict";
 
-const VERSION="1.0.41";
+const VERSION="1.0.39";
 const WEEKLY_TARGET=500;
 
 const PRICES={drink:12,snack:6};
@@ -629,8 +610,8 @@ function fbPack(topic){
   };
 }
 
-/* --- Jobs (unchanged content) --- */
-const JOB_CATALOG = [
+const JOB_CATALOG=[
+  // Sam Patel (20)
   {id:"sam_01", who:"Sam Patel", name:"Hot food drop", dist:2.0, seq:1, repeat:true,  fb:fbPack("that hot drop")},
   {id:"sam_02", who:"Sam Patel", name:"Parcel run", dist:3.5, seq:1, repeat:true,  fb:fbPack("the parcel")},
   {id:"sam_03", who:"Sam Patel", name:"Groceries", dist:4.2, seq:1, repeat:true,  fb:fbPack("the groceries")},
@@ -652,6 +633,7 @@ const JOB_CATALOG = [
   {id:"sam_19", who:"Sam Patel", name:"Phone return", dist:3.6, seq:5, repeat:true,  fb:fbPack("that phone")},
   {id:"sam_20", who:"Sam Patel", name:"Bike lock", dist:2.2, seq:5, repeat:true,  fb:fbPack("the lock rescue")},
 
+  // Rosa Klein (20)
   {id:"rosa_01", who:"Rosa Klein", name:"VIP sushi", dist:3.2, seq:1, repeat:true,  fb:fbPack("the sushi")},
   {id:"rosa_02", who:"Rosa Klein", name:"Cake rescue", dist:5.6, seq:1, repeat:true,  fb:fbPack("the cake")},
   {id:"rosa_03", who:"Rosa Klein", name:"Props drop", dist:2.7, seq:1, repeat:true,  fb:fbPack("the props")},
@@ -673,6 +655,7 @@ const JOB_CATALOG = [
   {id:"rosa_19", who:"Rosa Klein", name:"Ticket stubs", dist:3.0, seq:5, repeat:true,  fb:fbPack("ticket stubs")},
   {id:"rosa_20", who:"Rosa Klein", name:"Stage pass", dist:4.4, seq:5, repeat:true,  fb:fbPack("the stage pass")},
 
+  // Aisha Rahman (20)
   {id:"aisha_01", who:"Aisha Rahman", name:"Pharmacy pickup", dist:2.8, seq:1, repeat:true,  fb:fbPack("the pickup")},
   {id:"aisha_02", who:"Aisha Rahman", name:"Iguana meds", dist:6.4, seq:1, repeat:true,  fb:fbPack("the meds")},
   {id:"aisha_03", who:"Aisha Rahman", name:"Clinic forms", dist:3.2, seq:1, repeat:true,  fb:fbPack("those forms")},
@@ -694,6 +677,7 @@ const JOB_CATALOG = [
   {id:"aisha_19", who:"Aisha Rahman", name:"IV supplies", dist:4.4, seq:5, repeat:true,  fb:fbPack("IV supplies")},
   {id:"aisha_20", who:"Aisha Rahman", name:"Hosp keys", dist:3.3, seq:5, repeat:false, fb:fbPack("those keys")},
 
+  // Tom Weaver (20)
   {id:"tom_01", who:"Tom Weaver", name:"Office keys", dist:2.2, seq:1, repeat:true,  fb:fbPack("the keys")},
   {id:"tom_02", who:"Tom Weaver", name:"Laptop charger", dist:3.0, seq:1, repeat:true,  fb:fbPack("the charger")},
   {id:"tom_03", who:"Tom Weaver", name:"Contract copies", dist:4.1, seq:1, repeat:true,  fb:fbPack("the contracts")},
@@ -759,22 +743,42 @@ const SAVE_SCHEMA=3;
 const state={
   day:1,cash:0,time:15*60,energy:100,speed:3,
   snacks:1,drinks:1,
+
   jobsDone:0,dayEarnings:0,
   offers:[],job:null,
+
   elapsed:0,progress:0,hiddenDuration:0,startEnergy:100,energySpentJob:0,
   jobStartAbs:0,
+
   snackFx:null,drinkFx:null,
+
   pendingEndOfDay:false,eod:null,
+
   lastEventAbs:-1e9,
+
   promptActive:false,promptEndMs:0,lastPromptAbs:-1e9,
+
   clientSeq:{},
   completedOneOffs:{},
   clientStats:{},
+
   stats:{
-    miles:0,minutes:0,made:0,spent:0,accepted:0,completed:0,aborted:0,early:0,late:0,snacks:0,events:0
+    miles:0,
+    minutes:0,
+    made:0,
+    spent:0,
+    accepted:0,
+    completed:0,
+    aborted:0,
+    early:0,
+    late:0,
+    snacks:0,
+    events:0
   },
+
   snackCdUntil:0,
   drinkCdUntil:0,
+
   lastTs:0,raf:0
 };
 
@@ -788,6 +792,7 @@ const on=(id, evt, fn)=>{
   if(!el) return;
   el.addEventListener(evt, fn, {passive:false});
 };
+
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const elText=(id, txt)=>{ const el=$(id); if(el) el.textContent=txt; };
 
@@ -801,54 +806,6 @@ function fmtClock(mins){
   const hh=Math.floor(total/60);
   const mm=total%60;
   return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");
-}
-
-/* ===== UNIQUE VECTOR LOGOS (used for requestor avatars + job list logos) ===== */
-function logoSvg(who){
-  if(who==="Sam Patel"){
-    return `
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="4" y="4" width="16" height="16" rx="4"></rect>
-        <path d="M15.5 8.5c-.6-1.4-2-2.3-3.8-2.3-1.9 0-3.2.9-3.2 2.3 0 3 7 .7 7 4.7 0 1.7-1.6 2.8-3.8 2.8-2.1 0-3.6-.9-4.3-2.5"></path>
-      </svg>`;
-  }
-  if(who==="Rosa Klein"){
-    return `
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="4.2"></circle>
-        <path d="M12 7.8c-1.4-2.2-4.2-2.8-5.8-1.2-1.6 1.6-1 4.4 1.2 5.8"></path>
-        <path d="M12 7.8c1.4-2.2 4.2-2.8 5.8-1.2 1.6 1.6 1 4.4-1.2 5.8"></path>
-        <path d="M12 16.2c-1.4 2.2-4.2 2.8-5.8 1.2-1.6-1.6-1-4.4 1.2-5.8"></path>
-        <path d="M12 16.2c1.4 2.2 4.2 2.8 5.8 1.2 1.6-1.6 1-4.4-1.2-5.8"></path>
-      </svg>`;
-  }
-  if(who==="Aisha Rahman"){
-    return `
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M14.8 5.2c-4.1 0-7.4 3.3-7.4 7.4 0 4.1 3.3 7.4 7.4 7.4 1.9 0 3.7-.7 5-1.9-1.5.4-3.1.2-4.4-.7-2.7-1.8-3.4-5.4-1.6-8.1.8-1.2 2-2 3.3-2.3-1.1-.9-2.4-1.4-3.9-1.4Z"></path>
-        <path d="M18.6 8.4l.7 1.5 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2.7-1.5Z"></path>
-      </svg>`;
-  }
-  if(who==="Tom Weaver"){
-    return `
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M6 7h12v13H6z"></path>
-        <path d="M9 7V5h6v2"></path>
-        <path d="M8.5 11h7"></path>
-        <path d="M8.5 14h7"></path>
-        <path d="M8.5 17h4.5"></path>
-      </svg>`;
-  }
-  return `
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="7"></circle>
-      <path d="M8 12h8"></path>
-    </svg>`;
-}
-function setLogoInto(elId, who){
-  const el=$(elId);
-  if(!el) return;
-  el.innerHTML = logoSvg(who);
 }
 
 /* SVG arc helpers */
@@ -910,7 +867,7 @@ function setAccentFromTime(){
   }
 }
 
-/* ===== CLIENTS / STATS (unchanged) ===== */
+/* ===== CLIENTS / STATS ===== */
 function initClientsIfNeeded(){
   for(const who of REQUESTORS){
     if(typeof state.clientSeq[who] !== "number") state.clientSeq[who]=1;
@@ -1025,7 +982,7 @@ function renderStats(){
   `;
 }
 
-/* ===== SAVE / LOAD (unchanged) ===== */
+/* ===== SAVE / LOAD ===== */
 function safeJsonParse(s){ try{ return JSON.parse(s); }catch(e){ return null; } }
 
 function saveState(force=false){
@@ -1222,10 +1179,8 @@ function updateConsumablesModal(){
 function renderTop(){
   setAccentFromTime();
   elText("headerClock",fmtClock(minutesOfDay()));
-
   elText("kpiCashTarget","£"+state.cash+" / £"+WEEKLY_TARGET+" due by friday");
-  elText("kpiWeekday", `${weekdayName()} · Week ${weekNumber()} · Day ${state.day}`);
-
+  elText("kpiWeekday",weekdayName());
   renderEnergyBar();
 
   const sc=$("shopCash");
@@ -1270,6 +1225,7 @@ function advanceMinutes(mins){
   if(rolled>0) onMidnightRollover();
 }
 
+/* Offer pruning with feasibility buffer (speed 5 theoretical max) */
 function minutesToCompleteAtSpeed5(dist){
   const mph = 8 * SPEEDS[5].mult;
   return (dist / mph) * 60;
@@ -1339,7 +1295,6 @@ function openOffer(o){
   elText("ofRoute",o.route);
   elText("ofPay","£"+o.pay);
   elText("ofDeadline",fmtClock(o.deadlineAbs % 1440));
-  setLogoInto("offerAvatar", o.who);
   setMode("offer");
   renderTop();
 }
@@ -1354,13 +1309,7 @@ function renderJobs(){
   state.offers.forEach(o=>{
     const r=document.createElement("div");
     r.className="jobRow";
-    r.innerHTML=`
-      <div class="jobLeft">
-        <div class="jobLogo" aria-hidden="true">${logoSvg(o.who)}</div>
-        <div class="jobTitle">${o.name}</div>
-      </div>
-      <div class="jobPay">£${o.pay}</div>
-    `;
+    r.innerHTML=`<div class="jobTitle">${o.name}</div><div class="jobPay">£${o.pay}</div>`;
     r.addEventListener("click", ()=>{ if(!noEnergy) openOffer(o); });
     if(noEnergy) r.style.opacity=".4";
     wrap.appendChild(r);
@@ -1421,6 +1370,7 @@ function applyPendingEffects(){
   }
 }
 
+/* tips unchanged; late penalties harsher */
 function tipPenaltyForFinish(){
   const now=nowAbsPrecise();
   const delta = state.job.deadlineAbs - now;
@@ -1441,8 +1391,7 @@ function abortPenalty(){ return -Math.max(5, Math.round(state.job.pay*0.35)); }
 function showFeedback(who, text){
   const wrap=$("feedbackWrap");
   if(!wrap) return;
-  setLogoInto("fbAvatar", who);
-  elText("feedbackName", who);
+  elText("feedbackWho", who.toUpperCase()+" — FEEDBACK");
   elText("feedbackText", text);
   wrap.classList.remove("hidden");
 }
@@ -1450,8 +1399,7 @@ function hideFeedback(){
   const wrap=$("feedbackWrap");
   if(!wrap) return;
   wrap.classList.add("hidden");
-  const av=$("fbAvatar"); if(av) av.innerHTML="";
-  elText("feedbackName","—");
+  elText("feedbackWho","—");
   elText("feedbackText","—");
 }
 function feedbackForOutcome(job, tp, aborted=false){
@@ -1467,6 +1415,7 @@ function startJob(o, resume=false){
 
   if(!resume){
     initClientsIfNeeded();
+
     state.stats.accepted++;
     recordClientAccept(o);
 
@@ -1475,6 +1424,7 @@ function startJob(o, resume=false){
     state.jobStartAbs = nowAbsPrecise();
     state.lastEventAbs=-1e9; state.lastPromptAbs=-1e9;
     state.promptActive=false; state.promptEndMs=0;
+
     state.snackCdUntil=0;
     state.drinkCdUntil=0;
   }
@@ -1501,7 +1451,7 @@ function startJob(o, resume=false){
   saveState(true);
 }
 
-/* ===== EVENTS (unchanged) ===== */
+/* ===== EVENTS ===== */
 function chanceFromLambda(lambdaPerMin, dtMin){
   const x = lambdaPerMin * Math.max(0,dtMin);
   return 1 - Math.exp(-x);
@@ -1747,7 +1697,7 @@ function finish(){
   saveState(true);
 }
 
-/* Wiring (unchanged) */
+/* UI wiring */
 on("closeEvent","click", closeEvent);
 
 on("goJobs","click", ()=>{
@@ -1813,6 +1763,7 @@ on("backBoard","click", ()=>{
   saveState(true);
 });
 
+/* Shop */
 function updateShopUI(){
   elText("drinkPrice", PRICES.drink);
   elText("snackPrice", PRICES.snack);
@@ -1857,7 +1808,8 @@ on("buySnack","click", ()=>{
   saveState(true);
 });
 
-function cooldownMs(){ return 5000 + Math.floor(Math.random()*5001); }
+/* Consumables cooldown */
+function cooldownMs(){ return 5000 + Math.floor(Math.random()*5001); } // 5–10s
 
 on("openConsumables","click", ()=>{
   updateConsumablesModal();
@@ -1879,10 +1831,10 @@ on("drinkBtn","click", ()=>{
 
   state.energy=clamp(state.energy+20,0,100);
 
-  if(state.drinkFx && state.drinkFx.timeoutId) clearTimeout(state.drinkFx.timeoutId);
+  clearDrinkFx();
   state.drinkFx={timeoutId:setTimeout(()=>{
     state.energy=clamp(state.energy-10,0,100);
-    state.drinkFx=null;
+    clearDrinkFx();
     renderTop();
     saveState(true);
   },15000)};
@@ -1934,6 +1886,7 @@ on("snackBtn","click", ()=>{
   saveState(true);
 });
 
+/* Abort */
 on("cancel","click", ()=>{
   cancelAnimationFrame(state.raf);
 
@@ -1994,6 +1947,7 @@ on("cancel","click", ()=>{
   saveState(true);
 });
 
+/* Optional prompted Event button */
 on("eventBtn","click", ()=>{
   if(!state.job) return;
   if(!state.promptActive) return;
@@ -2010,6 +1964,7 @@ on("eventBtn","click", ()=>{
   openPromptEvent();
 });
 
+/* Rest */
 function canUntilMorning(){
   const m=minutesOfDay();
   return (m>=18*60 || m<6*60);
@@ -2085,11 +2040,11 @@ on("confirmEnd","click", ()=>{
   saveState(true);
 });
 
+/* Reset */
 function hardResetGame(){
   cancelAnimationFrame(state.raf);
   clearSnackFx();
-  if(state.drinkFx && state.drinkFx.timeoutId) clearTimeout(state.drinkFx.timeoutId);
-  state.drinkFx=null;
+  clearDrinkFx();
 
   const em=$("eventModal"); if(em) em.style.display="none";
   const cm=$("energyModal"); if(cm) cm.style.display="none";

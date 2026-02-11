@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.34</title>
+  <title>Courier v1.0.35</title>
   <style>
     :root{
       color-scheme: dark;
@@ -23,14 +23,12 @@
       font-family:var(--sans);
       font-size:18px;
     }
-
     .safe{
       padding: calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 260px);
       max-width:760px;
       margin:0 auto;
     }
 
-    /* HEADER: left Courier, right big clock */
     .top{
       display:flex;
       justify-content:space-between;
@@ -102,25 +100,6 @@
       width:auto;
     }
 
-    .btnIcon{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      text-align:center;
-    }
-    .btnIcon svg{
-      width:22px;
-      height:22px;
-      stroke:currentColor;
-      fill:none;
-      stroke-width:2;
-      stroke-linecap:round;
-      stroke-linejoin:round;
-      flex:0 0 auto;
-    }
-    .btnMini.btnIcon svg{width:18px;height:18px;}
-
     .hubGrid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -133,6 +112,13 @@
       margin-top:0;
     }
 
+    .hubRow{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:12px;
+    }
+
     .hubBtn{
       display:flex;
       flex-direction:column;
@@ -141,33 +127,14 @@
       gap:10px;
       text-align:center;
     }
-    .hubBtn svg{
-      width:44px;
-      height:44px;
-      stroke:currentColor;
-      fill:none;
-      stroke-width:2;
-      stroke-linecap:round;
-      stroke-linejoin:round;
+
+    .jobTitle{font-size:22px;font-weight:950;color:var(--accent);}
+    .pageTitle{
+      text-align:center;
+      margin-top:28px;
+      margin-bottom:12px;
     }
 
-    /* Rest: icon LEFT of text */
-    .hubBtnInline{
-      flex-direction:row;
-      justify-content:center;
-      gap:12px;
-    }
-    .hubBtnInline svg{
-      width:34px;
-      height:34px;
-    }
-
-    .row{
-      display:flex;
-      justify-content:space-between;
-      align-items:baseline;
-      gap:12px;
-    }
     .jobs{display:grid;gap:12px;margin-top:12px;}
     .jobRow{
       border:var(--stroke) solid var(--accent);
@@ -184,313 +151,13 @@
     .jobRow .jobTitle,
     .jobRow .jobPay{ color:#000; }
 
-    .jobTitle{font-size:22px;font-weight:950;color:var(--accent);}
-    .jobPay{font-family:var(--mono);font-size:20px;font-weight:950;color:var(--accent);}
+    .jobPay{font-family:var(--mono);font-size:20px;font-weight:950;}
 
-    /* Centered page titles (Job board / Shop / Job complete) */
-    .pageTitle{
-      text-align:center;
-      margin-top:28px;     /* increased spacing above */
-      margin-bottom:12px;
-    }
-
-    .refreshText{
-      margin-top:14px;
-      text-align:center;
-      font-family:var(--mono);
-      font-size:16px;
-      font-weight:900;
-      cursor:pointer;
-      user-select:none;
-      color:var(--accent);
-    }
     .bottomRight{
       margin-top:14px;
       display:flex;
       justify-content:flex-end;
     }
-
-    .progressLabel{font-family:var(--mono);font-size:22px;font-weight:950;color:var(--accent);}
-    .progressPct{font-family:var(--mono);font-size:22px;font-weight:950;color:var(--accent);}
-    .bar{
-      height:16px;
-      border:var(--stroke) solid var(--accent);
-      border-radius:999px;
-      overflow:hidden;
-      margin-top:6px;
-    }
-    .fill{height:100%;width:0;background:var(--accent);}
-
-    .progressMeta{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      margin-top:8px;
-      font-family:var(--mono);
-      font-size:14px;
-      font-weight:800;
-      color:var(--accent);
-    }
-    .progressMeta div:nth-child(2){text-align:center;}
-    .progressMeta div:nth-child(3){text-align:right;}
-
-    /* TIME LEFT: circular dial + text (inside) */
-    .timeLeftWrap{
-      margin-top:16px;
-      padding-top:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:var(--accent);
-    }
-    .timeDial{
-      width:176px;
-      height:176px;
-      flex:0 0 auto;
-      display:block;
-    }
-    .timeDial circle,
-    .timeDial path{
-      vector-effect: non-scaling-stroke;
-    }
-    .timeDial text{
-      font-family:var(--mono);
-      fill:var(--accent);
-      text-anchor:middle;
-      dominant-baseline:middle;
-    }
-    .timeDial .dialK{
-      font-size:8px;
-      font-weight:900;
-      letter-spacing:.8px;
-      opacity:.9;
-    }
-    .timeDial .dialV{
-      font-size:12px;
-      font-weight:950;
-    }
-
-    .progressBlock{ margin-top:26px; }
-    .progressHead{ margin-bottom:18px; }
-
-    .jobControls{
-      position:fixed;
-      left:0;right:0;
-      bottom:calc(env(safe-area-inset-bottom) + 64px + 110px);
-      padding:10px 14px;
-      background:var(--bg);
-    }
-    .jobControlsWrap{
-      max-width:760px;
-      margin:0 auto;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-    }
-    .btnMini{
-      width:auto;
-      margin-top:0;
-      padding:12px 14px;
-      font-size:16px;
-      border-radius:14px;
-    }
-
-    .speedbar{
-      position:fixed;
-      left:0;right:0;
-      bottom:calc(env(safe-area-inset-bottom) + 64px);
-      padding:10px 14px 20px;
-      background:var(--bg);
-      border-top:var(--stroke) solid var(--accent);
-    }
-    .speedwrap{max-width:760px;margin:0 auto;}
-    .speedhead{display:flex;justify-content:space-between;margin-bottom:8px;}
-    .speedTitle{
-      font-family:var(--mono);
-      font-size:14px;
-      font-weight:900;
-      letter-spacing:.3px;
-      color:var(--accent);
-    }
-    .seg{
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:8px;
-    }
-    .seg button{
-      padding:14px 0;
-      border-radius:14px;
-      border:var(--stroke) solid var(--accent);
-      background:var(--bg);
-      color:var(--accent);
-      font-size:16px;
-      font-weight:900;
-      touch-action: manipulation;
-    }
-    .seg button.active{background:var(--accent);color:#000;}
-    .seg button[disabled]{opacity:.35;}
-
-    .energyFooter{
-      position:fixed;
-      left:0;right:0;
-      bottom:0;
-      padding:10px 14px calc(env(safe-area-inset-bottom) + 10px);
-      background:var(--bg);
-      border-top:var(--stroke) solid var(--accent);
-    }
-    .energyWrap{max-width:760px;margin:0 auto;}
-    .energyLabel{
-      font-family:var(--mono);
-      font-size:14px;
-      font-weight:900;
-      margin-bottom:8px;
-      letter-spacing:.3px;
-      color:var(--accent);
-    }
-    .energyBar{
-      display:grid;
-      grid-template-columns:repeat(10,1fr);
-      gap:8px;
-    }
-    .energySeg{
-      height:16px;
-      border:var(--stroke) solid var(--accent);
-      border-radius:6px;
-      background:transparent;
-      opacity:0;
-    }
-
-    /* OFFER SCREEN */
-    .offerHeader{
-      background:var(--accent);
-      color:#000;
-      padding:14px 12px;
-      border-radius:var(--r2);
-      text-align:center;
-      font-family:var(--mono);
-      font-size:22px;
-      font-weight:950;
-      letter-spacing:1px;
-      margin-bottom:18px;
-      text-transform:uppercase;
-    }
-    .offerTop{
-      display:grid;
-      grid-template-columns:120px 1fr;
-      gap:16px;
-      align-items:start;
-      margin-bottom:22px;
-    }
-    .avatar{
-      border:var(--stroke) solid var(--accent);
-      border-radius:16px;
-      height:120px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:var(--accent);
-      opacity:.95;
-    }
-    .avatar svg{
-      width:92px;
-      height:92px;
-      stroke:currentColor;
-      fill:none;
-      stroke-width:2;
-      stroke-linecap:round;
-      stroke-linejoin:round;
-    }
-
-    .offerOrg{
-      font-size:28px;
-      font-weight:950;
-      line-height:1.05;
-      color:var(--accent);
-    }
-    .offerRole{
-      font-family:var(--mono);
-      font-size:14px;
-      font-weight:900;
-      margin-top:10px;
-      opacity:.85;
-      color:var(--accent);
-    }
-    .offerFacts{
-      margin-top:18px;
-      border-top:var(--stroke) solid var(--accent);
-      padding-top:14px;
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      font-family:var(--mono);
-      font-weight:900;
-      color:var(--accent);
-    }
-    .factsCol{display:grid;gap:10px;}
-    .fact .k{opacity:.8;}
-    .fact .v{font-size:28px;margin-top:2px;}
-    .fact.pay .v{font-size:28px;}
-    .offerActions{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      margin-top:18px;
-    }
-
-    .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.7);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-    }
-    .modalBox{
-      border:var(--stroke) solid var(--accent);
-      border-radius:20px;
-      padding:16px;
-      max-width:520px;
-      width:100%;
-      background:var(--bg);
-      color:var(--accent);
-    }
-    .modalTitle{
-      text-align:center;
-      font-family:var(--mono);
-      font-size:18px;
-      font-weight:950;
-      letter-spacing:2px;
-      margin-bottom:10px;
-      color:var(--accent);
-    }
-    .modalBtn{
-      width:100%;
-      text-align:center;
-      padding:18px 12px;
-      border-radius:16px;
-      border:var(--stroke) solid var(--accent);
-      background:var(--bg);
-      color:var(--accent);
-      font-weight:950;
-      font-size:22px;
-      margin-top:12px;
-    }
-    .modalBtn .sub{
-      display:block;
-      margin-top:6px;
-      font-family:var(--mono);
-      font-size:14px;
-      font-weight:900;
-      opacity:.9;
-      color:var(--accent);
-    }
-    .modalBtn[disabled]{opacity:.35;}
-
-    .modalBtnFill{
-      background:var(--accent);
-      color:#000;
-    }
-    .modalBtnFill .sub{ color:#000; }
 
     .resultBox{
       border:var(--stroke) solid var(--accent);
@@ -509,21 +176,19 @@
       font-family:var(--mono);
       font-weight:900;
       color:var(--accent);
-      opacity:.95;
     }
     .feedbackWho{opacity:.8;margin-bottom:6px;}
-    .feedbackText{line-height:1.25;}
 
-    /* Shop cash line */
-    .shopCash{
-      text-align:center;
-      font-family:var(--mono);
-      font-size:16px;
-      font-weight:900;
-      letter-spacing:.5px;
-      margin:2px 0 14px;
-      opacity:.95;
-      color:var(--accent);
+    .clientCard{
+      border:var(--stroke) solid var(--accent);
+      border-radius:var(--r2);
+      padding:12px;
+      margin-top:12px;
+    }
+    .clientTitle{
+      font-size:20px;
+      font-weight:950;
+      margin-bottom:8px;
     }
   </style>
 </head>
@@ -537,12 +202,11 @@
 
   <div class="divider"></div>
 
-  <!-- KPI shown only on hub -->
   <div id="kpiWrap">
     <div class="kpiRow">
       <div class="kpiLeft" id="dayText">Day 1</div>
-      <div class="kpiMid" id="versionText">v1.0.34</div>
-      <div class="kpiRight" id="cashText">£0</div>
+      <div class="kpiMid" id="versionText">v1.0.35</div>
+      <div class="kpiRight" id="cashText">£0 / £500</div>
     </div>
     <div class="divider"></div>
   </div>
@@ -550,97 +214,28 @@
   <!-- HUB -->
   <div class="screen" id="hub">
     <div class="hubGrid">
-      <button class="btn hubBtn" id="goJobs" aria-label="Jobs">
-        <svg viewBox="0 0 24 24">
-          <rect x="5" y="3.5" width="14" height="17" rx="2"></rect>
-          <line x1="8" y1="8" x2="16" y2="8"></line>
-          <line x1="8" y1="12" x2="16" y2="12"></line>
-          <line x1="8" y1="16" x2="13" y2="16"></line>
-        </svg>
-        Jobs
-      </button>
-      <button class="btn hubBtn" id="goShop" aria-label="Shop">
-        <svg viewBox="0 0 24 24">
-          <path d="M6 8h15l-2 9H8L6 8Z"></path>
-          <path d="M6 8l-2-3H2"></path>
-          <circle cx="9" cy="20" r="1"></circle>
-          <circle cx="18" cy="20" r="1"></circle>
-        </svg>
-        Shop
-      </button>
+      <button class="btn hubBtn" id="goJobs">Jobs</button>
+      <button class="btn hubBtn" id="goShop">Shop</button>
 
-      <!-- Equipment (was Kit) -->
-      <button class="btnOutline hubBtn" disabled aria-label="Equipment">
-        <svg viewBox="0 0 24 24">
-          <path d="M14.5 5.2a3.7 3.7 0 0 0-4.9 4.9L4.4 15.3a2 2 0 0 0 2.8 2.8l5.2-5.2a3.7 3.7 0 0 0 4.9-4.9l-2 2-2-2 2-2Z"></path>
-          <path d="M18.5 15.5l1.6 1.6"></path>
-          <path d="M17.3 16.7l1.6-1.6"></path>
-        </svg>
-        Equipment
-      </button>
+      <button class="btnOutline hubBtn" disabled>Equipment</button>
+      <button class="btnOutline hubBtn" disabled>Vehicles</button>
 
-      <!-- Vehicles (was Bag) -->
-      <button class="btnOutline hubBtn" disabled aria-label="Vehicles">
-        <svg viewBox="0 0 24 24">
-          <circle cx="7" cy="17" r="3"></circle>
-          <circle cx="17" cy="17" r="3"></circle>
-          <path d="M9 17l3-7h3l2 4"></path>
-          <path d="M12 10l-2-3H7"></path>
-          <path d="M12 10h4"></path>
-        </svg>
-        Vehicles
-      </button>
+      <button class="btn hubBtn" id="goClients">Clients</button>
+      <button class="btnOutline hubBtn" disabled>Stats</button>
     </div>
 
-    <button class="btn hubBtn hubBtnInline" id="restOpen" aria-label="Rest">
-      <svg viewBox="0 0 24 24">
-        <path d="M4 12V8a2 2 0 0 1 2-2h11a3 3 0 0 1 3 3v3"></path>
-        <path d="M4 12h17a2 2 0 0 1 2 2v4H2v-4a2 2 0 0 1 2-2Z"></path>
-        <path d="M7 10h3"></path>
-      </svg>
-      Rest
-    </button>
-
-    <button class="btnOutline hubBtn hubBtnInline" id="resetGame" aria-label="Reset game">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
-        <path d="M21 3v6h-6"></path>
-        <path d="M9 9l6 6"></path>
-        <path d="M15 9l-6 6"></path>
-      </svg>
-      Reset game
-    </button>
+    <div class="hubRow">
+      <button class="btnOutline" id="resetGame">Reset</button>
+      <button class="btn" id="restOpen">Rest</button>
+    </div>
   </div>
 
-  <!-- SHOP -->
-  <div class="screen hidden" id="shop">
-    <div class="jobTitle pageTitle">Shop</div>
-    <div class="shopCash" id="shopCash">CASH — £0</div>
-
-    <button class="btn btnIcon" id="buyDrink">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M10 2h4"></path>
-        <path d="M10 2v3"></path>
-        <path d="M14 2v3"></path>
-        <path d="M9 5h6"></path>
-        <path d="M9 5l-1 3v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8l-1-3"></path>
-        <path d="M9 12h6"></path>
-      </svg>
-      <span>Energy drink — £<span id="drinkPrice"></span> (<span id="drinkCount"></span>/5)</span>
-    </button>
-
-    <button class="btn btnIcon" id="buySnack">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="6" y="5" width="12" height="16" rx="2"></rect>
-        <path d="M9 8v10"></path>
-        <path d="M12 8v10"></path>
-        <path d="M15 8v10"></path>
-      </svg>
-      <span>Snack — £<span id="snackPrice"></span> (<span id="snackCount"></span>/5)</span>
-    </button>
-
+  <!-- CLIENTS -->
+  <div class="screen hidden" id="clients">
+    <div class="jobTitle pageTitle">Clients</div>
+    <div id="clientsWrap"></div>
     <div class="bottomRight">
-      <button class="btnOutline btnSmall" id="backHub2">Back</button>
+      <button class="btnOutline btnSmall" id="backHubClients">Back</button>
     </div>
   </div>
 
@@ -648,75 +243,8 @@
   <div class="screen hidden" id="board">
     <div class="jobTitle pageTitle">Job board</div>
     <div class="jobs" id="jobs"></div>
-    <div class="refreshText" id="refreshJobs">↻ Refresh jobs</div>
     <div class="bottomRight">
       <button class="btnOutline btnSmall" id="backHub">Back</button>
-    </div>
-  </div>
-
-  <!-- OFFER -->
-  <div class="screen hidden" id="offer">
-    <div class="offerHeader" id="offerTitle">—</div>
-
-    <div class="offerTop">
-      <div class="avatar" aria-label="Dispatcher">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="8" r="3.2"></circle>
-          <path d="M5.5 20c1.6-4.4 11.4-4.4 13 0"></path>
-        </svg>
-      </div>
-      <div>
-        <div class="offerOrg" id="ofOrg">—</div>
-        <div class="offerRole" id="ofQuote">—</div>
-      </div>
-    </div>
-
-    <div class="offerFacts">
-      <div class="factsCol">
-        <div class="fact"><div class="k">DISTANCE</div><div class="v" id="ofDistance">—</div></div>
-        <div class="fact"><div class="k">ROUTE</div><div class="v" id="ofRoute">—</div></div>
-      </div>
-      <div class="factsCol">
-        <div class="fact pay"><div class="k">PAY</div><div class="v" id="ofPay">£0</div></div>
-        <div class="fact"><div class="k">DEADLINE</div><div class="v" id="ofDeadline">—</div></div>
-      </div>
-    </div>
-
-    <div class="offerActions">
-      <button class="btnOutline" id="offerBack">Back</button>
-      <button class="btn" id="offerAccept">ACCEPT</button>
-    </div>
-  </div>
-
-  <!-- LIVE JOB -->
-  <div class="screen hidden" id="job">
-    <div class="offerHeader" id="jobName">—</div>
-
-    <div class="timeLeftWrap">
-      <svg class="timeDial" viewBox="0 0 100 100" aria-label="Time left">
-        <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="14" fill="none" opacity="0.18"></circle>
-        <path id="timeArc"
-          stroke="var(--accent)"
-          stroke-width="16"
-          fill="none"
-          stroke-linecap="butt"
-          d=""></path>
-        <text class="dialK" x="50" y="45">TIME LEFT</text>
-        <text class="dialV" id="remaining" x="50" y="57">—</text>
-      </svg>
-    </div>
-
-    <div class="progressBlock">
-      <div class="row progressHead">
-        <div class="progressLabel">Progress</div>
-        <div class="progressPct" id="pct">0%</div>
-      </div>
-      <div class="bar"><div class="fill" id="fill"></div></div>
-      <div class="progressMeta">
-        <div id="milesDone">0.0 mi</div>
-        <div id="mph">0 mph</div>
-        <div id="milesLeft">0.0 mi</div>
-      </div>
     </div>
   </div>
 
@@ -726,1579 +254,125 @@
     <div class="resultBox">
       <div class="vlist" id="resultList"></div>
       <div class="feedbackLine hidden" id="feedbackWrap">
-        <div class="feedbackWho" id="feedbackWho">—</div>
-        <div class="feedbackText" id="feedbackText">—</div>
+        <div class="feedbackWho" id="feedbackWho"></div>
+        <div id="feedbackText"></div>
       </div>
     </div>
-    <div style="height:30px"></div>
     <button class="btn" id="backBoard">Back to job board</button>
-  </div>
-
-  <!-- END DAY -->
-  <div class="screen hidden" id="end">
-    <div class="jobTitle" id="endTitle">End of day</div>
-    <div class="resultBox">
-      <div class="vlist" id="endList"></div>
-    </div>
-    <button class="btn" id="confirmEnd">Start next day</button>
-  </div>
-</div>
-
-<!-- Live job bottom controls -->
-<div class="jobControls hidden" id="jobControls">
-  <div class="jobControlsWrap">
-    <button class="btnOutline btnMini" id="cancel">Abort</button>
-    <button class="btnOutline btnMini" id="eventBtn" disabled>Event</button>
-    <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
-  </div>
-</div>
-
-<!-- Speed controls -->
-<div class="speedbar hidden" id="speedBar">
-  <div class="speedwrap">
-    <div class="speedhead">
-      <div class="speedTitle">SPEED</div>
-      <div class="speedTitle" id="speedLabel">average</div>
-    </div>
-    <div class="seg" id="speedSeg"></div>
-  </div>
-</div>
-
-<!-- Energy footer -->
-<div class="energyFooter" id="energyFooter">
-  <div class="energyWrap">
-    <div class="energyLabel">ENERGY</div>
-    <div class="energyBar" id="energyBar"></div>
-  </div>
-</div>
-
-<!-- Consumables modal -->
-<div class="modal" id="energyModal">
-  <div class="modalBox">
-    <div class="modalTitle">SNACKS</div>
-    <button class="modalBtn" id="drinkBtn"></button>
-    <button class="modalBtn" id="snackBtn"></button>
-    <button class="btnOutline" id="closeEnergy">Cancel</button>
-  </div>
-</div>
-
-<!-- Event modal -->
-<div class="modal" id="eventModal">
-  <div class="modalBox">
-    <div class="modalTitle">EVENT</div>
-    <div class="resultBox" style="margin-top:0">
-      <div class="vlist" id="eventList"></div>
-    </div>
-    <button class="btn" id="closeEvent">Continue</button>
-  </div>
-</div>
-
-<!-- Rest modal -->
-<div class="modal" id="restModal">
-  <div class="modalBox">
-    <div class="modalTitle">REST</div>
-    <button class="modalBtn modalBtnFill" id="rest2">Rest 2 hours</button>
-    <button class="modalBtn modalBtnFill" id="rest4">Rest 4 hours</button>
-    <button class="modalBtn modalBtnFill" id="rest8">Rest 8 hours</button>
-    <button class="modalBtn modalBtnFill" id="restMorning">Until morning</button>
-    <button class="btnOutline" id="closeRest">Cancel</button>
   </div>
 </div>
 
 <script>
-const VERSION="1.0.34";
-
-const PRICES={drink:12,snack:6};
-const COSTS={rent:35,food:15};
-
-const SPEEDS={
-  1:{name:"very slow",mult:0.55},
-  2:{name:"slow",mult:0.8},
-  3:{name:"average",mult:1},
-  4:{name:"fast",mult:1.25},
-  5:{name:"very fast",mult:1.55}
-};
-
-/* REQUESTORS + JOBS
-   - ~20 jobs per requestor
-   - each job has: id, name (<= 20 chars), dist, sequence, repeatable, feedback variants
-*/
-const REQUESTORS = [
-  {
-    name:"Sam Patel",
-    jobs:[
-      {id:"sam_01",name:"Hot food drop",dist:2.0,sequence:1,repeatable:true,feedback:{success:"Good. Clean handoff. Keep that pace.",early:"That’s what I call urgent. Nice.",late:"Bit shaky on timing. Don’t make it a habit.",aborted:"I needed that. Don’t accept if you can’t run it."}},
-      {id:"sam_02",name:"Groceries",dist:4.2,sequence:1,repeatable:true,feedback:{success:"Client’s happy. No drama.",early:"Early and intact. Ideal.",late:"Too late for chilled stuff. Tighten up.",aborted:"You left me holding the bag. Literally."}},
-      {id:"sam_03",name:"Council docs",dist:3.7,sequence:1,repeatable:false,feedback:{success:"Filed. Signed. Done. Nice.",early:"You beat the desk closing. Perfect.",late:"They nearly locked up. Watch the clock.",aborted:"Now I’m the one doing it."}},
-      {id:"sam_04",name:"Bike lock rescue",dist:2.2,sequence:1,repeatable:true,feedback:{success:"Sorted. You saved the afternoon.",early:"Quick save. Respect.",late:"They waited around. Not great.",aborted:"They’re stuck. That’s on you."}},
-
-      {id:"sam_05",name:"Parcel run",dist:3.5,sequence:2,repeatable:true,feedback:{success:"That’s how you run parcels.",early:"Early drop. Smooth.",late:"Late drop. Customer complained.",aborted:"Don’t start what you won’t finish."}},
-      {id:"sam_06",name:"Do not bend book",dist:3.9,sequence:2,repeatable:false,feedback:{success:"No creases. You understood the brief.",early:"Early and pristine. Great.",late:"It arrived late. Still intact though.",aborted:"Now it’s someone else’s problem."}},
-      {id:"sam_07",name:"Legal bundle",dist:5.4,sequence:2,repeatable:false,feedback:{success:"Signed and stamped. Good work.",early:"You saved a hearing. Seriously.",late:"It was touch-and-go. Tight margins.",aborted:"You bailed on a legal run?"}},
-      {id:"sam_08",name:"Lab sample rush",dist:5.9,sequence:2,repeatable:false,feedback:{success:"Sample arrived. You kept it stable.",early:"Early delivery. Lab’s impressed.",late:"Late. They had to rerun checks.",aborted:"That’s a failed chain-of-custody."}},
-
-      {id:"sam_09",name:"Urgent hard drive",dist:6.1,sequence:3,repeatable:false,feedback:{success:"Data’s safe. You did the job.",early:"That saved hours. Nice one.",late:"They lost time. Don’t repeat.",aborted:"You abandoned a data run?"}},
-      {id:"sam_10",name:"Film reel transfer",dist:6.6,sequence:3,repeatable:false,feedback:{success:"Reel arrived intact. Good hands.",early:"You beat the edit window. Great.",late:"Late means overtime. Not ideal.",aborted:"Now the shoot schedule’s broken."}},
-      {id:"sam_11",name:"Press pass handoff",dist:4.4,sequence:3,repeatable:true,feedback:{success:"Press got in. You’re useful.",early:"Early handoff. Cleaner than most.",late:"Late handoff. Stressful.",aborted:"They missed access because of you."}},
-      {id:"sam_12",name:"Festival bands",dist:4.8,sequence:3,repeatable:true,feedback:{success:"Bands delivered. Crowd gets in.",early:"You beat gates. Perfect.",late:"Late bands = queue chaos.",aborted:"Now I’m explaining it to security."}},
-
-      {id:"sam_13",name:"Forgotten passport",dist:6.9,sequence:4,repeatable:false,feedback:{success:"They made the flight. Barely.",early:"Absolute lifesaver. Seriously.",late:"Too late. That’s brutal.",aborted:"That’s an abandoned passport run."}},
-      {id:"sam_14",name:"Wedding cake box",dist:5.1,sequence:4,repeatable:false,feedback:{success:"Cake survived. Miracle worker.",early:"Early arrival. Calm hands.",late:"Late = panic. Keep it tighter.",aborted:"You dropped a wedding run?"}},
-      {id:"sam_15",name:"Sash parts",dist:5.8,sequence:4,repeatable:true,feedback:{success:"Parts arrived. Builder’s moving.",early:"Early delivery. Keeps trades happy.",late:"Late means wasted labour.",aborted:"Trades are waiting because of you."}},
-      {id:"sam_16",name:"Kitchen knife set",dist:3.1,sequence:4,repeatable:true,feedback:{success:"Delivered. No issues.",early:"Early drop. Good.",late:"Late drop. Customer annoyed.",aborted:"You left a paid delivery hanging."}},
-
-      {id:"sam_17",name:"VIP sushi apology",dist:3.2,sequence:5,repeatable:true,feedback:{success:"They forgave us. Barely.",early:"You saved the account. Nice.",late:"Late sushi is dead sushi.",aborted:"You just burned a VIP client."}},
-      {id:"sam_18",name:"Rush SLA",dist:6.0,sequence:5,repeatable:true,feedback:{success:"SLA met. Don’t get cocky.",early:"Ahead of SLA. That’s rare.",late:"SLA breach. That hurts us.",aborted:"You quit an SLA run? Wow."}},
-      {id:"sam_19",name:"Mysterious case",dist:4.8,sequence:5,repeatable:false,feedback:{success:"Package received. No questions.",early:"Fast and quiet. Good.",late:"Late delivery. Eyes on us now.",aborted:"You don’t walk away from that."}},
-      {id:"sam_20",name:"VIP keys drop",dist:4.0,sequence:5,repeatable:true,feedback:{success:"Keys delivered. Lock-up sorted.",early:"Early keys. Site secured.",late:"Late keys = risk. Don’t.",aborted:"Now the place is unsecured."}}
-    ]
-  },
-  {
-    name:"Rosa Klein",
-    jobs:[
-      {id:"rosa_01",name:"Tattoo stencil",dist:2.1,sequence:1,repeatable:true,feedback:{success:"Artist’s happy. Clean run.",early:"Early. Studio’s ready.",late:"Late. Appointment slipped.",aborted:"Now I’m rescheduling clients."}},
-      {id:"rosa_02",name:"Vintage vinyl",dist:2.5,sequence:1,repeatable:true,feedback:{success:"No warps. Nicely handled.",early:"Early drop. Great.",late:"Late. Buyer got twitchy.",aborted:"You bailed on a collector?"}},
-      {id:"rosa_03",name:"Charity raffle",dist:4.7,sequence:1,repeatable:false,feedback:{success:"All tickets accounted for.",early:"You saved the setup.",late:"Late means fewer sales.",aborted:"That’s a big hit for them."}},
-      {id:"rosa_04",name:"Pharmacy pickup",dist:2.8,sequence:1,repeatable:true,feedback:{success:"Meds delivered. Good.",early:"Early meds. Perfect.",late:"Late meds. Not acceptable.",aborted:"Don’t drop health runs."}},
-
-      {id:"rosa_05",name:"Escape props",dist:2.7,sequence:2,repeatable:true,feedback:{success:"Props arrived. Show runs.",early:"Early = no panic. Nice.",late:"Late = angry manager.",aborted:"They had to cancel a slot."}},
-      {id:"rosa_06",name:"Band merch",dist:4.1,sequence:2,repeatable:true,feedback:{success:"Merch table’s up. Great.",early:"Early = smooth sales.",late:"Late = missed sales.",aborted:"You ditched a gig run?"}},
-      {id:"rosa_07",name:"Cake topper",dist:3.4,sequence:2,repeatable:false,feedback:{success:"Topper intact. Cute.",early:"Early. Baker’s relieved.",late:"Late. Cake went out bare.",aborted:"Now it’s ruined."}},
-      {id:"rosa_08",name:"Lost phone return",dist:3.6,sequence:2,repeatable:false,feedback:{success:"Phone returned. Good deed.",early:"Fast return. Respect.",late:"Late return. Stressful.",aborted:"That’s nasty. Don’t."}},
-
-      {id:"rosa_09",name:"Spare theatre keys",dist:4.0,sequence:3,repeatable:true,feedback:{success:"Keys arrived. Doors open.",early:"Early keys. Smooth.",late:"Late keys. Tech crew fuming.",aborted:"You left them locked out."}},
-      {id:"rosa_10",name:"Wedding flowers",dist:5.3,sequence:3,repeatable:false,feedback:{success:"Flowers survived. Nice.",early:"Early. Cooler stayed cold.",late:"Late. Wilting risk.",aborted:"That’s a wedding disaster."}},
-      {id:"rosa_11",name:"Gallery invoice",dist:3.0,sequence:3,repeatable:true,feedback:{success:"Paperwork done. Thanks.",early:"Early. Office calm.",late:"Late. Payment delayed.",aborted:"Now we’re chasing."}},
-      {id:"rosa_12",name:"Fragile item",dist:5.0,sequence:3,repeatable:true,feedback:{success:"No cracks. Solid.",early:"Early and safe. Good.",late:"Late. Customer tense.",aborted:"That’s a broken promise."}},
-
-      {id:"rosa_13",name:"Custom frame",dist:4.6,sequence:4,repeatable:true,feedback:{success:"Frame delivered. Great.",early:"Early. Installer’s ready.",late:"Late. Installer waited.",aborted:"You just wasted labour."}},
-      {id:"rosa_14",name:"Caterer ice",dist:6.2,sequence:4,repeatable:true,feedback:{success:"Ice arrived. Service saved.",early:"Early = perfect.",late:"Late = melted. Bad.",aborted:"You dropped a service run."}},
-      {id:"rosa_15",name:"Handmade rings",dist:5.7,sequence:4,repeatable:false,feedback:{success:"Rings received. Relief.",early:"Early. No nerves.",late:"Late. Panic mode.",aborted:"That’s unforgivable."}},
-      {id:"rosa_16",name:"Urgent script",dist:4.9,sequence:4,repeatable:true,feedback:{success:"Script’s in. Rehearsal on.",early:"Early. Director’s happy.",late:"Late. Wasted rehearsal time.",aborted:"That’s amateur hour."}},
-
-      {id:"rosa_17",name:"VIP art courier",dist:6.4,sequence:5,repeatable:false,feedback:{success:"Piece delivered. No scratches.",early:"Early. Collector’s pleased.",late:"Late. Security upset.",aborted:"You don’t abort art."}},
-      {id:"rosa_18",name:"Rush wardrobe",dist:5.8,sequence:5,repeatable:true,feedback:{success:"Wardrobe arrived. Show saved.",early:"Early. Quick change ready.",late:"Late. Nearly missed cue.",aborted:"You bailed on a live show."}},
-      {id:"rosa_19",name:"Last call tickets",dist:3.8,sequence:5,repeatable:true,feedback:{success:"Tickets delivered. Good.",early:"Early. Easy entry.",late:"Late. Door almost closed.",aborted:"They missed the event."}},
-      {id:"rosa_20",name:"Backstage pass",dist:4.2,sequence:5,repeatable:true,feedback:{success:"Pass delivered. Clean.",early:"Early. No fuss.",late:"Late. Security got strict.",aborted:"Now it’s a mess at the door."}}
-    ]
-  },
-  {
-    name:"Aisha Rahman",
-    jobs:[
-      {id:"aisha_01",name:"Late rent env",dist:2.4,sequence:1,repeatable:true,feedback:{success:"Rent’s in. Crisis averted.",early:"Early rent. Nice.",late:"Late rent. Fees risk.",aborted:"That’s someone’s home. Don’t."}},
-      {id:"aisha_02",name:"Coffee beans",dist:3.3,sequence:1,repeatable:true,feedback:{success:"Beans arrived. Service runs.",early:"Early restock. Great.",late:"Late restock. Bad look.",aborted:"Now we’re out all day."}},
-      {id:"aisha_03",name:"Client contract",dist:4.5,sequence:1,repeatable:false,feedback:{success:"Signed. Sent. Done.",early:"Early. Legal’s impressed.",late:"Late. Deal nearly slipped.",aborted:"You just blew a contract."}},
-      {id:"aisha_04",name:"Hot meal drop",dist:3.1,sequence:1,repeatable:true,feedback:{success:"Hot on arrival. Good.",early:"Early and hot. Perfect.",late:"Late and cold. Not good.",aborted:"You accepted a meal run then quit?"}},
-
-      {id:"aisha_05",name:"Press kit",dist:4.1,sequence:2,repeatable:true,feedback:{success:"Kit delivered. Coverage secured.",early:"Early kit. Smooth.",late:"Late kit. Missed window.",aborted:"You dropped a press run."}},
-      {id:"aisha_06",name:"VIP meeting notes",dist:5.2,sequence:2,repeatable:false,feedback:{success:"Notes received. Helpful.",early:"Early = prepared meeting.",late:"Late = wasted time.",aborted:"That’s a bad look."}},
-      {id:"aisha_07",name:"Spare laptop",dist:6.0,sequence:2,repeatable:true,feedback:{success:"Laptop’s in. Work resumes.",early:"Early. Saved the day.",late:"Late. Lost hours.",aborted:"Now they can’t work."}},
-      {id:"aisha_08",name:"Pharmacy repeat",dist:2.6,sequence:2,repeatable:true,feedback:{success:"Delivered. Thank you.",early:"Early meds. Great.",late:"Late meds. Not okay.",aborted:"Don’t abandon essentials."}},
-
-      {id:"aisha_09",name:"Court filing",dist:6.3,sequence:3,repeatable:false,feedback:{success:"Filed. On record.",early:"Early filing. Excellent.",late:"Late filing. Risky.",aborted:"You can’t abort filings."}},
-      {id:"aisha_10",name:"Confidential docs",dist:5.5,sequence:3,repeatable:false,feedback:{success:"Delivered discreetly. Good.",early:"Early and quiet. Perfect.",late:"Late. Eyes were on us.",aborted:"That’s a breach of trust."}},
-      {id:"aisha_11",name:"Repro graphics",dist:4.7,sequence:3,repeatable:true,feedback:{success:"Prints arrived. Meeting saved.",early:"Early prints. Great.",late:"Late prints. Scramble.",aborted:"Now we present nothing."}},
-      {id:"aisha_12",name:"Catering run",dist:5.9,sequence:3,repeatable:true,feedback:{success:"Catering arrived. Sorted.",early:"Early setup. Great.",late:"Late setup. Awkward.",aborted:"You ditched a client lunch."}},
-
-      {id:"aisha_13",name:"Emergency charger",dist:3.9,sequence:4,repeatable:true,feedback:{success:"Charger delivered. Good.",early:"Early. No battery panic.",late:"Late. They died mid-call.",aborted:"You left them stranded."}},
-      {id:"aisha_14",name:"Exhibit paperwork",dist:6.1,sequence:4,repeatable:false,feedback:{success:"Paperwork cleared. Thanks.",early:"Early submission. Smooth.",late:"Late submission. Risky.",aborted:"Now it’s delayed."}},
-      {id:"aisha_15",name:"Key handover",dist:4.0,sequence:4,repeatable:true,feedback:{success:"Keys handed over. Great.",early:"Early handover. Clean.",late:"Late handover. Stress.",aborted:"Now nobody can access."}},
-      {id:"aisha_16",name:"Prototype parts",dist:6.5,sequence:4,repeatable:true,feedback:{success:"Parts arrived. Build continues.",early:"Early parts. Nice.",late:"Late parts. Lost hours.",aborted:"You stalled a build."}},
-
-      {id:"aisha_17",name:"CEO gift bag",dist:4.8,sequence:5,repeatable:true,feedback:{success:"Delivered. No fuss.",early:"Early delivery. Great.",late:"Late. Embarrassing.",aborted:"You dropped a VIP run."}},
-      {id:"aisha_18",name:"Last-minute deck",dist:5.6,sequence:5,repeatable:true,feedback:{success:"Deck delivered. Pitch ready.",early:"Early deck. Strong.",late:"Late deck. Panic edits.",aborted:"You sank a pitch."}},
-      {id:"aisha_19",name:"Secure access card",dist:6.7,sequence:5,repeatable:true,feedback:{success:"Card delivered. Site open.",early:"Early. No downtime.",late:"Late. Downtime cost money.",aborted:"That’s a security failure."}},
-      {id:"aisha_20",name:"Urgent injunction",dist:6.9,sequence:5,repeatable:false,feedback:{success:"Filed and served. Huge.",early:"Early service. Excellent.",late:"Late service. Damage done.",aborted:"That’s catastrophic."}}
-    ]
-  }
-];
-
-const ROUTES=["Easy","Mid","Tricky","Hellish"];
-
-const QUOTES=[
-  "We’ve had two riders drop this already. Needs doing before the deadline.",
-  "Client is calling every 2 minutes. Keep it moving.",
-  "Estate drop. Stairs. No lift. Don’t be late."
-];
-
-/* Events:
-   - AUTO events: accidents + negative-weighting influenced by speed AND route difficulty
-   - PROMPT events: optional via timed Event button; NOT speed-weighted
-*/
-const EVENT_POOL = {
-  normal: [
-    {t:"Red light gamble", d:"You gun it through a late amber. Lose 6% energy.", energy:-6, mins:0, mood:"bad"},
-    {t:"Stairwell detour", d:"Lift is out. Lose 4 minutes.", energy:0, mins:4, mood:"bad"},
-    {t:"Tailwind stretch", d:"Clear road. Gain 2 minutes.", energy:0, mins:-2, mood:"good"},
-    {t:"Loose strap", d:"Bag strap slips. Lose 3% energy and 2 minutes.", energy:-3, mins:2, mood:"bad"},
-
-    {t:"Quiet cut-through", d:"A calm side street. Gain 1 minute.", energy:0, mins:-1, mood:"good"},
-    {t:"Coffee queue", d:"You get stuck behind a crowd. Lose 3 minutes.", energy:0, mins:3, mood:"bad"},
-    {t:"Helpful doorman", d:"Someone holds the door. Gain 1 minute.", energy:0, mins:-1, mood:"good"},
-    {t:"Wrong buzzer", d:"You buzz the wrong flat. Lose 2 minutes.", energy:0, mins:2, mood:"bad"},
-    {t:"Cobbles", d:"Rattly cobbles drain you. Lose 2% energy.", energy:-2, mins:0, mood:"bad"},
-    {t:"Green wave", d:"Every light goes green. Gain 3 minutes.", energy:0, mins:-3, mood:"good"},
-    {t:"Roadworks shuffle", d:"Cones everywhere. Lose 5 minutes.", energy:0, mins:5, mood:"bad"},
-    {t:"Unexpected shortcut", d:"A signed cut-through. Gain 2 minutes.", energy:0, mins:-2, mood:"good"},
-    {t:"Bag re-pack", d:"You re-pack on the move. Lose 1 minute, save 1% energy.", energy:+1, mins:1, mood:"neutral"},
-    {t:"Steep ramp", d:"A long ramp saps you. Lose 4% energy.", energy:-4, mins:0, mood:"bad"}
-  ],
-  accident: [
-    {t:"Near miss", d:"Hard brake. You wobble it out. Lose 8% energy and 3 minutes.", energy:-8, mins:3, mood:"bad"},
-    {t:"Minor spill", d:"You clip a curb. Lose 12% energy and 6 minutes.", energy:-12, mins:6, mood:"bad"},
-    {t:"Impact scare", d:"Close call with a car door. Lose 10% energy and 4 minutes.", energy:-10, mins:4, mood:"bad"},
-
-    {t:"Chain slip", d:"Chain slips under load. Lose 6% energy and 3 minutes.", energy:-6, mins:3, mood:"bad"},
-    {t:"Skid", d:"Painted lines in drizzle. Lose 9% energy and 2 minutes.", energy:-9, mins:2, mood:"bad"},
-    {t:"Kerb strike", d:"Wheel bangs a kerb. Lose 7% energy and 5 minutes.", energy:-7, mins:5, mood:"bad"},
-    {t:"Handlebar clip", d:"You clip a bollard. Lose 11% energy and 4 minutes.", energy:-11, mins:4, mood:"bad"},
-    {t:"Foot slip", d:"Foot slips off pedal. Lose 5% energy and 2 minutes.", energy:-5, mins:2, mood:"bad"},
-    {t:"Bag spill", d:"Something shifts. Lose 8% energy and 6 minutes.", energy:-8, mins:6, mood:"bad"}
-  ]
-};
-
-/* Prompt/optional events: NOT speed-weighted and NOT route-weighted (neutral mix as per prior note). */
-const PROMPT_EVENTS=[
-  {t:"Shortcut sign", d:"A gated cut-through is ajar. Could save time.", energy:0, mins:-2},
-  {t:"Dodgy alley", d:"You cut through anyway. Bad vibe. Lose time.", energy:0, mins:3},
-  {t:"Perfect slipstream", d:"You tuck in behind a smooth rider. Gain time.", energy:0, mins:-2},
-  {t:"Puddle blast", d:"You hit a deep puddle. Lose energy and time.", energy:-5, mins:2}
-];
+const VERSION="1.0.35";
+const WEEKLY_TARGET=500;
 
 const SAVE_KEY="courier_save";
-const SAVE_SCHEMA=1;
 
 const state={
   day:1,
   cash:0,
-  time:15*60,     // minutes into current day (0..1439)
-  energy:100,
-  speed:3,
-
-  snacks:1,
-  drinks:1,
-
+  time:15*60,
   jobsDone:0,
-  dayEarnings:0,
-
-  offers:[],
   job:null,
-
-  elapsed:0,        // (game) minutes elapsed on this job (seconds-as-minutes model)
-  progress:0,       // progress-minutes, scaled by speed
-  hiddenDuration:0,
-  startEnergy:100,
-  energySpentJob:0,
-
-  /* deadline dial baseline (precise, float minutes) */
-  jobStartAbs:0,
-
-  snackFx:null,
-  drinkFx:null,
-
-  pendingEndOfDay:false,
-  eod:null,
-
-  /* random event control */
-  lastEventAbs:-1e9,
-
-  /* prompt event control (optional) */
-  promptActive:false,
-  promptEndMs:0,
-  lastPromptAbs:-1e9,
-
-  /* progression */
-  requestorSeq:{},            // { [requestorName]: number }
-  completedOneOff:{},         // { [jobId]: true }
-
-  lastTs:0,
-  raf:0
+  requestorStats:{},
+  requestorSeq:{},
+  completedOneOff:{}
 };
 
-let jobsInitialised=false;
-let selectedOffer=null;
+const REQUESTORS=["Sam Patel","Rosa Klein","Aisha Rahman"];
+const REPUTATION={
+  "Sam Patel":7,
+  "Rosa Klein":8,
+  "Aisha Rahman":9
+};
 
-/* throttled autosave */
-let lastSaveMs=0;
-
-const $=id=>document.getElementById(id);
-const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-
-function minutesOfDay(){
-  return ((Math.floor(state.time)%1440)+1440)%1440;
-}
-function minutesOfDayPrecise(){
-  return ((state.time%1440)+1440)%1440;
-}
-
-function nowAbs(){
-  return (state.day-1)*1440 + minutesOfDay();
-}
-function nowAbsPrecise(){
-  return (state.day-1)*1440 + minutesOfDayPrecise();
-}
-
-function fmtClock(mins){
-  const total=Math.floor(mins);
-  const hh=Math.floor(total/60);
-  const mm=total%60;
-  return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");
-}
-
-/* SVG arc helpers (0deg at TOP, clockwise) */
-function polarToCartesian(cx, cy, r, angleDeg){
-  const rad=(angleDeg-90) * Math.PI/180;
-  return {x: cx + (r*Math.cos(rad)), y: cy + (r*Math.sin(rad))};
-}
-function describeArc(cx, cy, r, startAngle, endAngle){
-  const start=polarToCartesian(cx, cy, r, endAngle);
-  const end=polarToCartesian(cx, cy, r, startAngle);
-  const largeArcFlag = (endAngle-startAngle) <= 180 ? "0" : "1";
-  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`;
-}
-function describeFullCircle(cx, cy, r){
-  const a1 = describeArc(cx, cy, r, 0, 180);
-  const a2 = describeArc(cx, cy, r, 180, 360);
-  return `${a1} ${a2}`;
-}
-
-function hexToRgb(hex){
-  const h=hex.replace("#","").trim();
-  const full = (h.length===3) ? h.split("").map(c=>c+c).join("") : h;
-  const n=parseInt(full,16);
-  return {r:(n>>16)&255,g:(n>>8)&255,b:n&255};
-}
-function rgbToHex(r,g,b){
-  const to=h=>h.toString(16).padStart(2,"0");
-  return "#"+to(r)+to(g)+to(b);
-}
-function lerp(a,b,t){ return a + (b-a)*t; }
-function lerpColor(c1,c2,t){
-  const a=hexToRgb(c1), b=hexToRgb(c2);
-  const r=Math.round(lerp(a.r,b.r,t));
-  const g=Math.round(lerp(a.g,b.g,t));
-  const bb=Math.round(lerp(a.b,b.b,t));
-  return rgbToHex(r,g,bb);
-}
-function setAccentFromTime(){
-  const m=minutesOfDay();
-  const stops=[
-    {m:  360, c:"#B8C9CA"},
-    {m:  600, c:"#C1E7B8"},
-    {m:  780, c:"#EBE8B8"},
-    {m:  960, c:"#F8BFC7"},
-    {m: 1140, c:"#F2A9CC"},
-    {m: 1320, c:"#C9A6D8"}
-  ];
-
-  if(m < stops[0].m){
-    const t = m / stops[0].m;
-    const col = lerpColor(stops[stops.length-1].c, stops[0].c, t);
-    document.documentElement.style.setProperty("--accent", col);
-    return;
-  }
-  if(m >= stops[stops.length-1].m){
-    document.documentElement.style.setProperty("--accent", stops[stops.length-1].c);
-    return;
-  }
-  for(let i=0;i<stops.length-1;i++){
-    const a=stops[i], b=stops[i+1];
-    if(m>=a.m && m<b.m){
-      const t = (m-a.m)/(b.m-a.m);
-      const col = lerpColor(a.c,b.c,t);
-      document.documentElement.style.setProperty("--accent", col);
-      return;
-    }
-  }
-}
-
-/* ===== PROGRESSION ===== */
-
-function ensureProgressionDefaults(){
-  if(!state.requestorSeq || typeof state.requestorSeq!=="object") state.requestorSeq={};
-  if(!state.completedOneOff || typeof state.completedOneOff!=="object") state.completedOneOff={};
+function ensureStats(){
   for(const r of REQUESTORS){
-    if(typeof state.requestorSeq[r.name]!=="number" || state.requestorSeq[r.name]<1){
-      state.requestorSeq[r.name]=1;
+    if(!state.requestorStats[r]){
+      state.requestorStats[r]={
+        completed:0,
+        aborted:0,
+        revenue:0,
+        tips:0,
+        penalties:0
+      };
+    }
+    if(!state.requestorSeq[r]){
+      state.requestorSeq[r]=1;
     }
   }
 }
 
-function currentSeqFor(requestorName){
-  ensureProgressionDefaults();
-  return state.requestorSeq[requestorName] || 1;
+function save(){
+  localStorage.setItem(SAVE_KEY,JSON.stringify(state));
 }
-
-function markOneOffCompleted(jobId){
-  state.completedOneOff[jobId]=true;
-}
-
-function isOneOffCompleted(jobId){
-  return !!state.completedOneOff[jobId];
-}
-
-/* ===== SAVE / LOAD ===== */
-
-function safeJsonParse(s){
-  try{ return JSON.parse(s); }catch(e){ return null; }
-}
-
-function saveState(force=false){
-  const now=performance.now();
-  if(!force && (now-lastSaveMs)<900) return;
-  lastSaveMs=now;
-
-  const payload={
-    schema:SAVE_SCHEMA,
-    version:VERSION,
-    state:{
-      day:state.day,
-      cash:state.cash,
-      time:state.time,
-      energy:state.energy,
-      speed:state.speed,
-      snacks:state.snacks,
-      drinks:state.drinks,
-      jobsDone:state.jobsDone,
-      dayEarnings:state.dayEarnings,
-      offers:state.offers,
-      job:state.job,
-      elapsed:state.elapsed,
-      progress:state.progress,
-      hiddenDuration:state.hiddenDuration,
-      startEnergy:state.startEnergy,
-      energySpentJob:state.energySpentJob,
-      jobStartAbs:state.jobStartAbs,
-      pendingEndOfDay:state.pendingEndOfDay,
-      eod:state.eod,
-      lastEventAbs:state.lastEventAbs,
-      promptActive:state.promptActive,
-      promptEndMs:state.promptEndMs,
-      lastPromptAbs:state.lastPromptAbs,
-
-      requestorSeq:state.requestorSeq,
-      completedOneOff:state.completedOneOff
-    }
-  };
-
-  try{
-    localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
-  }catch(e){
-    /* ignore (storage full / blocked) */
-  }
-}
-
-function loadState(){
+function load(){
   const raw=localStorage.getItem(SAVE_KEY);
-  if(!raw) return false;
-
-  const data=safeJsonParse(raw);
-  if(!data || !data.state) return false;
-
-  const s=data.state;
-
-  state.day = (typeof s.day==="number" && s.day>=1) ? s.day : state.day;
-  state.cash = (typeof s.cash==="number") ? s.cash : state.cash;
-  state.time = (typeof s.time==="number") ? s.time : state.time;
-  state.energy = (typeof s.energy==="number") ? clamp(s.energy,0,100) : state.energy;
-  state.speed = (typeof s.speed==="number") ? clamp(Math.round(s.speed),1,5) : state.speed;
-
-  state.snacks = (typeof s.snacks==="number") ? clamp(Math.round(s.snacks),0,5) : state.snacks;
-  state.drinks = (typeof s.drinks==="number") ? clamp(Math.round(s.drinks),0,5) : state.drinks;
-
-  state.jobsDone = (typeof s.jobsDone==="number") ? Math.max(0,Math.round(s.jobsDone)) : state.jobsDone;
-  state.dayEarnings = (typeof s.dayEarnings==="number") ? Math.round(s.dayEarnings) : state.dayEarnings;
-
-  state.offers = Array.isArray(s.offers) ? s.offers : state.offers;
-
-  state.job = s.job || null;
-  state.elapsed = (typeof s.elapsed==="number") ? s.elapsed : 0;
-  state.progress = (typeof s.progress==="number") ? s.progress : 0;
-  state.hiddenDuration = (typeof s.hiddenDuration==="number") ? s.hiddenDuration : 0;
-  state.startEnergy = (typeof s.startEnergy==="number") ? s.startEnergy : state.energy;
-  state.energySpentJob = (typeof s.energySpentJob==="number") ? s.energySpentJob : 0;
-  state.jobStartAbs = (typeof s.jobStartAbs==="number") ? s.jobStartAbs : nowAbsPrecise();
-
-  state.pendingEndOfDay = !!s.pendingEndOfDay;
-  state.eod = (s.eod && typeof s.eod==="object") ? s.eod : null;
-
-  state.lastEventAbs = (typeof s.lastEventAbs==="number") ? s.lastEventAbs : -1e9;
-
-  state.promptActive = !!s.promptActive;
-  state.promptEndMs = (typeof s.promptEndMs==="number") ? s.promptEndMs : 0;
-  state.lastPromptAbs = (typeof s.lastPromptAbs==="number") ? s.lastPromptAbs : -1e9;
-
-  state.requestorSeq = (s.requestorSeq && typeof s.requestorSeq==="object") ? s.requestorSeq : {};
-  state.completedOneOff = (s.completedOneOff && typeof s.completedOneOff==="object") ? s.completedOneOff : {};
-
-  ensureProgressionDefaults();
-
-  /* if prompt window already expired (reload), cancel it */
-  if(state.promptActive && Date.now() > state.promptEndMs){
-    state.promptActive=false;
-    state.promptEndMs=0;
-  }
-
-  /* do not restore in-flight consumable timers (safer) */
-  state.snackFx=null;
-  state.drinkFx=null;
-
-  jobsInitialised = Array.isArray(state.offers) && state.offers.length>0;
-  selectedOffer=null;
-
-  return true;
-}
-
-function wipeSave(){
-  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
-}
-
-/* ===== UI ===== */
-
-function renderEnergyBar(){
-  const bar=$("energyBar"); bar.innerHTML="";
-  for(let i=0;i<10;i++){
-    const seg=document.createElement("div");
-    seg.className="energySeg";
-    const bandStart=i*10;
-    const frac=clamp((state.energy-bandStart)/10,0,1);
-    if(frac>0){
-      seg.style.background="var(--accent)";
-      seg.style.opacity=String(frac);
-    }else{
-      seg.style.background="transparent";
-      seg.style.opacity="0";
-    }
-    bar.appendChild(seg);
-  }
-}
-
-/* Event button: hidden unless prompt is active */
-function updateEventBtnUI(){
-  const b=$("eventBtn");
-  if(!b) return;
-
-  if(state.promptActive){
-    b.style.display="";
-    b.disabled=false;
-    b.classList.remove("btnOutline");
-    b.classList.add("btn");
-  }else{
-    b.disabled=true;
-    b.classList.remove("btn");
-    b.classList.add("btnOutline");
-    b.style.display="none";
-  }
-}
-
-/* time dial based on deadline (smooth, never splits, starts full) */
-function updateTimeDialFromDeadline(){
-  const arc=$("timeArc");
-  if(!arc || !state.job) return;
-
-  const cx=50, cy=50, r=38;
-
-  const now=nowAbsPrecise();
-  const total=Math.max(0.000001, state.job.deadlineAbs - state.jobStartAbs);
-  const left=Math.max(0, state.job.deadlineAbs - now);
-
-  const fracLeft=clamp(left/total, 0, 1);
-
-  if(left<=0){
-    arc.setAttribute("d","");
-    arc.style.opacity="0";
-  }else if(fracLeft >= 0.999999){
-    arc.setAttribute("d", describeFullCircle(cx,cy,r));
-    arc.style.opacity="1";
-  }else{
-    const endAngle = 360*fracLeft;
-    arc.setAttribute("d", describeArc(cx,cy,r,0,endAngle));
-    arc.style.opacity="1";
-  }
-
-  $("remaining").textContent=Math.max(0,Math.ceil(left))+"m";
+  if(!raw) return;
+  Object.assign(state,JSON.parse(raw));
 }
 
 function renderTop(){
-  setAccentFromTime();
-  $("cashText").textContent="£"+state.cash;
-  $("headerClock").textContent=fmtClock(minutesOfDay());
-  $("versionText").textContent="v"+VERSION;
-  $("dayText").textContent="Day "+state.day;
-  renderEnergyBar();
-
-  const shopCash=$("shopCash");
-  if(shopCash) shopCash.textContent="CASH — £"+state.cash;
-
-  updateEventBtnUI();
+  document.getElementById("cashText").textContent=
+    "£"+state.cash+" / £"+WEEKLY_TARGET;
+  document.getElementById("versionText").textContent="v"+VERSION;
+  document.getElementById("dayText").textContent="Day "+state.day;
 }
 
 function setMode(m){
-  ["hub","shop","board","offer","job","result","end"].forEach(s=>$(s).classList.toggle("hidden",s!==m));
-  $("speedBar").classList.toggle("hidden",m!=="job");
-  $("jobControls").classList.toggle("hidden",m!=="job");
-  $("kpiWrap").classList.toggle("hidden", m!=="hub");
-  saveState();
+  ["hub","board","result","clients"].forEach(id=>{
+    document.getElementById(id).classList.toggle("hidden",id!==m);
+  });
+  save();
 }
 
-function snapshotEOD(){
-  state.eod={
-    dayEnded: state.day-1,
-    jobs: state.jobsDone,
-    earnings: state.dayEarnings,
-    rent: COSTS.rent,
-    food: COSTS.food
-  };
-}
-function showEndOfDay(){
-  if(!state.eod) snapshotEOD();
-  const deductions=state.eod.rent+state.eod.food;
-  const net=state.eod.earnings-deductions;
-  $("endTitle").textContent="End of day (Day "+state.eod.dayEnded+")";
-  $("endList").innerHTML=`
-    <div class="vrow"><span>Jobs</span><span>${state.eod.jobs}</span></div>
-    <div class="vrow"><span>Earnings</span><span>£${state.eod.earnings}</span></div>
-    <div class="vrow"><span>Rent</span><span>-£${state.eod.rent}</span></div>
-    <div class="vrow"><span>Food</span><span>-£${state.eod.food}</span></div>
-    <div class="vrow total"><span>Net</span><span>£${net}</span></div>
-  `;
-  setMode("end");
-  renderTop();
-  saveState(true);
-}
-function onMidnightRollover(){
-  if(!state.eod) snapshotEOD();
-  if(state.job){
-    state.pendingEndOfDay=true;
-    saveState(true);
-    return;
-  }
-  showEndOfDay();
-}
-
-function advanceMinutes(mins){
-  state.time += mins;
-  let rolled=0;
-  while(state.time>=1440){
-    state.time -= 1440;
-    state.day++;
-    rolled++;
-  }
-  while(state.time<0){
-    state.time += 1440;
-    state.day = Math.max(1, state.day-1);
-  }
-  if(rolled>0) onMidnightRollover();
-}
-
-function pruneOffers(){
-  const now=nowAbs();
-  state.offers = state.offers.filter(o => o.deadlineAbs > now);
-}
-
-function eligibleJobsPool(){
-  ensureProgressionDefaults();
-
-  const pool=[];
+function renderClients(){
+  ensureStats();
+  const wrap=document.getElementById("clientsWrap");
+  wrap.innerHTML="";
   for(const r of REQUESTORS){
-    const seq=currentSeqFor(r.name);
-    for(const j of r.jobs){
-      if(j.sequence>seq) continue;
-      if(!j.repeatable && isOneOffCompleted(j.id)) continue;
-      pool.push({requestor:r.name, job:j});
-    }
-  }
-  return pool;
-}
+    const s=state.requestorStats[r];
+    const net=s.revenue + s.tips - s.penalties;
 
-function genJobs(){
-  ensureProgressionDefaults();
-
-  const base=nowAbs();
-  const pool=eligibleJobsPool().sort(()=>Math.random()-.5);
-
-  const picks=pool.slice(0,5).map(p=>{
-    const j=p.job;
-
-    const avg=(j.dist/8)*60;
-    const slow=avg/SPEEDS[1].mult;
-    const fast=avg/SPEEDS[5].mult;
-    const hidden=fast+(slow-fast)*(.15+Math.random()*.7);
-
-    const slack = Math.round(Math.random()*2*60);
-
-    return{
-      id:j.id,
-      name:j.name,
-      dist:j.dist,
-      sequence:j.sequence,
-      repeatable:j.repeatable,
-      feedback:j.feedback,
-
-      giver:p.requestor,
-      quote: QUOTES[Math.floor(Math.random()*QUOTES.length)],
-      hidden:Math.round(hidden),
-      pay:Math.round(j.dist*12+Math.random()*6),
-      route: ROUTES[Math.floor(Math.random()*ROUTES.length)],
-      deadlineAbs: base + Math.round(avg) + slack
-    };
-  });
-
-  state.offers=picks;
-  pruneOffers();
-  saveState(true);
-}
-
-function openOffer(o){
-  selectedOffer=o;
-
-  $("offerTitle").textContent=o.name.toUpperCase();
-  $("ofOrg").textContent=o.giver;
-  $("ofQuote").textContent="“"+o.quote+"”";
-
-  $("ofDistance").textContent=o.dist.toFixed(1)+" mi";
-  $("ofRoute").textContent=o.route;
-  $("ofPay").textContent="£"+o.pay;
-  $("ofDeadline").textContent=fmtClock(o.deadlineAbs % 1440);
-
-  setMode("offer");
-  renderTop();
-}
-
-function renderJobs(){
-  pruneOffers();
-  const wrap=$("jobs");wrap.innerHTML="";
-  const noEnergy=state.energy<=0;
-  state.offers.forEach(o=>{
-    const r=document.createElement("div");
-    r.className="jobRow";
-    r.innerHTML=`
-      <div class="jobTitle">${o.name}</div>
-      <div class="jobPay">£${o.pay}</div>
+    const div=document.createElement("div");
+    div.className="clientCard";
+    div.innerHTML=`
+      <div class="clientTitle">${r}</div>
+      <div class="vlist">
+        <div class="vrow"><span>Jobs completed</span><span>${s.completed}</span></div>
+        <div class="vrow"><span>Jobs aborted</span><span>${s.aborted}</span></div>
+        <div class="vrow"><span>Total revenue</span><span>£${s.revenue}</span></div>
+        <div class="vrow"><span>Total tips</span><span>£${s.tips}</span></div>
+        <div class="vrow"><span>Total penalties</span><span>£${s.penalties}</span></div>
+        <div class="vrow"><span>Net pay</span><span>£${net}</span></div>
+        <div class="vrow"><span>Sequence</span><span>${state.requestorSeq[r]}</span></div>
+        <div class="vrow"><span>Reputation</span><span>${REPUTATION[r]}/10</span></div>
+      </div>
     `;
-    r.onclick=()=>{ if(!noEnergy) openOffer(o); };
-    if(noEnergy) r.style.opacity=".4";
-    wrap.appendChild(r);
-  });
-}
-
-function maxSpeed(){
-  if(state.energy<=5) return 1;
-  if(state.energy<=10) return 2;
-  if(state.energy<=15) return 3;
-  if(state.energy<=20) return 4;
-  return 5;
-}
-
-function buildSpeed(){
-  const seg=$("speedSeg");seg.innerHTML="";
-  for(let i=1;i<=5;i++){
-    const b=document.createElement("button");
-    b.textContent=i;
-    b.onclick=()=>{state.speed=Math.min(i,maxSpeed());syncSpeed();saveState(true);};
-    seg.appendChild(b);
-  }
-  syncSpeed();
-}
-
-function syncSpeed(){
-  const max=maxSpeed();
-  if(state.speed>max) state.speed=max;
-  [...$("speedSeg").children].forEach((b,i)=>{
-    const s=i+1;
-    b.classList.toggle("active",s===state.speed);
-    b.disabled=s>max;
-  });
-  $("speedLabel").textContent=SPEEDS[state.speed].name;
-}
-
-function clearSnackFx(){
-  if(!state.snackFx) return;
-  if(state.snackFx.delayId) clearTimeout(state.snackFx.delayId);
-  if(state.snackFx.intervalId) clearInterval(state.snackFx.intervalId);
-  state.snackFx=null;
-}
-
-function clearDrinkFx(){
-  if(!state.drinkFx) return;
-  if(state.drinkFx.timeoutId) clearTimeout(state.drinkFx.timeoutId);
-  state.drinkFx=null;
-}
-
-function applyPendingEffects(){
-  if(state.snackFx){
-    state.energy=clamp(state.energy+state.snackFx.remaining,0,100);
-    clearSnackFx();
-  }
-  if(state.drinkFx){
-    state.energy=clamp(state.energy-10,0,100);
-    clearDrinkFx();
+    wrap.appendChild(div);
   }
 }
 
-/* tip/penalty uses precise time base */
-function tipPenaltyForFinish(){
-  const now=nowAbsPrecise();
-  const delta = state.job.deadlineAbs - now;
-
-  if(delta>0){
-    const raw = Math.floor(delta/10);
-    const cap = Math.max(1, Math.floor(state.job.pay*0.30));
-    return Math.min(raw, cap);
-  }else if(delta<0){
-    const late = Math.ceil(Math.abs(delta)/5);
-    const raw = -(late*2);
-    return Math.max(raw, -state.job.pay);
-  }
-  return 0;
-}
-
-function abortPenalty(){
-  return -Math.max(5, Math.round(state.job.pay*0.35));
-}
-
-function showFeedback(requestorName, text){
-  const w=$("feedbackWrap");
-  const who=$("feedbackWho");
-  const t=$("feedbackText");
-  if(!w || !who || !t) return;
-
-  if(!requestorName || !text){
-    w.classList.add("hidden");
-    who.textContent="—";
-    t.textContent="—";
-    return;
-  }
-  who.textContent=requestorName;
-  t.textContent="“"+text+"”";
-  w.classList.remove("hidden");
-}
-
-function startJob(o, resume=false){
-  state.job=o;
-
-  if(!resume){
-    state.elapsed=0;
-    state.progress=0;
-    state.hiddenDuration=o.hidden;
-    state.startEnergy=state.energy;
-    state.energySpentJob=0;
-
-    state.jobStartAbs = nowAbsPrecise();
-
-    state.lastEventAbs = -1e9;
-    state.lastPromptAbs = -1e9;
-    state.promptActive=false;
-    state.promptEndMs=0;
-  }
-
-  $("jobName").textContent=o.name.toUpperCase();
-
-  const p=clamp(state.hiddenDuration>0 ? (state.progress/state.hiddenDuration) : 0,0,1);
-  $("pct").textContent=Math.floor(p*100)+"%";
-  $("fill").style.width=(p*100)+"%";
-
-  const milesDone=(o.dist*p);
-  $("milesDone").textContent=milesDone.toFixed(1)+" mi";
-  $("milesLeft").textContent=(o.dist-milesDone).toFixed(1)+" mi";
-  $("mph").textContent=Math.round(8*SPEEDS[state.speed].mult)+" mph";
-
-  updateTimeDialFromDeadline();
-
-  syncSpeed();
-  setMode("job");
-
-  state.lastTs=performance.now();
-  cancelAnimationFrame(state.raf);
-  state.raf=requestAnimationFrame(tick);
-
-  renderTop();
-  saveState(true);
-}
-
-/* ===== RANDOM EVENT SYSTEM ===== */
-
-function chanceFromLambda(lambdaPerMin, dtMin){
-  const x = lambdaPerMin * Math.max(0,dtMin);
-  return 1 - Math.exp(-x);
-}
-
-function lambdaForSpeed(speed){
-  /* auto events per in-game minute (speed-weighted) */
-  const bySpeed=[0, 0.010, 0.014, 0.020, 0.028, 0.038]; // 1..5
-  return bySpeed[clamp(speed,1,5)];
-}
-
-function routeTier(route){
-  if(route==="Easy") return 0;
-  if(route==="Mid") return 1;
-  if(route==="Tricky") return 2;
-  if(route==="Hellish") return 3;
-  return 1;
-}
-
-/* route influences negativity:
-   - accident chance multiplier
-   - normal pool bad-vs-good weighting
-*/
-function routeAccidentMult(route){
-  const t=routeTier(route);
-  return [0.75, 1.0, 1.25, 1.6][t];
-}
-function routeBadWeight(route){
-  const t=routeTier(route);
-  return [0.75, 1.0, 1.35, 1.75][t];
-}
-
-function accidentChanceForSpeedAndRoute(speed, route){
-  /* base from speed then scaled by route */
-  const base = 0.15 + 0.10*(clamp(speed,1,5)-1); // 0.15..0.55
-  const mult = routeAccidentMult(route);
-  return clamp(base*mult, 0.05, 0.90);
-}
-
-function lambdaPrompt(){
-  /* prompts per in-game minute */
-  return 0.020;
-}
-
-function pickWeighted(list, weightFn){
-  let sum=0;
-  for(const it of list) sum += Math.max(0, weightFn(it));
-  if(sum<=0) return list[Math.floor(Math.random()*list.length)];
-  let r=Math.random()*sum;
-  for(const it of list){
-    r -= Math.max(0, weightFn(it));
-    if(r<=0) return it;
-  }
-  return list[list.length-1];
-}
-
-function openEventFromObj(e){
-  const rows=[];
-  rows.push(`<div class="vrow"><span>${e.t}</span><span></span></div>`);
-  rows.push(`<div class="vrow"><span style="opacity:.85">${e.d}</span><span></span></div>`);
-
-  if(e.mins!==0) rows.push(`<div class="vrow"><span>Time</span><span>${e.mins>0?"+":""}${e.mins}m</span></div>`);
-  if(e.energy!==0) rows.push(`<div class="vrow"><span>Energy</span><span>${e.energy>0?"+":""}${e.energy}%</span></div>`);
-
-  $("eventList").innerHTML=rows.join("");
-
-  if(e.mins!==0) advanceMinutes(e.mins);
-  if(e.energy!==0){
-    state.energy=clamp(state.energy+e.energy,0,100);
-    syncSpeed();
-  }
-
-  updateTimeDialFromDeadline();
-  renderTop();
-
-  $("eventModal").style.display="flex";
-  saveState(true);
-}
-
-function openAutoEvent(){
-  if(!state.job) return;
-  if($("eventModal").style.display==="flex") return;
-
-  const route = state.job.route || "Mid";
-  const acc = Math.random() < accidentChanceForSpeedAndRoute(state.speed, route);
-
-  if(acc){
-    const pool = EVENT_POOL.accident;
-    const e = pool[Math.floor(Math.random()*pool.length)];
-    openEventFromObj(e);
-    return;
-  }
-
-  const badW = routeBadWeight(route);
-  const e = pickWeighted(EVENT_POOL.normal, (x)=>{
-    if(x.mood==="bad") return 1.0*badW;
-    if(x.mood==="good") return 1.0;
-    return 0.9; // neutral
-  });
-  openEventFromObj(e);
-}
-
-function openPromptEvent(){
-  if(!state.job) return;
-  if($("eventModal").style.display==="flex") return;
-
-  const e = PROMPT_EVENTS[Math.floor(Math.random()*PROMPT_EVENTS.length)];
-  openEventFromObj(e);
-}
-
-function closeEvent(){
-  $("eventModal").style.display="none";
-  renderTop();
-  saveState(true);
-}
-$("closeEvent").onclick=()=>{ closeEvent(); };
-
-function maybeTriggerAutoEvent(dtMin){
-  if(!state.job) return;
-  if($("eventModal").style.display==="flex") return;
-
-  /* don't auto-trigger while prompt window is active */
-  if(state.promptActive) return;
-
-  const now=nowAbsPrecise();
-  const minGap=3; // minutes
-  if((now - state.lastEventAbs) < minGap) return;
-  if((now - state.lastPromptAbs) < minGap) return;
-
-  const lambda=lambdaForSpeed(state.speed);
-  const p=chanceFromLambda(lambda, dtMin);
-
-  if(Math.random() < p){
-    state.lastEventAbs = now;
-    openAutoEvent();
-  }
-}
-
-function maybeStartPromptWindow(dtMin){
-  if(!state.job) return;
-  if($("eventModal").style.display==="flex") return;
-
-  /* expire if needed */
-  if(state.promptActive && Date.now() > state.promptEndMs){
-    state.promptActive=false;
-    state.promptEndMs=0;
-    updateEventBtnUI();
-    saveState(true);
-  }
-
-  if(state.promptActive) return;
-
-  const now=nowAbsPrecise();
-  const minGap=4; // minutes between prompts (and away from auto events)
-  if((now - state.lastPromptAbs) < minGap) return;
-  if((now - state.lastEventAbs) < minGap) return;
-
-  const p=chanceFromLambda(lambdaPrompt(), dtMin);
-  if(Math.random() < p){
-    state.promptActive=true;
-    state.promptEndMs = Date.now() + (3000 + Math.random()*2000); // 3–5 seconds
-    updateEventBtnUI();
-    saveState(true);
-  }
-}
-
-function tick(ts){
-  state.raf=requestAnimationFrame(tick);
-
-  /* pause simulation while modal is open */
-  if($("eventModal").style.display==="flex" || $("energyModal").style.display==="flex" || $("restModal").style.display==="flex"){
-    state.lastTs=ts;
-    return;
-  }
-
-  /* prompt window expiry (real time) */
-  if(state.promptActive && Date.now() > state.promptEndMs){
-    state.promptActive=false;
-    state.promptEndMs=0;
-    updateEventBtnUI();
-    saveState(true);
-  }
-
-  const dtSec=(ts-state.lastTs)/1000;
-  state.lastTs=ts;
-
-  const dtMin=dtSec;
-  const mult=SPEEDS[state.speed].mult;
-
-  state.elapsed += dtMin;
-  state.progress += dtMin * mult;
-
-  advanceMinutes(dtMin);
-
-  const drain = 0.65*mult*mult*dtMin;
-  state.energySpentJob += drain;
-  state.energy=clamp(state.energy-drain,0,100);
-  syncSpeed();
-
-  const p=clamp(state.progress/state.hiddenDuration,0,1);
-  $("pct").textContent=Math.floor(p*100)+"%";
-  $("fill").style.width=(p*100)+"%";
-
-  const milesDone=(state.job.dist*p);
-  $("milesDone").textContent=milesDone.toFixed(1)+" mi";
-  $("milesLeft").textContent=(state.job.dist-milesDone).toFixed(1)+" mi";
-  $("mph").textContent=Math.round(8*mult)+" mph";
-
-  updateTimeDialFromDeadline();
-
-  /* prompt window + auto events */
-  maybeStartPromptWindow(dtMin);
-  maybeTriggerAutoEvent(dtMin);
-
-  renderTop();
-  saveState();
-
-  if(p>=1) finish();
-}
-
-function maybeAdvanceSequenceOnSuccess(job){
-  if(!job || !job.giver) return;
-
-  ensureProgressionDefaults();
-
-  const cur=currentSeqFor(job.giver);
-  const completedSeq = (typeof job.sequence==="number") ? job.sequence : 1;
-
-  if(completedSeq>=cur){
-    state.requestorSeq[job.giver]=cur+1;
-  }
-}
-
-function finish(){
-  cancelAnimationFrame(state.raf);
-  applyPendingEffects();
-
-  /* clear prompt on job end */
-  state.promptActive=false;
-  state.promptEndMs=0;
-
-  const timeTaken=Math.max(1,Math.ceil(state.elapsed));
-  const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
-  const avgSpeed = (state.job.dist * 60) / timeTaken; // mph
-
-  const tp = tipPenaltyForFinish();
-  const total = Math.max(0, state.job.pay + tp);
-
-  const completedJob = state.job;
-
-  state.cash += total;
-  state.dayEarnings += total;
-  state.jobsDone++;
-
-  /* completion flags + sequence progression */
-  if(completedJob && !completedJob.repeatable){
-    markOneOffCompleted(completedJob.id);
-  }
-  maybeAdvanceSequenceOnSuccess(completedJob);
-
-  /* feedback */
-  let fbText="";
-  if(completedJob && completedJob.feedback){
-    if(tp>0) fbText = completedJob.feedback.early || completedJob.feedback.success || "";
-    else if(tp<0) fbText = completedJob.feedback.late || completedJob.feedback.success || "";
-    else fbText = completedJob.feedback.success || "";
-  }
-  showFeedback(completedJob ? completedJob.giver : "", fbText);
-
-  $("resultTitle").textContent="Job complete";
-  $("resultList").innerHTML=`
-    <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
-    <div class="vrow"><span>Average speed</span><span>${avgSpeed.toFixed(1)} mph</span></div>
-    <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>
-    <div class="vrow"><span>Pay</span><span>£${completedJob.pay}</span></div>
-    <div class="vrow"><span>Tip / penalty</span><span>${tp>=0 ? "£"+tp : "-£"+Math.abs(tp)}</span></div>
-    <div class="vrow total"><span>Total</span><span>£${total}</span></div>
-  `;
-
-  state.job=null;
-
-  pruneOffers();
-  renderJobs();
-
-  if(state.pendingEndOfDay){
-    state.pendingEndOfDay=false;
-    showEndOfDay();
-    return;
-  }
-
-  setMode("result");
-  renderTop();
-  saveState(true);
-}
-
-/* UI wiring */
-
-$("goJobs").onclick=()=>{
-  ensureProgressionDefaults();
-  if(!jobsInitialised){
-    genJobs();
-    renderJobs();
-    jobsInitialised=true;
-  }else{
-    pruneOffers();
-    renderJobs();
-  }
-  setMode("board");
-  renderTop();
-  saveState(true);
+document.getElementById("goClients").onclick=()=>{
+  renderClients();
+  setMode("clients");
 };
-
-$("refreshJobs").onclick=()=>{
-  genJobs();
-  renderJobs();
-  jobsInitialised=true;
-  saveState(true);
-};
-
-$("backHub").onclick=()=>{setMode("hub");renderTop();saveState(true);};
-
-$("offerBack").onclick=()=>{
-  selectedOffer=null;
-  setMode("board");
-  renderTop();
-  saveState(true);
-};
-
-$("offerAccept").onclick=()=>{
-  if(!selectedOffer) return;
-  const o=selectedOffer;
-  selectedOffer=null;
-  startJob(o,false);
-};
-
-$("backBoard").onclick=()=>{
-  pruneOffers();
-  renderJobs();
-  setMode("board");
-  renderTop();
-  saveState(true);
-};
-
-$("goShop").onclick=()=>{
-  updateShopUI();
-  setMode("shop");
-  renderTop();
-  saveState(true);
-};
-$("backHub2").onclick=()=>{setMode("hub");renderTop();saveState(true);};
-
-$("cancel").onclick=()=>{
-  cancelAnimationFrame(state.raf);
-  applyPendingEffects();
-
-  state.promptActive=false;
-  state.promptEndMs=0;
-
-  const timeTaken=Math.max(1,Math.ceil(state.elapsed));
-  const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
-
-  const pen = abortPenalty();
-  state.cash += pen;
-  state.dayEarnings += pen;
-
-  /* aborted feedback */
-  const abortedJob = state.job;
-  let fbText="";
-  if(abortedJob && abortedJob.feedback){
-    fbText = abortedJob.feedback.aborted || abortedJob.feedback.late || abortedJob.feedback.success || "";
-  }
-  showFeedback(abortedJob ? abortedJob.giver : "", fbText);
-
-  $("resultTitle").textContent="Job aborted";
-  $("resultList").innerHTML=`
-    <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
-    <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>
-    <div class="vrow"><span>Penalty</span><span>-£${Math.abs(pen)}</span></div>
-    <div class="vrow total"><span>Total</span><span>-£${Math.abs(pen)}</span></div>
-  `;
-
-  state.job=null;
-
-  pruneOffers();
-  renderJobs();
-
-  if(state.pendingEndOfDay){
-    state.pendingEndOfDay=false;
-    showEndOfDay();
-    return;
-  }
-
-  setMode("result");
-  renderTop();
-  saveState(true);
-};
-
-/* Optional prompted Event button */
-$("eventBtn").onclick=()=>{
-  if(!state.job) return;
-  if(!state.promptActive) return;
-  if($("eventModal").style.display==="flex") return;
-
-  state.promptActive=false;
-  state.promptEndMs=0;
-
-  state.lastPromptAbs = nowAbsPrecise();
-  state.lastEventAbs = state.lastPromptAbs; // avoid immediate auto event after prompt
-
-  updateEventBtnUI();
-  saveState(true);
-
-  openPromptEvent();
-};
-
-/* Consumables */
-function updateConsumablesModal(){
-  const d=$("drinkBtn");
-  const s=$("snackBtn");
-
-  d.innerHTML=`Energy Drink x ${state.drinks}<span class="sub">+20% energy immediately then 10% crash after 15s</span>`;
-  s.innerHTML=`Snack x ${state.snacks}<span class="sub">15s delay, then + energy each second for 15s</span>`;
-
-  d.disabled=state.drinks<=0;
-  s.disabled=state.snacks<=0;
-}
-
-$("openConsumables").onclick=()=>{
-  updateConsumablesModal();
-  $("energyModal").style.display="flex";
-  saveState(true);
-};
-
-$("closeEnergy").onclick=()=>{$("energyModal").style.display="none";saveState(true);};
-
-$("drinkBtn").onclick=()=>{
-  if(state.drinks<=0) return;
-  state.drinks--;
-
-  state.energy=clamp(state.energy+20,0,100);
-
-  clearDrinkFx();
-  state.drinkFx={timeoutId:setTimeout(()=>{
-    state.energy=clamp(state.energy-10,0,100);
-    clearDrinkFx();
-    renderTop();
-    saveState(true);
-  },15000)};
-
-  $("energyModal").style.display="none";
-  renderTop();
-  saveState(true);
-};
-
-$("snackBtn").onclick=()=>{
-  if(state.snacks<=0) return;
-  state.snacks--;
-
-  clearSnackFx();
-  state.snackFx={remaining:20,delayId:0,intervalId:0};
-
-  state.snackFx.delayId=setTimeout(()=>{
-    if(!state.snackFx) return;
-    let ticks=0;
-    state.snackFx.intervalId=setInterval(()=>{
-      if(!state.snackFx) return;
-
-      const inc=20/15;
-      const before=state.energy;
-      state.energy=clamp(state.energy+inc,0,100);
-      const gained=state.energy-before;
-
-      state.snackFx.remaining=clamp(state.snackFx.remaining-gained,0,20);
-
-      ticks++;
-      renderTop();
-      saveState();
-      if(ticks>=15 || state.snackFx.remaining<=0){
-        clearSnackFx();
-        saveState(true);
-      }
-    },1000);
-  },15000);
-
-  $("energyModal").style.display="none";
-  saveState(true);
-};
-
-/* Shop */
-function updateShopUI(){
-  $("drinkPrice").textContent=PRICES.drink;
-  $("snackPrice").textContent=PRICES.snack;
-  $("drinkCount").textContent=state.drinks;
-  $("snackCount").textContent=state.snacks;
-  $("shopCash").textContent="CASH — £"+state.cash;
-
-  const buyDrink=$("buyDrink");
-  const buySnack=$("buySnack");
-
-  buyDrink.disabled = (state.drinks>=5) || (state.cash<PRICES.drink);
-  buySnack.disabled = (state.snacks>=5) || (state.cash<PRICES.snack);
-}
-
-$("buyDrink").onclick=()=>{
-  if(state.drinks>=5) return;
-  if(state.cash<PRICES.drink) return;
-  state.cash-=PRICES.drink;
-  state.drinks++;
-  updateShopUI();
-  renderTop();
-  saveState(true);
-};
-
-$("buySnack").onclick=()=>{
-  if(state.snacks>=5) return;
-  if(state.cash<PRICES.snack) return;
-  state.cash-=PRICES.snack;
-  state.snacks++;
-  updateShopUI();
-  renderTop();
-  saveState(true);
-};
-
-/* Rest */
-function canUntilMorning(){
-  const m=minutesOfDay();
-  return (m>=18*60 || m<6*60);
-}
-
-function openRest(){
-  const btn=$("restMorning");
-  const allowed=canUntilMorning();
-  btn.disabled=!allowed;
-  btn.style.display=allowed ? "block" : "none";
-  $("restModal").style.display="flex";
-  saveState(true);
-}
-
-function closeRest(){
-  $("restModal").style.display="none";
-  saveState(true);
-}
-
-/* boosted 4h and 8h */
-function restGainChoice(hours){
-  if(hours===4) return 18;
-  if(hours===8) return 40;
-  return hours;
-}
-
-function restHours(h){
-  advanceMinutes(h*60);
-  state.energy = clamp(state.energy + restGainChoice(h), 0, 100);
-  pruneOffers();
-  renderJobs();
-  renderTop();
-  closeRest();
-  saveState(true);
-}
-
-function restUntilMorning(){
-  if(!canUntilMorning()) return;
-  const before=nowAbs();
-  const m=minutesOfDay();
-  if(m<6*60){
-    advanceMinutes((6*60)-m);
-  }else{
-    advanceMinutes((1440-m)+(6*60));
-  }
-  const after=nowAbs();
-  const sleptHours=Math.max(0,(after-before)/60);
-  state.energy = clamp(state.energy + sleptHours, 0, 100);
-  pruneOffers();
-  renderJobs();
-  renderTop();
-  closeRest();
-  saveState(true);
-}
-
-$("restOpen").onclick=()=>{ openRest(); };
-$("closeRest").onclick=()=>{ closeRest(); };
-$("rest2").onclick=()=>{ restHours(2); };
-$("rest4").onclick=()=>{ restHours(4); };
-$("rest8").onclick=()=>{ restHours(8); };
-$("restMorning").onclick=()=>{ restUntilMorning(); };
-
-$("confirmEnd").onclick=()=>{
-  if(!state.eod) snapshotEOD();
-  const deductions=state.eod.rent+state.eod.food;
-  state.cash -= deductions;
-
-  state.jobsDone=0;
-  state.dayEarnings=0;
-  state.eod=null;
-
-  state.energy=100;
-  state.time = 6*60;
-
+document.getElementById("backHubClients").onclick=()=>{
   setMode("hub");
-  renderTop();
-  saveState(true);
 };
 
-/* Reset game */
-function hardResetGame(){
-  cancelAnimationFrame(state.raf);
-  clearSnackFx();
-  clearDrinkFx();
+document.getElementById("backHub").onclick=()=>setMode("hub");
+document.getElementById("backBoard").onclick=()=>setMode("board");
 
-  $("eventModal").style.display="none";
-  $("energyModal").style.display="none";
-  $("restModal").style.display="none";
+document.getElementById("resetGame").onclick=()=>{
+  localStorage.removeItem(SAVE_KEY);
+  location.reload();
+};
 
-  state.day=1;
-  state.cash=0;
-  state.time=15*60;
-  state.energy=100;
-  state.speed=3;
-
-  state.snacks=1;
-  state.drinks=1;
-
-  state.jobsDone=0;
-  state.dayEarnings=0;
-
-  state.offers=[];
-  state.job=null;
-
-  state.elapsed=0;
-  state.progress=0;
-  state.hiddenDuration=0;
-  state.startEnergy=100;
-  state.energySpentJob=0;
-
-  state.jobStartAbs=0;
-  state.pendingEndOfDay=false;
-  state.eod=null;
-  state.lastEventAbs=-1e9;
-
-  state.promptActive=false;
-  state.promptEndMs=0;
-  state.lastPromptAbs=-1e9;
-
-  state.requestorSeq={};
-  state.completedOneOff={};
-  ensureProgressionDefaults();
-
-  selectedOffer=null;
-  jobsInitialised=false;
-
-  wipeSave();
-  renderTop();
-  setMode("hub");
-  saveState(true);
-}
-
-$("resetGame").onclick=()=>{ hardResetGame(); };
-
-/* boot */
-ensureProgressionDefaults();
-buildSpeed();
-
-/* load save if present */
-const loaded = loadState();
-
+load();
+ensureStats();
 renderTop();
-document.title="Courier v"+VERSION;
-
-if(state.job){
-  /* resume in-progress job */
-  startJob(state.job, true);
-}else{
-  setMode("hub");
-}
-
-/* ensure we have jobs when entering board */
-if(loaded && Array.isArray(state.offers) && state.offers.length>0){
-  pruneOffers();
-  renderJobs();
-  saveState(true);
-}
+setMode("hub");
 </script>
 </body>
 </html>

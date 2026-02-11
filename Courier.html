@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.39</title>
+  <title>Courier v1.0.40</title>
   <style>
     :root{
       color-scheme: dark;
@@ -36,17 +36,26 @@
 
     .divider{height:4px;background:var(--accent);margin:14px 0;}
 
-    /* KPI: left cash/target, right weekday */
+    /* KPI: two-line, flipped */
     .kpiRow{
       display:grid;
       grid-template-columns:1fr 1fr;
+      gap:12px;
       font-family:var(--mono);
       font-weight:900;
       color:var(--accent);
       padding:0 8px;
     }
-    .kpiLeft{ text-align:left; }
-    .kpiRight{ text-align:right; }
+    .kpiCell{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      line-height:1.05;
+    }
+    .kpiLeft{ text-align:left; align-items:flex-start; }
+    .kpiRight{ text-align:right; align-items:flex-end; }
+    .kpiSmall{opacity:.9;font-weight:900;font-size:14px;letter-spacing:.2px;}
+    .kpiBig{font-weight:950;font-size:18px;letter-spacing:.2px;}
 
     .screen{display:block;}
     .hidden{display:none!important;}
@@ -126,6 +135,20 @@
       font-weight:900;cursor:pointer;user-select:none;color:var(--accent);
     }
     .bottomRight{margin-top:14px;display:flex;justify-content:flex-end;}
+
+    /* Top row for screens (title left, back right) */
+    .pageTopRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:12px;
+      margin-top:28px;
+      margin-bottom:12px;
+    }
+    .pageTopRow .pageTitleLeft{
+      margin:0;
+      text-align:left;
+    }
 
     .progressLabel,.progressPct{font-family:var(--mono);font-size:22px;font-weight:950;color:var(--accent);}
     .bar{height:16px;border:var(--stroke) solid var(--accent);border-radius:999px;overflow:hidden;margin-top:6px;}
@@ -239,11 +262,6 @@
     .vrow{display:flex;justify-content:space-between;font-family:var(--mono);font-weight:800;color:var(--accent);}
     .vrow.total{border-top:var(--stroke) solid var(--accent);padding-top:10px;margin-top:6px;}
 
-    .shopCash{
-      text-align:center;font-family:var(--mono);font-size:16px;font-weight:900;
-      letter-spacing:.5px;margin:2px 0 14px;opacity:.95;color:var(--accent);
-    }
-
     /* Clients */
     .clientsTopBar{display:flex;justify-content:flex-end;margin-top:6px;margin-bottom:8px;}
     .clientCard{border:var(--stroke) solid var(--accent);border-radius:var(--r2);padding:12px;}
@@ -273,11 +291,17 @@
 
   <div class="divider"></div>
 
-  <!-- KPI shown only on hub -->
+  <!-- KPI shown on hub + job board + shop -->
   <div id="kpiWrap">
     <div class="kpiRow">
-      <div class="kpiLeft" id="kpiCashTarget">£0 / £500 due by friday</div>
-      <div class="kpiRight" id="kpiWeekday">monday</div>
+      <div class="kpiCell kpiLeft">
+        <div class="kpiBig" id="kpiWeekdayTop">monday</div>
+        <div class="kpiSmall" id="kpiWeekBottom">Week 1</div>
+      </div>
+      <div class="kpiCell kpiRight">
+        <div class="kpiBig" id="kpiCashTop">Cash: £0</div>
+        <div class="kpiSmall" id="kpiTargetBottom">£500 due friday</div>
+      </div>
     </div>
     <div class="divider"></div>
   </div>
@@ -368,8 +392,8 @@
 
   <!-- CLIENTS -->
   <div class="screen hidden" id="clients">
-    <div class="jobTitle pageTitle">Clients</div>
-    <div class="clientsTopBar">
+    <div class="pageTopRow">
+      <div class="jobTitle pageTitleLeft">Clients</div>
       <button class="btnOutline btnSmall" id="backHubClients">Back</button>
     </div>
     <div class="vlist" id="clientsList"></div>
@@ -377,8 +401,8 @@
 
   <!-- STATS -->
   <div class="screen hidden" id="stats">
-    <div class="jobTitle pageTitle">Stats</div>
-    <div class="clientsTopBar">
+    <div class="pageTopRow">
+      <div class="jobTitle pageTitleLeft">Stats</div>
       <button class="btnOutline btnSmall" id="backHubStats">Back</button>
     </div>
     <div class="resultBox">
@@ -388,8 +412,10 @@
 
   <!-- SHOP -->
   <div class="screen hidden" id="shop">
-    <div class="jobTitle pageTitle">Shop</div>
-    <div class="shopCash" id="shopCash">CASH — £0</div>
+    <div class="pageTopRow">
+      <div class="jobTitle pageTitleLeft">Shop</div>
+      <button class="btnOutline btnSmall" id="backHub2">Back</button>
+    </div>
 
     <button class="btn btnIcon" id="buyDrink">
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -412,10 +438,6 @@
       </svg>
       <span>Snack — £<span id="snackPrice"></span> (<span id="snackCount"></span>/5)</span>
     </button>
-
-    <div class="bottomRight">
-      <button class="btnOutline btnSmall" id="backHub2">Back</button>
-    </div>
   </div>
 
   <!-- JOB BOARD -->
@@ -577,7 +599,7 @@
 <script>
 "use strict";
 
-const VERSION="1.0.39";
+const VERSION="1.0.40";
 const WEEKLY_TARGET=500;
 
 const PRICES={drink:12,snack:6};
@@ -1152,7 +1174,11 @@ function setMode(m){
   });
   const speedBar=$("speedBar"); if(speedBar) speedBar.classList.toggle("hidden",m!=="job");
   const jobControls=$("jobControls"); if(jobControls) jobControls.classList.toggle("hidden",m!=="job");
-  const kpiWrap=$("kpiWrap"); if(kpiWrap) kpiWrap.classList.toggle("hidden", m!=="hub");
+
+  /* KPI visible on hub + board + shop only */
+  const kpiWrap=$("kpiWrap");
+  if(kpiWrap) kpiWrap.classList.toggle("hidden", !(m==="hub" || m==="board" || m==="shop"));
+
   saveState();
 }
 
@@ -1179,13 +1205,13 @@ function updateConsumablesModal(){
 function renderTop(){
   setAccentFromTime();
   elText("headerClock",fmtClock(minutesOfDay()));
-  elText("kpiCashTarget","£"+state.cash+" / £"+WEEKLY_TARGET+" due by friday");
-  elText("kpiWeekday",weekdayName());
+
+  elText("kpiWeekdayTop", weekdayName());
+  elText("kpiWeekBottom", "Week "+weekNumber());
+  elText("kpiCashTop", "Cash: £"+state.cash);
+  elText("kpiTargetBottom", "£"+WEEKLY_TARGET+" due friday");
+
   renderEnergyBar();
-
-  const sc=$("shopCash");
-  if(sc) sc.textContent="CASH — £"+state.cash;
-
   updateEventBtnUI();
   updateConsumablesModal();
 }
@@ -1724,7 +1750,6 @@ on("refreshJobs","click", ()=>{
 });
 
 on("backHub","click", ()=>{ setMode("hub"); renderTop(); saveState(true); });
-on("backHub2","click", ()=>{ setMode("hub"); renderTop(); saveState(true); });
 
 on("goClients","click", ()=>{
   renderClients();
@@ -1769,7 +1794,6 @@ function updateShopUI(){
   elText("snackPrice", PRICES.snack);
   elText("drinkCount", state.drinks);
   elText("snackCount", state.snacks);
-  elText("shopCash", "CASH — £"+state.cash);
 
   const bd=$("buyDrink");
   const bs=$("buySnack");
@@ -1783,6 +1807,7 @@ on("goShop","click", ()=>{
   renderTop();
   saveState(true);
 });
+on("backHub2","click", ()=>{ setMode("hub"); renderTop(); saveState(true); });
 
 on("buyDrink","click", ()=>{
   if(state.drinks>=5) return;

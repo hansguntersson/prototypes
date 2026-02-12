@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Courier v1.0.43</title>
+  <title>Courier v1.0.45</title>
   <style>
     :root{
       color-scheme: dark;
@@ -29,7 +29,7 @@
       margin:0 auto;
     }
 
-    /* HEADER: left Courier, right big clock */
+    /* Header: left Courier, right clock */
     .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
     h1{margin:0;font-size:44px;font-weight:900;color:var(--accent);text-align:left;}
     .headerClock{text-align:right;font-family:var(--mono);font-size:44px;font-weight:950;letter-spacing:.2px;color:var(--accent);}
@@ -46,14 +46,9 @@
       color:var(--accent);
       padding:0 8px;
     }
-    .kpiCell{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      line-height:1.05;
-    }
-    .kpiLeft{ text-align:left; align-items:flex-start; }
-    .kpiRight{ text-align:right; align-items:flex-end; }
+    .kpiCell{display:flex;flex-direction:column;gap:4px;line-height:1.05;}
+    .kpiLeft{text-align:left;align-items:flex-start;}
+    .kpiRight{text-align:right;align-items:flex-end;}
     .kpiSmall{opacity:.9;font-weight:900;font-size:14px;letter-spacing:.2px;}
     .kpiBig{font-weight:950;font-size:18px;letter-spacing:.2px;}
 
@@ -76,6 +71,7 @@
     .btn[disabled],.btnOutline[disabled]{opacity:.4;}
 
     .btnSmall{padding:8px 12px;font-size:16px;margin-top:0;width:auto;}
+    .btnMini{width:auto;margin-top:0;padding:12px 14px;font-size:16px;border-radius:14px;}
 
     .btnIcon{display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;}
     .btnIcon svg{
@@ -85,32 +81,11 @@
     .btnMini.btnIcon svg{width:18px;height:18px;}
 
     /* HUB: tighter vertical spacing between buttons */
-    .hubGrid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-top:18px;
-    }
-    .hubGrid .btn, .hubGrid .btnOutline{ margin-top:0; }
-    .hubBtn{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      text-align:center;
-    }
-    .hubBtn svg{
-      width:34px;
-      height:34px;
-      stroke:currentColor;
-      fill:none;
-      stroke-width:2;
-      stroke-linecap:round;
-      stroke-linejoin:round;
-      flex:0 0 auto;
-    }
+    .hubGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;}
+    .hubGrid .btn, .hubGrid .btnOutline{margin-top:0;}
+    .hubBtn{display:flex;align-items:center;justify-content:center;gap:12px;text-align:center;}
+    .hubBtn svg{width:34px;height:34px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;}
 
-    .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;}
     .jobs{display:grid;gap:12px;margin-top:12px;}
     .jobRow{
       border:var(--stroke) solid var(--accent);
@@ -125,35 +100,15 @@
       color:#000;
       gap:12px;
     }
-    .jobRow .jobTitle,.jobRow .jobPay{ color:#000; }
-
-    .jobLeft{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:0;
-    }
-    .jobLogo{
-      width:24px;
-      height:24px;
-      flex:0 0 auto;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#000;
-    }
-    .jobLogo svg{
-      width:24px;height:24px;
-      stroke:currentColor;
-      fill:none;
-      stroke-width:1; /* 50% thickness for avatars */
-      stroke-linecap:round;
-      stroke-linejoin:round;
-    }
-
+    .jobRow .jobTitle,.jobRow .jobPay{color:#000;}
+    .jobLeft{display:flex;align-items:center;gap:10px;min-width:0;}
+    .jobLogo{width:24px;height:24px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#000;}
+    .jobLogo svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;}
     .jobTitle{font-size:22px;font-weight:950;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .jobPay{font-family:var(--mono);font-size:20px;font-weight:950;color:var(--accent);flex:0 0 auto;}
 
+    .pageTopRow{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:28px;margin-bottom:12px;}
+    .pageTitleLeft{margin:0;text-align:left;}
     .pageTitle{text-align:center;margin-top:28px;margin-bottom:12px;}
 
     .refreshText{
@@ -161,20 +116,7 @@
       font-weight:900;cursor:pointer;user-select:none;color:var(--accent);
     }
 
-    /* Top row for screens (title left, back right) */
-    .pageTopRow{
-      display:flex;
-      justify-content:space-between;
-      align-items:baseline;
-      gap:12px;
-      margin-top:28px;
-      margin-bottom:12px;
-    }
-    .pageTopRow .pageTitleLeft{
-      margin:0;
-      text-align:left;
-    }
-
+    .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;}
     .progressLabel,.progressPct{font-family:var(--mono);font-size:22px;font-weight:950;color:var(--accent);}
     .bar{height:16px;border:var(--stroke) solid var(--accent);border-radius:999px;overflow:hidden;margin-top:6px;}
     .fill{height:100%;width:0;background:var(--accent);}
@@ -192,19 +134,15 @@
     .timeDial .dialK{font-size:8px;font-weight:900;letter-spacing:.8px;opacity:.9;}
     .timeDial .dialV{font-size:12px;font-weight:950;}
 
-    .progressBlock{ margin-top:26px; }
-    .progressHead{ margin-bottom:18px; }
+    .progressBlock{margin-top:26px;}
+    .progressHead{margin-bottom:18px;}
 
     .jobControls{
       position:fixed;left:0;right:0;
       bottom:calc(env(safe-area-inset-bottom) + 64px + 110px);
       padding:10px 14px;background:var(--bg);
     }
-    .jobControlsWrap{
-      max-width:760px;margin:0 auto;
-      display:flex;justify-content:space-between;gap:12px;
-    }
-    .btnMini{width:auto;margin-top:0;padding:12px 14px;font-size:16px;border-radius:14px;}
+    .jobControlsWrap{max-width:760px;margin:0 auto;display:flex;justify-content:space-between;gap:12px;}
 
     .speedbar{
       position:fixed;left:0;right:0;
@@ -214,9 +152,7 @@
     }
     .speedwrap{max-width:760px;margin:0 auto;}
     .speedhead{display:flex;justify-content:space-between;margin-bottom:8px;}
-    .speedTitle{
-      font-family:var(--mono);font-size:14px;font-weight:900;letter-spacing:.3px;color:var(--accent);
-    }
+    .speedTitle{font-family:var(--mono);font-size:14px;font-weight:900;letter-spacing:.3px;color:var(--accent);}
     .seg{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
     .seg button{
       padding:14px 0;border-radius:14px;border:var(--stroke) solid var(--accent);
@@ -231,13 +167,11 @@
       background:var(--bg);border-top:var(--stroke) solid var(--accent);
     }
     .energyWrap{max-width:760px;margin:0 auto;}
-    .energyLabel{
-      font-family:var(--mono);font-size:14px;font-weight:900;margin-bottom:8px;letter-spacing:.3px;color:var(--accent);
-    }
+    .energyLabel{font-family:var(--mono);font-size:14px;font-weight:900;margin-bottom:8px;letter-spacing:.3px;color:var(--accent);}
     .energyBar{display:grid;grid-template-columns:repeat(10,1fr);gap:8px;}
     .energySeg{height:16px;border:var(--stroke) solid var(--accent);border-radius:6px;background:transparent;opacity:0;}
 
-    /* OFFER */
+    /* Offer */
     .offerHeader{
       background:var(--accent);color:#000;padding:14px 12px;border-radius:var(--r2);
       text-align:center;font-family:var(--mono);font-size:22px;font-weight:950;
@@ -248,14 +182,7 @@
       border:var(--stroke) solid var(--accent);border-radius:16px;height:120px;
       display:flex;align-items:center;justify-content:center;color:var(--accent);opacity:.95;
     }
-    .avatar svg{
-      width:92px;height:92px;
-      stroke:currentColor;
-      fill:none;
-      stroke-width:1; /* 50% thickness for avatars */
-      stroke-linecap:round;
-      stroke-linejoin:round;
-    }
+    .avatar svg{width:92px;height:92px;stroke:currentColor;fill:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;}
     .offerOrg{font-size:28px;font-weight:950;line-height:1.05;color:var(--accent);}
     .offerRole{font-family:var(--mono);font-size:14px;font-weight:900;margin-top:10px;opacity:.85;color:var(--accent);}
     .offerFacts{
@@ -287,7 +214,7 @@
     .modalBtn .sub{display:block;margin-top:6px;font-family:var(--mono);font-size:14px;font-weight:900;opacity:.9;color:var(--accent);}
     .modalBtn[disabled]{opacity:.35;}
     .modalBtnFill{background:var(--accent);color:#000;}
-    .modalBtnFill .sub{ color:#000; }
+    .modalBtnFill .sub{color:#000;}
 
     .resultBox{border:var(--stroke) solid var(--accent);border-radius:var(--r2);padding:12px;margin-top:12px;}
     .vlist{display:grid;gap:8px;}
@@ -295,7 +222,6 @@
     .vrow.total{border-top:var(--stroke) solid var(--accent);padding-top:10px;margin-top:6px;}
 
     /* Clients */
-    .clientsTopBar{display:flex;justify-content:flex-end;margin-top:6px;margin-bottom:8px;}
     .clientCard{border:var(--stroke) solid var(--accent);border-radius:var(--r2);padding:12px;}
     .clientName{font-size:20px;font-weight:950;margin-bottom:10px;color:var(--accent);}
     .clientGrid{
@@ -307,359 +233,401 @@
     .clientGrid .wide{grid-column:1/-1;}
     .clientDivider{height:1px;background:var(--accent);opacity:.35;margin:10px 0;}
 
-    /* Feedback (result screen) */
+    /* Feedback result */
     .feedbackWrap{margin-top:12px;border-top:var(--stroke) solid var(--accent);padding-top:12px;}
-    .feedbackRow{
-      display:grid;
-      grid-template-columns:80px 1fr;
-      gap:12px;
-      align-items:start;
-    }
+    .feedbackRow{display:grid;grid-template-columns:80px 1fr;gap:12px;align-items:start;}
     .avatarFilled{
-      height:80px;
-      border-radius:16px;
-      background:var(--accent);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#000;
+      height:80px;border-radius:16px;background:var(--accent);
+      display:flex;align-items:center;justify-content:center;color:#000;
     }
-    .avatarFilled svg{
-      width:64px;height:64px;
-      stroke:currentColor;
-      fill:none;
-      stroke-width:1; /* 50% thickness for avatars */
-      stroke-linecap:round;
-      stroke-linejoin:round;
-    }
+    .avatarFilled svg{width:64px;height:64px;stroke:currentColor;fill:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;}
     .feedbackWho{font-family:var(--mono);font-weight:950;letter-spacing:.3px;opacity:.95;margin-bottom:8px;}
     .feedbackText{font-family:var(--mono);font-weight:900;opacity:.95;line-height:1.25;}
   </style>
 </head>
 
 <body>
-<div class="safe">
-  <div class="top">
-    <h1>Courier</h1>
-    <div class="headerClock" id="headerClock">15:00</div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- KPI shown on hub + job board + shop -->
-  <div id="kpiWrap">
-    <div class="kpiRow">
-      <div class="kpiCell kpiLeft">
-        <div class="kpiBig" id="kpiWeekdayTop">monday</div>
-        <div class="kpiSmall" id="kpiWeekBottom">Week 1, Day 1</div>
-      </div>
-      <div class="kpiCell kpiRight">
-        <div class="kpiBig" id="kpiCashTop">Cash: £0</div>
-        <div class="kpiSmall" id="kpiTargetBottom">£500 due friday</div>
-      </div>
+  <div class="safe">
+    <div class="top">
+      <h1>Courier</h1>
+      <div class="headerClock" id="headerClock">08:00</div>
     </div>
+
     <div class="divider"></div>
-  </div>
 
-  <!-- HUB -->
-  <div class="screen" id="hub">
-    <div class="hubGrid">
-      <button class="btn hubBtn" id="goJobs" aria-label="Jobs">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="5" y="3.5" width="14" height="17" rx="2"></rect>
-          <line x1="8" y1="8" x2="16" y2="8"></line>
-          <line x1="8" y1="12" x2="16" y2="12"></line>
-          <line x1="8" y1="16" x2="13" y2="16"></line>
-        </svg>
-        Jobs
-      </button>
-
-      <button class="btn hubBtn" id="goShop" aria-label="Shop">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M6 8h15l-2 9H8L6 8Z"></path>
-          <path d="M6 8l-2-3H2"></path>
-          <circle cx="9" cy="20" r="1"></circle>
-          <circle cx="18" cy="20" r="1"></circle>
-        </svg>
-        Shop
-      </button>
-
-      <button class="btnOutline hubBtn" disabled aria-label="Kit">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M14.5 5.2a3.7 3.7 0 0 0-4.9 4.9L4.4 15.3a2 2 0 0 0 2.8 2.8l5.2-5.2a3.7 3.7 0 0 0 4.9-4.9l-2 2-2-2 2-2Z"></path>
-          <path d="M18.5 15.5l1.6 1.6"></path>
-          <path d="M17.3 16.7l1.6-1.6"></path>
-        </svg>
-        Kit
-      </button>
-
-      <button class="btnOutline hubBtn" disabled aria-label="Rides">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="7" cy="17" r="3"></circle>
-          <circle cx="17" cy="17" r="3"></circle>
-          <path d="M9 17l3-7h3l2 4"></path>
-          <path d="M12 10l-2-3H7"></path>
-          <path d="M12 10h4"></path>
-        </svg>
-        Rides
-      </button>
-
-      <button class="btn hubBtn" id="goClients" aria-label="Clients">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="9" cy="8" r="3"></circle>
-          <path d="M3.5 20c1.2-4 9.8-4 11 0"></path>
-          <circle cx="17" cy="9" r="2.2"></circle>
-          <path d="M14.5 20c.7-2.7 5.3-2.7 6 0"></path>
-        </svg>
-        Clients
-      </button>
-
-      <button class="btn hubBtn" id="goStats" aria-label="Stats">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 20V6"></path>
-          <path d="M9 20V10"></path>
-          <path d="M14 20V4"></path>
-          <path d="M19 20V13"></path>
-        </svg>
-        Stats
-      </button>
-
-      <button class="btnOutline hubBtn" id="resetGame" aria-label="Reset">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
-          <path d="M21 3v6h-6"></path>
-          <path d="M9 9l6 6"></path>
-          <path d="M15 9l-6 6"></path>
-        </svg>
-        Reset
-      </button>
-
-      <button class="btn hubBtn" id="restOpen" aria-label="Rest">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 12V8a2 2 0 0 1 2-2h11a3 3 0 0 1 3 3v3"></path>
-          <path d="M4 12h17a2 2 0 0 1 2 2v4H2v-4a2 2 0 0 1 2-2Z"></path>
-          <path d="M7 10h3"></path>
-        </svg>
-        Rest
-      </button>
-    </div>
-  </div>
-
-  <!-- CLIENTS -->
-  <div class="screen hidden" id="clients">
-    <div class="pageTopRow">
-      <div class="jobTitle pageTitleLeft">Clients</div>
-      <button class="btnOutline btnSmall" id="backHubClients">Back</button>
-    </div>
-    <div class="vlist" id="clientsList"></div>
-  </div>
-
-  <!-- STATS -->
-  <div class="screen hidden" id="stats">
-    <div class="pageTopRow">
-      <div class="jobTitle pageTitleLeft">Stats</div>
-      <button class="btnOutline btnSmall" id="backHubStats">Back</button>
-    </div>
-    <div class="resultBox">
-      <div class="vlist" id="statsList"></div>
-    </div>
-  </div>
-
-  <!-- SHOP -->
-  <div class="screen hidden" id="shop">
-    <div class="pageTopRow">
-      <div class="jobTitle pageTitleLeft">Shop</div>
-      <button class="btnOutline btnSmall" id="backHub2">Back</button>
+    <!-- KPI shown on hub + job board + shop -->
+    <div id="kpiWrap">
+      <div class="kpiRow">
+        <div class="kpiCell kpiLeft">
+          <div class="kpiBig" id="kpiWeekdayTop">monday</div>
+          <div class="kpiSmall" id="kpiWeekBottom">Week 1, Day 1</div>
+        </div>
+        <div class="kpiCell kpiRight">
+          <div class="kpiBig" id="kpiCashTop">Cash: £0</div>
+          <div class="kpiSmall" id="kpiTargetBottom">£1000 due friday</div>
+        </div>
+      </div>
+      <div class="divider"></div>
     </div>
 
-    <button class="btn btnIcon" id="buyDrink">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M10 2h4"></path>
-        <path d="M10 2v3"></path>
-        <path d="M14 2v3"></path>
-        <path d="M9 5h6"></path>
-        <path d="M9 5l-1 3v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8l-1-3"></path>
-        <path d="M9 12h6"></path>
-      </svg>
-      <span>Energy drink — £<span id="drinkPrice"></span> (<span id="drinkCount"></span>/5)</span>
-    </button>
+    <!-- HUB -->
+    <div class="screen" id="hub">
+      <div class="hubGrid">
+        <button class="btn hubBtn" id="goJobs" aria-label="Jobs">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="5" y="3.5" width="14" height="17" rx="2"></rect>
+            <line x1="8" y1="8" x2="16" y2="8"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+            <line x1="8" y1="16" x2="13" y2="16"></line>
+          </svg>
+          Jobs
+        </button>
 
-    <button class="btn btnIcon" id="buySnack">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="6" y="5" width="12" height="16" rx="2"></rect>
-        <path d="M9 8v10"></path>
-        <path d="M12 8v10"></path>
-        <path d="M15 8v10"></path>
-      </svg>
-      <span>Snack — £<span id="snackPrice"></span> (<span id="snackCount"></span>/5)</span>
-    </button>
-  </div>
+        <button class="btn hubBtn" id="goShop" aria-label="Shop">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 8h15l-2 9H8L6 8Z"></path>
+            <path d="M6 8l-2-3H2"></path>
+            <circle cx="9" cy="20" r="1"></circle>
+            <circle cx="18" cy="20" r="1"></circle>
+          </svg>
+          Shop
+        </button>
 
-  <!-- JOB BOARD -->
-  <div class="screen hidden" id="board">
-    <div class="pageTopRow">
-      <div class="jobTitle pageTitleLeft">Job board</div>
-      <button class="btnOutline btnSmall" id="backHub">Back</button>
-    </div>
-    <div class="jobs" id="jobs"></div>
-    <div class="refreshText" id="refreshJobs">↻ Refresh jobs</div>
-  </div>
+        <button class="btnOutline hubBtn" disabled aria-label="Equipment">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14.5 5.2a3.7 3.7 0 0 0-4.9 4.9L4.4 15.3a2 2 0 0 0 2.8 2.8l5.2-5.2a3.7 3.7 0 0 0 4.9-4.9l-2 2-2-2 2-2Z"></path>
+            <path d="M18.5 15.5l1.6 1.6"></path>
+            <path d="M17.3 16.7l1.6-1.6"></path>
+          </svg>
+          Equipment
+        </button>
 
-  <!-- OFFER -->
-  <div class="screen hidden" id="offer">
-    <div class="offerHeader" id="offerTitle">—</div>
+        <button class="btnOutline hubBtn" disabled aria-label="Vehicles">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="7" cy="17" r="3"></circle>
+            <circle cx="17" cy="17" r="3"></circle>
+            <path d="M9 17l3-7h3l2 4"></path>
+            <path d="M12 10l-2-3H7"></path>
+            <path d="M12 10h4"></path>
+          </svg>
+          Vehicles
+        </button>
 
-    <div class="offerTop">
-      <div class="avatar" id="offerAvatar" aria-label="Dispatcher"></div>
-      <div>
-        <div class="offerOrg" id="ofOrg">—</div>
-        <div class="offerRole" id="ofQuote">—</div>
+        <button class="btn hubBtn" id="goClients" aria-label="Clients">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="9" cy="8" r="3"></circle>
+            <path d="M3.5 20c1.2-4 9.8-4 11 0"></path>
+            <circle cx="17" cy="9" r="2.2"></circle>
+            <path d="M14.5 20c.7-2.7 5.3-2.7 6 0"></path>
+          </svg>
+          Clients
+        </button>
+
+        <button class="btn hubBtn" id="goStats" aria-label="Stats">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 20V6"></path>
+            <path d="M9 20V10"></path>
+            <path d="M14 20V4"></path>
+            <path d="M19 20V13"></path>
+          </svg>
+          Stats
+        </button>
+
+        <button class="btnOutline hubBtn" id="resetGame" aria-label="Reset">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+            <path d="M21 3v6h-6"></path>
+            <path d="M9 9l6 6"></path>
+            <path d="M15 9l-6 6"></path>
+          </svg>
+          Reset
+        </button>
+
+        <button class="btn hubBtn" id="restOpen" aria-label="Rest">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 12V8a2 2 0 0 1 2-2h11a3 3 0 0 1 3 3v3"></path>
+            <path d="M4 12h17a2 2 0 0 1 2 2v4H2v-4a2 2 0 0 1 2-2Z"></path>
+            <path d="M7 10h3"></path>
+          </svg>
+          Rest
+        </button>
       </div>
     </div>
 
-    <div class="offerFacts">
-      <div class="factsCol">
-        <div class="fact"><div class="k">DISTANCE</div><div class="v" id="ofDistance">—</div></div>
-        <div class="fact"><div class="k">ROUTE</div><div class="v" id="ofRoute">—</div></div>
+    <!-- CLIENTS -->
+    <div class="screen hidden" id="clients">
+      <div class="pageTopRow">
+        <div class="jobTitle pageTitleLeft">Clients</div>
+        <button class="btnOutline btnSmall" id="backHubClients">Back</button>
       </div>
-      <div class="factsCol">
-        <div class="fact pay"><div class="k">PAY</div><div class="v" id="ofPay">£0</div></div>
-        <div class="fact"><div class="k">DEADLINE</div><div class="v" id="ofDeadline">—</div></div>
-      </div>
+      <div class="vlist" id="clientsList"></div>
     </div>
 
-    <div class="offerActions">
-      <button class="btnOutline" id="offerBack">Back</button>
-      <button class="btn" id="offerAccept">ACCEPT</button>
-    </div>
-  </div>
-
-  <!-- LIVE JOB -->
-  <div class="screen hidden" id="job">
-    <div class="offerHeader" id="jobName">—</div>
-
-    <div class="timeLeftWrap">
-      <svg class="timeDial" viewBox="0 0 100 100" aria-label="Time left">
-        <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="14" fill="none" opacity="0.18"></circle>
-        <path id="timeArc" stroke="var(--accent)" stroke-width="16" fill="none" stroke-linecap="butt" d=""></path>
-        <text class="dialK" x="50" y="45">TIME LEFT</text>
-        <text class="dialV" id="remaining" x="50" y="57">—</text>
-      </svg>
-    </div>
-
-    <div class="progressBlock">
-      <div class="row progressHead">
-        <div class="progressLabel">Progress</div>
-        <div class="progressPct" id="pct">0%</div>
+    <!-- STATS -->
+    <div class="screen hidden" id="stats">
+      <div class="pageTopRow">
+        <div class="jobTitle pageTitleLeft">Stats</div>
+        <button class="btnOutline btnSmall" id="backHubStats">Back</button>
       </div>
-      <div class="bar"><div class="fill" id="fill"></div></div>
-      <div class="progressMeta">
-        <div id="milesDone">0.0 mi</div>
-        <div id="mph">0 mph</div>
-        <div id="milesLeft">0.0 mi</div>
+      <div class="resultBox">
+        <div class="vlist" id="statsList"></div>
       </div>
     </div>
-  </div>
 
-  <!-- RESULT -->
-  <div class="screen hidden" id="result">
-    <div class="jobTitle pageTitle" id="resultTitle">Job complete</div>
-    <div class="resultBox">
-      <div class="vlist" id="resultList"></div>
-      <div class="feedbackWrap hidden" id="feedbackWrap">
-        <div class="feedbackRow">
-          <div class="avatarFilled" id="resultAvatar"></div>
-          <div>
-            <div class="feedbackWho" id="feedbackWho">—</div>
-            <div class="feedbackText" id="feedbackText">—</div>
-          </div>
+    <!-- SHOP -->
+    <div class="screen hidden" id="shop">
+      <div class="pageTopRow">
+        <div class="jobTitle pageTitleLeft">Shop</div>
+        <button class="btnOutline btnSmall" id="backHubShop">Back</button>
+      </div>
+
+      <button class="btn btnIcon" id="buyDrink">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 2h4"></path>
+          <path d="M10 2v3"></path>
+          <path d="M14 2v3"></path>
+          <path d="M9 5h6"></path>
+          <path d="M9 5l-1 3v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8l-1-3"></path>
+          <path d="M9 12h6"></path>
+        </svg>
+        <span>Energy drink — £<span id="drinkPrice"></span> (<span id="drinkCount"></span>/5)</span>
+      </button>
+
+      <button class="btn btnIcon" id="buySnack">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="6" y="5" width="12" height="16" rx="2"></rect>
+          <path d="M9 8v10"></path>
+          <path d="M12 8v10"></path>
+          <path d="M15 8v10"></path>
+        </svg>
+        <span>Snack — £<span id="snackPrice"></span> (<span id="snackCount"></span>/5)</span>
+      </button>
+
+      <div class="resultBox">
+        <div class="vlist">
+          <div class="vrow"><span>Cash</span><span id="shopCash">£0</span></div>
         </div>
       </div>
     </div>
-    <div style="height:30px"></div>
-    <button class="btn" id="backBoard">Back to job board</button>
-  </div>
 
-  <!-- END DAY -->
-  <div class="screen hidden" id="end">
-    <div class="jobTitle" id="endTitle">End of day</div>
-    <div class="resultBox">
-      <div class="vlist" id="endList"></div>
+    <!-- JOB BOARD -->
+    <div class="screen hidden" id="board">
+      <div class="pageTopRow">
+        <div class="jobTitle pageTitleLeft">Job board</div>
+        <button class="btnOutline btnSmall" id="backHubBoard">Back</button>
+      </div>
+      <div class="jobs" id="jobs"></div>
+      <div class="refreshText" id="refreshJobs">↻ Refresh jobs</div>
     </div>
-    <button class="btn" id="confirmEnd">Start next day</button>
-  </div>
-</div>
 
-<!-- Live job bottom controls -->
-<div class="jobControls hidden" id="jobControls">
-  <div class="jobControlsWrap">
-    <button class="btnOutline btnMini" id="cancel">Abort</button>
-    <button class="btnOutline btnMini" id="eventBtn" disabled>Event</button>
-    <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
-  </div>
-</div>
+    <!-- OFFER -->
+    <div class="screen hidden" id="offer">
+      <div class="offerHeader" id="offerTitle">—</div>
 
-<!-- Speed controls -->
-<div class="speedbar hidden" id="speedBar">
-  <div class="speedwrap">
-    <div class="speedhead">
-      <div class="speedTitle">SPEED</div>
-      <div class="speedTitle" id="speedLabel">average</div>
+      <div class="offerTop">
+        <div class="avatar" id="offerAvatar" aria-label="Dispatcher"></div>
+        <div>
+          <div class="offerOrg" id="ofOrg">—</div>
+          <div class="offerRole" id="ofQuote">—</div>
+        </div>
+      </div>
+
+      <div class="offerFacts">
+        <div class="factsCol">
+          <div class="fact"><div class="k">DISTANCE</div><div class="v" id="ofDistance">—</div></div>
+          <div class="fact"><div class="k">ROUTE</div><div class="v" id="ofRoute">—</div></div>
+        </div>
+        <div class="factsCol">
+          <div class="fact"><div class="k">PAY</div><div class="v" id="ofPay">£0</div></div>
+          <div class="fact"><div class="k">DEADLINE</div><div class="v" id="ofDeadline">—</div></div>
+        </div>
+      </div>
+
+      <div class="offerActions">
+        <button class="btnOutline" id="offerBack">Back</button>
+        <button class="btn" id="offerAccept">ACCEPT</button>
+      </div>
     </div>
-    <div class="seg" id="speedSeg"></div>
-  </div>
-</div>
 
-<!-- Energy footer -->
-<div class="energyFooter" id="energyFooter">
-  <div class="energyWrap">
-    <div class="energyLabel">ENERGY</div>
-    <div class="energyBar" id="energyBar"></div>
-  </div>
-</div>
+    <!-- LIVE JOB -->
+    <div class="screen hidden" id="job">
+      <div class="offerHeader" id="jobName">—</div>
 
-<!-- Consumables modal -->
-<div class="modal" id="energyModal">
-  <div class="modalBox">
-    <div class="modalTitle">SNACKS</div>
-    <button class="modalBtn" id="drinkBtn"></button>
-    <button class="modalBtn" id="snackBtn"></button>
-    <button class="btnOutline" id="closeEnergy">Cancel</button>
-  </div>
-</div>
+      <div class="timeLeftWrap">
+        <svg class="timeDial" viewBox="0 0 100 100" aria-label="Time left">
+          <circle cx="50" cy="50" r="38" stroke="var(--accent)" stroke-width="14" fill="none" opacity="0.18"></circle>
+          <path id="timeArc" stroke="var(--accent)" stroke-width="16" fill="none" stroke-linecap="butt" d=""></path>
+          <text class="dialK" x="50" y="45">TIME LEFT</text>
+          <text class="dialV" id="remaining" x="50" y="57">—</text>
+        </svg>
+      </div>
 
-<!-- Event modal -->
-<div class="modal" id="eventModal">
-  <div class="modalBox">
-    <div class="modalTitle">EVENT</div>
-    <div class="resultBox" style="margin-top:0">
-      <div class="vlist" id="eventList"></div>
+      <div class="progressBlock">
+        <div class="row progressHead">
+          <div class="progressLabel">Progress</div>
+          <div class="progressPct" id="pct">0%</div>
+        </div>
+        <div class="bar"><div class="fill" id="fill"></div></div>
+        <div class="progressMeta">
+          <div id="milesDone">0.0 mi</div>
+          <div id="mph">0 mph</div>
+          <div id="milesLeft">0.0 mi</div>
+        </div>
+      </div>
     </div>
-    <button class="btn" id="closeEvent">Continue</button>
-  </div>
-</div>
 
-<!-- Rest modal -->
-<div class="modal" id="restModal">
-  <div class="modalBox">
-    <div class="modalTitle">REST</div>
-    <button class="modalBtn modalBtnFill" id="rest2">Rest 2 hours</button>
-    <button class="modalBtn modalBtnFill" id="rest4">Rest 4 hours</button>
-    <button class="modalBtn modalBtnFill" id="rest8">Rest 8 hours</button>
-    <button class="modalBtn modalBtnFill" id="restMorning">Until morning</button>
-    <button class="btnOutline" id="closeRest">Cancel</button>
+    <!-- RESULT -->
+    <div class="screen hidden" id="result">
+      <div class="jobTitle pageTitle" id="resultTitle">Job complete</div>
+      <div class="resultBox">
+        <div class="vlist" id="resultList"></div>
+        <div class="feedbackWrap hidden" id="feedbackWrap">
+          <div class="feedbackRow">
+            <div class="avatarFilled" id="resultAvatar"></div>
+            <div>
+              <div class="feedbackWho" id="feedbackWho">—</div>
+              <div class="feedbackText" id="feedbackText">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="height:30px"></div>
+      <button class="btn" id="backBoard">Back to job board</button>
+    </div>
+
+    <!-- END DAY -->
+    <div class="screen hidden" id="end">
+      <div class="jobTitle" id="endTitle">End of day</div>
+      <div class="resultBox">
+        <div class="vlist" id="endList"></div>
+      </div>
+      <button class="btn" id="confirmEnd">Start next day</button>
+    </div>
   </div>
-</div>
+
+  <!-- Live job bottom controls -->
+  <div class="jobControls hidden" id="jobControls">
+    <div class="jobControlsWrap">
+      <button class="btnOutline btnMini" id="cancel">Abort</button>
+      <button class="btnOutline btnMini" id="eventBtn" disabled>Event</button>
+      <button class="btnOutline btnMini" id="openConsumables">Snacks</button>
+    </div>
+  </div>
+
+  <!-- Speed controls -->
+  <div class="speedbar hidden" id="speedBar">
+    <div class="speedwrap">
+      <div class="speedhead">
+        <div class="speedTitle">SPEED</div>
+        <div class="speedTitle" id="speedLabel">average</div>
+      </div>
+      <div class="seg" id="speedSeg"></div>
+    </div>
+  </div>
+
+  <!-- Energy footer -->
+  <div class="energyFooter" id="energyFooter">
+    <div class="energyWrap">
+      <div class="energyLabel">ENERGY</div>
+      <div class="energyBar" id="energyBar"></div>
+    </div>
+  </div>
+
+  <!-- Consumables modal -->
+  <div class="modal" id="energyModal">
+    <div class="modalBox">
+      <div class="modalTitle">SNACKS</div>
+      <button class="modalBtn" id="drinkBtn"></button>
+      <button class="modalBtn" id="snackBtn"></button>
+      <button class="btnOutline" id="closeEnergy">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Event modal -->
+  <div class="modal" id="eventModal">
+    <div class="modalBox">
+      <div class="modalTitle">EVENT</div>
+      <div class="resultBox" style="margin-top:0">
+        <div class="vlist" id="eventList"></div>
+      </div>
+      <button class="btn" id="closeEvent">Continue</button>
+    </div>
+  </div>
+
+  <!-- Rest modal -->
+  <div class="modal" id="restModal">
+    <div class="modalBox">
+      <div class="modalTitle">REST</div>
+      <button class="modalBtn modalBtnFill" id="rest2">Rest 2 hours</button>
+      <button class="modalBtn modalBtnFill" id="rest4">Rest 4 hours</button>
+      <button class="modalBtn modalBtnFill" id="rest8">Rest 8 hours</button>
+      <button class="modalBtn modalBtnFill" id="restMorning">Until morning</button>
+      <button class="btnOutline" id="closeRest">Cancel</button>
+    </div>
+  </div>
 
 <script>
 "use strict";
 
-const VERSION="1.0.43";
-const WEEKLY_TARGET=500;
+/* =================== CONFIG =================== */
+const VERSION = "1.0.45";
+const WEEKLY_TARGET = 1000;
 
-const PRICES={drink:12,snack:6};
-const COSTS={rent:35,food:15};
+const PRICES = { drink: 12, snack: 6 };
 
+const COSTS = { bills: 35, food: 15 };       // daily
+const WEEKLY_RENT = 245;                      // weekly (charged at end of day on day 7,14,...)
+
+/* Random EOD negatives (100) */
+const RANDOM_EOD_NEGATIVES=[
+  "Cat massager","Replacement bike bell","Lost key cutting","Overpriced coffee","Parking fine appeal fee",
+  "Broken phone screen protector","Laundry token","Flat tyre patch kit","Chain lubricant","Emergency umbrella",
+  "Energy bar multipack","Sock replacement","Bus fare bailout","Convenience store sandwich","Forgotten birthday card",
+  "USB-C cable","Power bank","Headphone tips","Dog treat bribe","Office plant contribution",
+  "Window cleaner","Subscription you forgot about","App upgrade","Taxi split fare","Late payment fee",
+  "Platform service charge","Inner tube","Spoke tightening","Brake pad replacement","Saddle adjustment",
+  "Lock key copy","Spare gloves","Rain poncho","Reflective tape","Water bottle",
+  "Courier bag strap","Backpack repair","Coffee loyalty card top-up","Snack impulse buy","Energy drink multipack",
+  "Laundry detergent","Replacement light battery","Helmet padding","Bike light upgrade","Shoe insoles",
+  "Hand sanitiser","Phone mount clamp","Screen cleaning kit","Stationery refill","Postage stamps",
+  "Parcel tape","Paper ream","Printer ink","Wi-Fi top-up","Mobile data add-on",
+  "Music subscription","Streaming subscription","Forgotten direct debit","Replacement ID lanyard","Spare charger",
+  "Cable organiser","Keyring torch","High-vis vest","Thermal base layer","Energy gel",
+  "Multivitamins","Haircut","Beard trim","Shoe polish","Insulting parking meter",
+  "Public toilet fee","Festival wristband fee","Security locker","Replacement zipper","Emergency sewing kit",
+  "Coffee thermos","Flatmate split adjustment","Shared utilities top-up","Insurance excess","Bank overdraft fee",
+  "Account maintenance fee","Phone repair deposit","Random charity donation","Lost Oyster top-up","City bike unlock",
+  "Emergency bus pass","Bag cleaning","Bike wash","Spare chain link","Tyre pressure gauge",
+  "Bike rack fee","Storage locker","Work gloves","Courier cap","Lunch meeting",
+  "Networking event ticket","Dry cleaning","Replacement wallet","Pet food","Online impulse purchase"
+];
+
+/* Random EOD positives (100) — occur ~1/5 as frequently as negatives */
+const RANDOM_EOD_POSITIVES=[
+  "Found £5 note","Unexpected tip","Cashback refund","Loyalty reward","Refund from retailer",
+  "Overpayment returned","Referral bonus","Promo code rebate","Client goodwill bonus","Delivery surge payout",
+  "Platform incentive","App bug compensation","Energy rebate","Bank interest","Found change in pocket",
+  "Coffee stamp freebie","Prize draw win","Scratchcard win","Sold old cable","Sold old charger",
+  "Spare parts resale","Cashback on fuel","Bike part refund","Warranty claim payout","Class action payout",
+  "Marketplace sale","Old book sold","Vinyl resale","Unexpected dividend","Micro-investment gain",
+  "Gift card balance found","Returned deposit","Insurance rebate","Subscription refund","Rent rebate",
+  "Utility overcharge refund","Cashback from card","Travel refund","Cancelled fee refund","Bonus shift payout",
+  "Overpayment adjustment","Client rounding up","Found coins at home","Small inheritance","Festival refund",
+  "Event cancellation refund","Tax adjustment","HMRC rebate","Cashback app payout","Mystery shopper reward",
+  "Street promotion reward","App sign-up bonus","Bank switching incentive","Gift from friend","Birthday money",
+  "Cashback on groceries","Fuel points converted","Survey payout","Focus group fee","Parking fine overturned",
+  "Returned late fee","Loyalty bonus","Energy bill credit","Broadband refund","Phone contract credit",
+  "Bike resale margin","Spare helmet sold","Old bag sold","Spare lock sold","Marketplace refund",
+  "Warranty goodwill","Damaged item refund","Returned library deposit","Forgotten wallet cash","Employer expense repayment",
+  "Deposit returned","Security deposit rebate","Referral payout","Referral chain bonus","Cashback stacking",
+  "Raffle win","Prize token cashout","Unexpected freelance payment","Legacy invoice paid","Old IOU repaid",
+  "Friend pays you back","Small lottery win","Cashback glitch","Bank error in your favour","Surprise voucher payout",
+  "Tax-free allowance refund","Utility loyalty payout","Platform compensation","Speed bonus","Customer apology bonus",
+  "Goodwill credit","Forgotten PayPal balance","Gifted crypto sold","Spare tube sold","Promotional cashback",
+  "App payout correction","Retail price match","Found gift voucher","Card points cashed out","Small refund from bank"
+];
+
+/* Speed model */
 const SPEEDS={
   1:{name:"very slow",mult:0.55},
   2:{name:"slow",mult:0.8},
@@ -667,6 +635,7 @@ const SPEEDS={
   4:{name:"fast",mult:1.25},
   5:{name:"very fast",mult:1.55}
 };
+const BASE_MPH=8; // at average speed
 
 const ROUTES=["Easy","Mid","Tricky","Hellish"];
 const QUOTES=[
@@ -677,158 +646,6 @@ const QUOTES=[
 
 const REQUESTORS=["Sam Patel","Rosa Klein","Aisha Rahman","Tom Weaver"];
 const REPUTATION={"Sam Patel":7,"Rosa Klein":8,"Aisha Rahman":9,"Tom Weaver":6};
-
-/* ===== UNIQUE AVATARS (vectors) ===== */
-function avatarSvg(who, color="currentColor"){
-  if(who==="Sam Patel"){
-    return `
-      <svg viewBox="0 0 24 24" aria-hidden="true" style="color:${color}">
-        <path d="M12 3l7 4v10l-7 4-7-4V7l7-4Z"></path>
-        <path d="M9 9c1.3-1.3 4.7-1.3 6 0"></path>
-        <path d="M9 15c1.3 1.3 4.7 1.3 6 0"></path>
-      </svg>`;
-  }
-  if(who==="Rosa Klein"){
-    return `
-      <svg viewBox="0 0 24 24" aria-hidden="true" style="color:${color}">
-        <path d="M12 3l2.2 5.2 5.6.5-4.2 3.6 1.3 5.4L12 15.6 7.1 17.7l1.3-5.4-4.2-3.6 5.6-.5L12 3Z"></path>
-        <circle cx="12" cy="12" r="1.8"></circle>
-      </svg>`;
-  }
-  if(who==="Aisha Rahman"){
-    return `
-      <svg viewBox="0 0 24 24" aria-hidden="true" style="color:${color}">
-        <path d="M15.5 4.8c-4.2.8-7.3 4.5-7.1 8.9.1 2.6 1.2 4.7 3.1 6.1 3.8.2 7.2-2.2 8.1-5.8"></path>
-        <path d="M16.8 8.2l3 3"></path>
-        <path d="M19.8 8.2l-3 3"></path>
-      </svg>`;
-  }
-  /* Tom Weaver */
-  return `
-    <svg viewBox="0 0 24 24" aria-hidden="true" style="color:${color}">
-      <rect x="5" y="6" width="14" height="12" rx="2"></rect>
-      <path d="M8 9h8"></path>
-      <path d="M8 12h8"></path>
-      <path d="M8 15h5"></path>
-      <path d="M7 5l2-2h6l2 2"></path>
-    </svg>`;
-}
-
-function setOfferAvatar(who){
-  const el=document.getElementById("offerAvatar");
-  if(!el) return;
-  el.innerHTML = avatarSvg(who, "currentColor");
-}
-function setResultAvatar(who){
-  const el=document.getElementById("resultAvatar");
-  if(!el) return;
-  el.innerHTML = avatarSvg(who, "#000");
-}
-function logoHtmlForJobRow(who){
-  return `<div class="jobLogo" aria-hidden="true">${avatarSvg(who,"currentColor")}</div>`;
-}
-
-function fbPack(topic){
-  return {
-    early:`Saved us on ${topic}. Perfect.`,
-    ontime:`Nice. ${topic} landed on time.`,
-    late:`Too slow. ${topic} was late.`,
-    aborted:`What happened? ${topic} didn’t arrive.`
-  };
-}
-
-const JOB_CATALOG = /* unchanged catalog */ (function(){
-  return window.__JOB_CATALOG__ || (window.__JOB_CATALOG__ = ([
-    /* --- same catalog as you pasted (80 jobs) --- */
-    /* Sam Patel (20) */
-    {id:"sam_01", who:"Sam Patel", name:"Hot food drop", dist:2.0, seq:1, repeat:true,  fb:fbPack("that hot drop")},
-    {id:"sam_02", who:"Sam Patel", name:"Parcel run", dist:3.5, seq:1, repeat:true,  fb:fbPack("the parcel")},
-    {id:"sam_03", who:"Sam Patel", name:"Groceries", dist:4.2, seq:1, repeat:true,  fb:fbPack("the groceries")},
-    {id:"sam_04", who:"Sam Patel", name:"Fragile item", dist:5.0, seq:1, repeat:false, fb:fbPack("the fragile item")},
-    {id:"sam_05", who:"Sam Patel", name:"Rush SLA", dist:6.0, seq:2, repeat:true,  fb:fbPack("the rush SLA")},
-    {id:"sam_06", who:"Sam Patel", name:"Late rent env", dist:2.4, seq:2, repeat:false, fb:fbPack("the rent envelope")},
-    {id:"sam_07", who:"Sam Patel", name:"Urgent drive", dist:6.1, seq:2, repeat:true,  fb:fbPack("the hard drive")},
-    {id:"sam_08", who:"Sam Patel", name:"Council docs", dist:3.7, seq:2, repeat:true,  fb:fbPack("the council docs")},
-    {id:"sam_09", who:"Sam Patel", name:"Legal bundle", dist:5.4, seq:3, repeat:true,  fb:fbPack("the legal bundle")},
-    {id:"sam_10", who:"Sam Patel", name:"Press pass", dist:4.4, seq:3, repeat:false, fb:fbPack("the press pass")},
-    {id:"sam_11", who:"Sam Patel", name:"Lab sample", dist:5.9, seq:3, repeat:true,  fb:fbPack("the lab sample")},
-    {id:"sam_12", who:"Sam Patel", name:"Film reel", dist:6.6, seq:3, repeat:false, fb:fbPack("the film reel")},
-    {id:"sam_13", who:"Sam Patel", name:"Vintage vinyl", dist:2.5, seq:4, repeat:true,  fb:fbPack("the vinyl swap")},
-    {id:"sam_14", who:"Sam Patel", name:"Wristbands", dist:4.8, seq:4, repeat:true,  fb:fbPack("the wristbands")},
-    {id:"sam_15", who:"Sam Patel", name:"Passport return", dist:6.9, seq:4, repeat:false, fb:fbPack("the passport")},
-    {id:"sam_16", who:"Sam Patel", name:"Theatre keys", dist:4.0, seq:4, repeat:true,  fb:fbPack("those keys")},
-    {id:"sam_17", who:"Sam Patel", name:"Knife set", dist:3.1, seq:5, repeat:true,  fb:fbPack("the knife set")},
-    {id:"sam_18", who:"Sam Patel", name:"Sash parts", dist:5.8, seq:5, repeat:false, fb:fbPack("the window parts")},
-    {id:"sam_19", who:"Sam Patel", name:"Phone return", dist:3.6, seq:5, repeat:true,  fb:fbPack("that phone")},
-    {id:"sam_20", who:"Sam Patel", name:"Bike lock", dist:2.2, seq:5, repeat:true,  fb:fbPack("the lock rescue")},
-
-    /* Rosa Klein (20) */
-    {id:"rosa_01", who:"Rosa Klein", name:"VIP sushi", dist:3.2, seq:1, repeat:true,  fb:fbPack("the sushi")},
-    {id:"rosa_02", who:"Rosa Klein", name:"Cake rescue", dist:5.6, seq:1, repeat:true,  fb:fbPack("the cake")},
-    {id:"rosa_03", who:"Rosa Klein", name:"Props drop", dist:2.7, seq:1, repeat:true,  fb:fbPack("the props")},
-    {id:"rosa_04", who:"Rosa Klein", name:"Do not bend", dist:3.9, seq:1, repeat:false, fb:fbPack("the book")},
-    {id:"rosa_05", who:"Rosa Klein", name:"Band merch", dist:4.1, seq:2, repeat:true,  fb:fbPack("the merch")},
-    {id:"rosa_06", who:"Rosa Klein", name:"Tattoo stencil", dist:2.1, seq:2, repeat:true,  fb:fbPack("the stencil")},
-    {id:"rosa_07", who:"Rosa Klein", name:"Cake topper", dist:3.4, seq:2, repeat:true,  fb:fbPack("the topper")},
-    {id:"rosa_08", who:"Rosa Klein", name:"Charity box", dist:4.7, seq:2, repeat:false, fb:fbPack("the raffle box")},
-    {id:"rosa_09", who:"Rosa Klein", name:"Poster tubes", dist:4.9, seq:3, repeat:true,  fb:fbPack("the posters")},
-    {id:"rosa_10", who:"Rosa Klein", name:"Lens rental", dist:5.5, seq:3, repeat:true,  fb:fbPack("the lens")},
-    {id:"rosa_11", who:"Rosa Klein", name:"Studio keys", dist:3.1, seq:3, repeat:false, fb:fbPack("studio keys")},
-    {id:"rosa_12", who:"Rosa Klein", name:"Afterparty bands", dist:4.2, seq:3, repeat:true,  fb:fbPack("the bands")},
-    {id:"rosa_13", who:"Rosa Klein", name:"Set list", dist:2.0, seq:4, repeat:true,  fb:fbPack("the set list")},
-    {id:"rosa_14", who:"Rosa Klein", name:"Wardrobe pins", dist:2.8, seq:4, repeat:true,  fb:fbPack("wardrobe pins")},
-    {id:"rosa_15", who:"Rosa Klein", name:"Makeup kit", dist:3.6, seq:4, repeat:false, fb:fbPack("the makeup kit")},
-    {id:"rosa_16", who:"Rosa Klein", name:"USB master", dist:5.7, seq:4, repeat:true,  fb:fbPack("the USB master")},
-    {id:"rosa_17", who:"Rosa Klein", name:"Signed vinyl", dist:3.8, seq:5, repeat:false, fb:fbPack("the signed vinyl")},
-    {id:"rosa_18", who:"Rosa Klein", name:"Green room", dist:2.6, seq:5, repeat:true,  fb:fbPack("green room snacks")},
-    {id:"rosa_19", who:"Rosa Klein", name:"Ticket stubs", dist:3.0, seq:5, repeat:true,  fb:fbPack("ticket stubs")},
-    {id:"rosa_20", who:"Rosa Klein", name:"Stage pass", dist:4.4, seq:5, repeat:true,  fb:fbPack("the stage pass")},
-
-    /* Aisha Rahman (20) */
-    {id:"aisha_01", who:"Aisha Rahman", name:"Pharmacy pickup", dist:2.8, seq:1, repeat:true,  fb:fbPack("the pickup")},
-    {id:"aisha_02", who:"Aisha Rahman", name:"Iguana meds", dist:6.4, seq:1, repeat:true,  fb:fbPack("the meds")},
-    {id:"aisha_03", who:"Aisha Rahman", name:"Clinic forms", dist:3.2, seq:1, repeat:true,  fb:fbPack("those forms")},
-    {id:"aisha_04", who:"Aisha Rahman", name:"Blood kit", dist:4.1, seq:1, repeat:false, fb:fbPack("the kit")},
-    {id:"aisha_05", who:"Aisha Rahman", name:"Lab rush", dist:5.9, seq:2, repeat:true,  fb:fbPack("the rush sample")},
-    {id:"aisha_06", who:"Aisha Rahman", name:"X-ray disc", dist:4.6, seq:2, repeat:false, fb:fbPack("the disc")},
-    {id:"aisha_07", who:"Aisha Rahman", name:"Care package", dist:3.9, seq:2, repeat:true,  fb:fbPack("the package")},
-    {id:"aisha_08", who:"Aisha Rahman", name:"Vaccine docs", dist:3.4, seq:2, repeat:true,  fb:fbPack("the docs")},
-    {id:"aisha_09", who:"Aisha Rahman", name:"Specimen box", dist:5.2, seq:3, repeat:true,  fb:fbPack("the specimen")},
-    {id:"aisha_10", who:"Aisha Rahman", name:"Allergy results", dist:3.7, seq:3, repeat:true,  fb:fbPack("the results")},
-    {id:"aisha_11", who:"Aisha Rahman", name:"Dental mould", dist:4.8, seq:3, repeat:false, fb:fbPack("the mould")},
-    {id:"aisha_12", who:"Aisha Rahman", name:"Stitch kit", dist:2.9, seq:3, repeat:true,  fb:fbPack("the kit")},
-    {id:"aisha_13", who:"Aisha Rahman", name:"Cold chain", dist:6.6, seq:4, repeat:true,  fb:fbPack("cold chain")},
-    {id:"aisha_14", who:"Aisha Rahman", name:"Urgent referral", dist:6.0, seq:4, repeat:false, fb:fbPack("the referral")},
-    {id:"aisha_15", who:"Aisha Rahman", name:"Ward swap", dist:4.0, seq:4, repeat:true,  fb:fbPack("the ward swap")},
-    {id:"aisha_16", who:"Aisha Rahman", name:"Therapy notes", dist:3.1, seq:4, repeat:true,  fb:fbPack("the notes")},
-    {id:"aisha_17", who:"Aisha Rahman", name:"Consent forms", dist:3.6, seq:5, repeat:true,  fb:fbPack("consent forms")},
-    {id:"aisha_18", who:"Aisha Rahman", name:"Path slides", dist:5.8, seq:5, repeat:false, fb:fbPack("the slides")},
-    {id:"aisha_19", who:"Aisha Rahman", name:"IV supplies", dist:4.4, seq:5, repeat:true,  fb:fbPack("IV supplies")},
-    {id:"aisha_20", who:"Aisha Rahman", name:"Hosp keys", dist:3.3, seq:5, repeat:false, fb:fbPack("those keys")},
-
-    /* Tom Weaver (20) */
-    {id:"tom_01", who:"Tom Weaver", name:"Office keys", dist:2.2, seq:1, repeat:true,  fb:fbPack("the keys")},
-    {id:"tom_02", who:"Tom Weaver", name:"Laptop charger", dist:3.0, seq:1, repeat:true,  fb:fbPack("the charger")},
-    {id:"tom_03", who:"Tom Weaver", name:"Contract copies", dist:4.1, seq:1, repeat:true,  fb:fbPack("the contracts")},
-    {id:"tom_04", who:"Tom Weaver", name:"Signed NDA", dist:3.6, seq:1, repeat:false, fb:fbPack("the NDA")},
-    {id:"tom_05", who:"Tom Weaver", name:"Meeting pack", dist:4.8, seq:2, repeat:true,  fb:fbPack("the pack")},
-    {id:"tom_06", who:"Tom Weaver", name:"Printer toner", dist:2.7, seq:2, repeat:true,  fb:fbPack("the toner")},
-    {id:"tom_07", who:"Tom Weaver", name:"Client gift", dist:5.0, seq:2, repeat:false, fb:fbPack("the gift")},
-    {id:"tom_08", who:"Tom Weaver", name:"Board papers", dist:5.6, seq:2, repeat:true,  fb:fbPack("the board papers")},
-    {id:"tom_09", who:"Tom Weaver", name:"Proto demo", dist:6.2, seq:3, repeat:true,  fb:fbPack("the demo")},
-    {id:"tom_10", who:"Tom Weaver", name:"Finance pack", dist:4.9, seq:3, repeat:true,  fb:fbPack("the finance pack")},
-    {id:"tom_11", who:"Tom Weaver", name:"Share cert", dist:3.4, seq:3, repeat:false, fb:fbPack("the certificate")},
-    {id:"tom_12", who:"Tom Weaver", name:"Courier samples", dist:5.3, seq:3, repeat:true,  fb:fbPack("the samples")},
-    {id:"tom_13", who:"Tom Weaver", name:"Spare badge", dist:2.6, seq:4, repeat:true,  fb:fbPack("the badge")},
-    {id:"tom_14", who:"Tom Weaver", name:"Server dongle", dist:6.1, seq:4, repeat:false, fb:fbPack("the dongle")},
-    {id:"tom_15", who:"Tom Weaver", name:"Audit files", dist:5.8, seq:4, repeat:true,  fb:fbPack("the audit files")},
-    {id:"tom_16", who:"Tom Weaver", name:"Client minutes", dist:3.9, seq:4, repeat:true,  fb:fbPack("those minutes")},
-    {id:"tom_17", who:"Tom Weaver", name:"Pitch deck", dist:4.6, seq:5, repeat:true,  fb:fbPack("the deck")},
-    {id:"tom_18", who:"Tom Weaver", name:"Signed contract", dist:5.2, seq:5, repeat:false, fb:fbPack("the contract")},
-    {id:"tom_19", who:"Tom Weaver", name:"Data stick", dist:3.3, seq:5, repeat:true,  fb:fbPack("the data stick")},
-    {id:"tom_20", who:"Tom Weaver", name:"Late invoice", dist:3.8, seq:5, repeat:true,  fb:fbPack("the invoice")}
-  ]));
-})();
 
 const EVENT_POOL = {
   normal: [
@@ -860,7 +677,7 @@ const EVENT_POOL = {
   ]
 };
 
-const PROMPT_EVENTS=[
+const OPTIONAL_EVENTS=[
   {t:"Shortcut sign", d:"A gated cut-through is ajar. Could save time.", energy:0, mins:-2},
   {t:"Dodgy alley", d:"You cut through anyway. Bad vibe. Lose time.", energy:0, mins:3},
   {t:"Perfect slipstream", d:"You tuck in behind a smooth rider. Gain time.", energy:0, mins:-2},
@@ -868,41 +685,170 @@ const PROMPT_EVENTS=[
 ];
 
 const SAVE_KEY="courier_save";
-const SAVE_SCHEMA=3;
+const SAVE_SCHEMA=4;
 
+/* =================== DATA =================== */
+function fbPack(topic){
+  return {
+    early:`Saved us on ${topic}. Perfect.`,
+    ontime:`Nice. ${topic} landed on time.`,
+    late:`Too slow. ${topic} was late.`,
+    aborted:`What happened? ${topic} didn’t arrive.`
+  };
+}
+
+/* 80 jobs (20 per requestor) */
+const JOB_CATALOG=[
+  {id:"sam_01", who:"Sam Patel", name:"Hot food drop", dist:2.0, seq:1, repeat:true,  fb:fbPack("that hot drop")},
+  {id:"sam_02", who:"Sam Patel", name:"Parcel run", dist:3.5, seq:1, repeat:true,  fb:fbPack("the parcel")},
+  {id:"sam_03", who:"Sam Patel", name:"Groceries", dist:4.2, seq:1, repeat:true,  fb:fbPack("the groceries")},
+  {id:"sam_04", who:"Sam Patel", name:"Fragile item", dist:5.0, seq:1, repeat:false, fb:fbPack("the fragile item")},
+  {id:"sam_05", who:"Sam Patel", name:"Rush SLA", dist:6.0, seq:2, repeat:true,  fb:fbPack("the rush SLA")},
+  {id:"sam_06", who:"Sam Patel", name:"Late rent env", dist:2.4, seq:2, repeat:false, fb:fbPack("the rent envelope")},
+  {id:"sam_07", who:"Sam Patel", name:"Urgent drive", dist:6.1, seq:2, repeat:true,  fb:fbPack("the hard drive")},
+  {id:"sam_08", who:"Sam Patel", name:"Council docs", dist:3.7, seq:2, repeat:true,  fb:fbPack("the council docs")},
+  {id:"sam_09", who:"Sam Patel", name:"Legal bundle", dist:5.4, seq:3, repeat:true,  fb:fbPack("the legal bundle")},
+  {id:"sam_10", who:"Sam Patel", name:"Press pass", dist:4.4, seq:3, repeat:false, fb:fbPack("the press pass")},
+  {id:"sam_11", who:"Sam Patel", name:"Lab sample", dist:5.9, seq:3, repeat:true,  fb:fbPack("the lab sample")},
+  {id:"sam_12", who:"Sam Patel", name:"Film reel", dist:6.6, seq:3, repeat:false, fb:fbPack("the film reel")},
+  {id:"sam_13", who:"Sam Patel", name:"Vintage vinyl", dist:2.5, seq:4, repeat:true,  fb:fbPack("the vinyl swap")},
+  {id:"sam_14", who:"Sam Patel", name:"Wristbands", dist:4.8, seq:4, repeat:true,  fb:fbPack("the wristbands")},
+  {id:"sam_15", who:"Sam Patel", name:"Passport return", dist:6.9, seq:4, repeat:false, fb:fbPack("the passport")},
+  {id:"sam_16", who:"Sam Patel", name:"Theatre keys", dist:4.0, seq:4, repeat:true,  fb:fbPack("those keys")},
+  {id:"sam_17", who:"Sam Patel", name:"Knife set", dist:3.1, seq:5, repeat:true,  fb:fbPack("the knife set")},
+  {id:"sam_18", who:"Sam Patel", name:"Sash parts", dist:5.8, seq:5, repeat:false, fb:fbPack("the window parts")},
+  {id:"sam_19", who:"Sam Patel", name:"Phone return", dist:3.6, seq:5, repeat:true,  fb:fbPack("that phone")},
+  {id:"sam_20", who:"Sam Patel", name:"Bike lock", dist:2.2, seq:5, repeat:true,  fb:fbPack("the lock rescue")},
+
+  {id:"rosa_01", who:"Rosa Klein", name:"VIP sushi", dist:3.2, seq:1, repeat:true,  fb:fbPack("the sushi")},
+  {id:"rosa_02", who:"Rosa Klein", name:"Cake rescue", dist:5.6, seq:1, repeat:true,  fb:fbPack("the cake")},
+  {id:"rosa_03", who:"Rosa Klein", name:"Props drop", dist:2.7, seq:1, repeat:true,  fb:fbPack("the props")},
+  {id:"rosa_04", who:"Rosa Klein", name:"Do not bend", dist:3.9, seq:1, repeat:false, fb:fbPack("the book")},
+  {id:"rosa_05", who:"Rosa Klein", name:"Band merch", dist:4.1, seq:2, repeat:true,  fb:fbPack("the merch")},
+  {id:"rosa_06", who:"Rosa Klein", name:"Tattoo stencil", dist:2.1, seq:2, repeat:true,  fb:fbPack("the stencil")},
+  {id:"rosa_07", who:"Rosa Klein", name:"Cake topper", dist:3.4, seq:2, repeat:true,  fb:fbPack("the topper")},
+  {id:"rosa_08", who:"Rosa Klein", name:"Charity box", dist:4.7, seq:2, repeat:false, fb:fbPack("the raffle box")},
+  {id:"rosa_09", who:"Rosa Klein", name:"Poster tubes", dist:4.9, seq:3, repeat:true,  fb:fbPack("the posters")},
+  {id:"rosa_10", who:"Rosa Klein", name:"Lens rental", dist:5.5, seq:3, repeat:true,  fb:fbPack("the lens")},
+  {id:"rosa_11", who:"Rosa Klein", name:"Studio keys", dist:3.1, seq:3, repeat:false, fb:fbPack("studio keys")},
+  {id:"rosa_12", who:"Rosa Klein", name:"Afterparty bands", dist:4.2, seq:3, repeat:true,  fb:fbPack("the bands")},
+  {id:"rosa_13", who:"Rosa Klein", name:"Set list", dist:2.0, seq:4, repeat:true,  fb:fbPack("the set list")},
+  {id:"rosa_14", who:"Rosa Klein", name:"Wardrobe pins", dist:2.8, seq:4, repeat:true,  fb:fbPack("wardrobe pins")},
+  {id:"rosa_15", who:"Rosa Klein", name:"Makeup kit", dist:3.6, seq:4, repeat:false, fb:fbPack("the makeup kit")},
+  {id:"rosa_16", who:"Rosa Klein", name:"USB master", dist:5.7, seq:4, repeat:true,  fb:fbPack("the USB master")},
+  {id:"rosa_17", who:"Rosa Klein", name:"Signed vinyl", dist:3.8, seq:5, repeat:false, fb:fbPack("the signed vinyl")},
+  {id:"rosa_18", who:"Rosa Klein", name:"Green room", dist:2.6, seq:5, repeat:true,  fb:fbPack("green room snacks")},
+  {id:"rosa_19", who:"Rosa Klein", name:"Ticket stubs", dist:3.0, seq:5, repeat:true,  fb:fbPack("ticket stubs")},
+  {id:"rosa_20", who:"Rosa Klein", name:"Stage pass", dist:4.4, seq:5, repeat:true,  fb:fbPack("the stage pass")},
+
+  {id:"aisha_01", who:"Aisha Rahman", name:"Pharmacy pickup", dist:2.8, seq:1, repeat:true,  fb:fbPack("the pickup")},
+  {id:"aisha_02", who:"Aisha Rahman", name:"Iguana meds", dist:6.4, seq:1, repeat:true,  fb:fbPack("the meds")},
+  {id:"aisha_03", who:"Aisha Rahman", name:"Clinic forms", dist:3.2, seq:1, repeat:true,  fb:fbPack("those forms")},
+  {id:"aisha_04", who:"Aisha Rahman", name:"Blood kit", dist:4.1, seq:1, repeat:false, fb:fbPack("the kit")},
+  {id:"aisha_05", who:"Aisha Rahman", name:"Lab rush", dist:5.9, seq:2, repeat:true,  fb:fbPack("the rush sample")},
+  {id:"aisha_06", who:"Aisha Rahman", name:"X-ray disc", dist:4.6, seq:2, repeat:false, fb:fbPack("the disc")},
+  {id:"aisha_07", who:"Aisha Rahman", name:"Care package", dist:3.9, seq:2, repeat:true,  fb:fbPack("the package")},
+  {id:"aisha_08", who:"Aisha Rahman", name:"Vaccine docs", dist:3.4, seq:2, repeat:true,  fb:fbPack("the docs")},
+  {id:"aisha_09", who:"Aisha Rahman", name:"Specimen box", dist:5.2, seq:3, repeat:true,  fb:fbPack("the specimen")},
+  {id:"aisha_10", who:"Aisha Rahman", name:"Allergy results", dist:3.7, seq:3, repeat:true,  fb:fbPack("the results")},
+  {id:"aisha_11", who:"Aisha Rahman", name:"Dental mould", dist:4.8, seq:3, repeat:false, fb:fbPack("the mould")},
+  {id:"aisha_12", who:"Aisha Rahman", name:"Stitch kit", dist:2.9, seq:3, repeat:true,  fb:fbPack("the kit")},
+  {id:"aisha_13", who:"Aisha Rahman", name:"Cold chain", dist:6.6, seq:4, repeat:true,  fb:fbPack("cold chain")},
+  {id:"aisha_14", who:"Aisha Rahman", name:"Urgent referral", dist:6.0, seq:4, repeat:false, fb:fbPack("the referral")},
+  {id:"aisha_15", who:"Aisha Rahman", name:"Ward swap", dist:4.0, seq:4, repeat:true,  fb:fbPack("the ward swap")},
+  {id:"aisha_16", who:"Aisha Rahman", name:"Therapy notes", dist:3.1, seq:4, repeat:true,  fb:fbPack("the notes")},
+  {id:"aisha_17", who:"Aisha Rahman", name:"Consent forms", dist:3.6, seq:5, repeat:true,  fb:fbPack("consent forms")},
+  {id:"aisha_18", who:"Aisha Rahman", name:"Path slides", dist:5.8, seq:5, repeat:false, fb:fbPack("the slides")},
+  {id:"aisha_19", who:"Aisha Rahman", name:"IV supplies", dist:4.4, seq:5, repeat:true,  fb:fbPack("IV supplies")},
+  {id:"aisha_20", who:"Aisha Rahman", name:"Hosp keys", dist:3.3, seq:5, repeat:false, fb:fbPack("those keys")},
+
+  {id:"tom_01", who:"Tom Weaver", name:"Office keys", dist:2.2, seq:1, repeat:true,  fb:fbPack("the keys")},
+  {id:"tom_02", who:"Tom Weaver", name:"Laptop charger", dist:3.0, seq:1, repeat:true,  fb:fbPack("the charger")},
+  {id:"tom_03", who:"Tom Weaver", name:"Contract copies", dist:4.1, seq:1, repeat:true,  fb:fbPack("the contracts")},
+  {id:"tom_04", who:"Tom Weaver", name:"Signed NDA", dist:3.6, seq:1, repeat:false, fb:fbPack("the NDA")},
+  {id:"tom_05", who:"Tom Weaver", name:"Meeting pack", dist:4.8, seq:2, repeat:true,  fb:fbPack("the pack")},
+  {id:"tom_06", who:"Tom Weaver", name:"Printer toner", dist:2.7, seq:2, repeat:true,  fb:fbPack("the toner")},
+  {id:"tom_07", who:"Tom Weaver", name:"Client gift", dist:5.0, seq:2, repeat:false, fb:fbPack("the gift")},
+  {id:"tom_08", who:"Tom Weaver", name:"Board papers", dist:5.6, seq:2, repeat:true,  fb:fbPack("the board papers")},
+  {id:"tom_09", who:"Tom Weaver", name:"Proto demo", dist:6.2, seq:3, repeat:true,  fb:fbPack("the demo")},
+  {id:"tom_10", who:"Tom Weaver", name:"Finance pack", dist:4.9, seq:3, repeat:true,  fb:fbPack("the finance pack")},
+  {id:"tom_11", who:"Tom Weaver", name:"Share cert", dist:3.4, seq:3, repeat:false, fb:fbPack("the certificate")},
+  {id:"tom_12", who:"Tom Weaver", name:"Courier samples", dist:5.3, seq:3, repeat:true,  fb:fbPack("the samples")},
+  {id:"tom_13", who:"Tom Weaver", name:"Spare badge", dist:2.6, seq:4, repeat:true,  fb:fbPack("the badge")},
+  {id:"tom_14", who:"Tom Weaver", name:"Server dongle", dist:6.1, seq:4, repeat:false, fb:fbPack("the dongle")},
+  {id:"tom_15", who:"Tom Weaver", name:"Audit files", dist:5.8, seq:4, repeat:true,  fb:fbPack("the audit files")},
+  {id:"tom_16", who:"Tom Weaver", name:"Client minutes", dist:3.9, seq:4, repeat:true,  fb:fbPack("those minutes")},
+  {id:"tom_17", who:"Tom Weaver", name:"Pitch deck", dist:4.6, seq:5, repeat:true,  fb:fbPack("the deck")},
+  {id:"tom_18", who:"Tom Weaver", name:"Signed contract", dist:5.2, seq:5, repeat:false, fb:fbPack("the contract")},
+  {id:"tom_19", who:"Tom Weaver", name:"Data stick", dist:3.3, seq:5, repeat:true,  fb:fbPack("the data stick")},
+  {id:"tom_20", who:"Tom Weaver", name:"Late invoice", dist:3.8, seq:5, repeat:true,  fb:fbPack("the invoice")}
+];
+
+/* =================== STATE =================== */
 const state={
-  day:1,cash:0,time:15*60,energy:100,speed:3,
-  snacks:1,drinks:1,
-  jobsDone:0,dayEarnings:0,
-  offers:[],job:null,
-  elapsed:0,progress:0,hiddenDuration:0,startEnergy:100,energySpentJob:0,
+  day:1,                       // Day 1 = Monday
+  cash:0,
+  time:8*60,                   // start 08:00
+  energy:100,
+  speed:3,
+
+  snacks:1,
+  drinks:1,
+
+  offers:[],
+  job:null,                    // active job object
+
+  dayEarnings:0,
+  jobsDone:0,
+
+  /* job runtime */
   jobStartAbs:0,
-  snackFx:null,drinkFx:null,
-  pendingEndOfDay:false,eod:null,
+  jobStartEnergy:100,
+  jobDistDone:0,
+  jobDistTotal:0,
+  jobElapsedMin:0,
+
+  /* events */
+  promptActive:false,
+  promptEndMs:0,
+  lastPromptAbs:-1e9,
   lastEventAbs:-1e9,
-  promptActive:false,promptEndMs:0,lastPromptAbs:-1e9,
+
+  /* end of day */
+  eod:null,
+
+  /* progression */
   clientSeq:{},
   completedOneOffs:{},
   clientStats:{},
-  stats:{miles:0,minutes:0,made:0,spent:0,accepted:0,completed:0,aborted:0,early:0,late:0,snacks:0,events:0},
+  stats:{
+    miles:0,
+    minutes:0,
+    made:0,
+    spent:0,
+    accepted:0,
+    completed:0,
+    aborted:0,
+    early:0,
+    late:0,
+    snacks:0,
+    events:0
+  },
+
+  /* consumable effects */
+  snackFx:null,
+  drinkFx:null,
   snackCdUntil:0,
   drinkCdUntil:0,
-  lastTs:0,raf:0
+
+  /* loop */
+  lastTs:0,
+  raf:0
 };
 
-let jobsInitialised=false;
-let selectedOffer=null;
-let lastSaveMs=0;
-
+/* =================== UTILS =================== */
 const $=id=>document.getElementById(id);
-const on=(id, evt, fn)=>{
-  const el=$(id);
-  if(!el) return;
-  el.addEventListener(evt, fn, {passive:false});
-};
-
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
-const elText=(id, txt)=>{ const el=$(id); if(el) el.textContent=txt; };
 
 function minutesOfDay(){ return ((Math.floor(state.time)%1440)+1440)%1440; }
 function minutesOfDayPrecise(){ return ((state.time%1440)+1440)%1440; }
@@ -914,6 +860,104 @@ function fmtClock(mins){
   const hh=Math.floor(total/60);
   const mm=total%60;
   return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");
+}
+
+function weekNumber(){ return Math.floor((state.day-1)/7)+1; }
+function weekdayName(){
+  const days=["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+  return days[(state.day-1)%7];
+}
+function isWeeklyRentDue(){ return (state.day % 7) === 0; }
+
+function pickRand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* =================== AVATARS =================== */
+function avatarSvg(who, color="currentColor"){
+  if(who==="Sam Patel"){
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="color:${color}">
+        <path d="M12 3l7 4v10l-7 4-7-4V7l7-4Z"></path>
+        <path d="M9 9c1.3-1.3 4.7-1.3 6 0"></path>
+        <path d="M9 15c1.3 1.3 4.7 1.3 6 0"></path>
+      </svg>`;
+  }
+  if(who==="Rosa Klein"){
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="color:${color}">
+        <path d="M12 3l2.2 5.2 5.6.5-4.2 3.6 1.3 5.4L12 15.6 7.1 17.7l1.3-5.4-4.2-3.6 5.6-.5L12 3Z"></path>
+        <circle cx="12" cy="12" r="1.8"></circle>
+      </svg>`;
+  }
+  if(who==="Aisha Rahman"){
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="color:${color}">
+        <path d="M15.5 4.8c-4.2.8-7.3 4.5-7.1 8.9.1 2.6 1.2 4.7 3.1 6.1 3.8.2 7.2-2.2 8.1-5.8"></path>
+        <path d="M16.8 8.2l3 3"></path>
+        <path d="M19.8 8.2l-3 3"></path>
+      </svg>`;
+  }
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="color:${color}">
+      <rect x="5" y="6" width="14" height="12" rx="2"></rect>
+      <path d="M8 9h8"></path>
+      <path d="M8 12h8"></path>
+      <path d="M8 15h5"></path>
+      <path d="M7 5l2-2h6l2 2"></path>
+    </svg>`;
+}
+function setOfferAvatar(who){
+  const el=$("offerAvatar"); if(!el) return;
+  el.innerHTML = avatarSvg(who, "currentColor");
+}
+function setResultAvatar(who){
+  const el=$("resultAvatar"); if(!el) return;
+  el.innerHTML = avatarSvg(who, "#000");
+}
+function logoHtmlForJobRow(who){
+  return `<div class="jobLogo" aria-hidden="true">${avatarSvg(who,"currentColor")}</div>`;
+}
+
+/* =================== VISUALS =================== */
+function hexToRgb(hex){
+  const h=hex.replace("#","").trim();
+  const full=(h.length===3)?h.split("").map(c=>c+c).join(""):h;
+  const n=parseInt(full,16);
+  return {r:(n>>16)&255,g:(n>>8)&255,b:n&255};
+}
+function rgbToHex(r,g,b){
+  const to=h=>h.toString(16).padStart(2,"0");
+  return "#"+to(r)+to(g)+to(b);
+}
+function lerp(a,b,t){ return a+(b-a)*t; }
+function lerpColor(c1,c2,t){
+  const a=hexToRgb(c1), b=hexToRgb(c2);
+  return rgbToHex(Math.round(lerp(a.r,b.r,t)),Math.round(lerp(a.g,b.g,t)),Math.round(lerp(a.b,b.b,t)));
+}
+function setAccentFromTime(){
+  const m=minutesOfDay();
+  const stops=[
+    {m:360,c:"#B8C9CA"},
+    {m:600,c:"#C1E7B8"},
+    {m:780,c:"#EBE8B8"},
+    {m:960,c:"#F8BFC7"},
+    {m:1140,c:"#F2A9CC"},
+    {m:1320,c:"#C9A6D8"}
+  ];
+  if(m<stops[0].m){
+    document.documentElement.style.setProperty("--accent", lerpColor(stops[stops.length-1].c, stops[0].c, m/stops[0].m));
+    return;
+  }
+  if(m>=stops[stops.length-1].m){
+    document.documentElement.style.setProperty("--accent", stops[stops.length-1].c);
+    return;
+  }
+  for(let i=0;i<stops.length-1;i++){
+    const a=stops[i], b=stops[i+1];
+    if(m>=a.m && m<b.m){
+      document.documentElement.style.setProperty("--accent", lerpColor(a.c,b.c,(m-a.m)/(b.m-a.m)));
+      return;
+    }
+  }
 }
 
 /* SVG arc helpers */
@@ -933,264 +977,20 @@ function describeFullCircle(cx, cy, r){
   return `${a1} ${a2}`;
 }
 
-function hexToRgb(hex){
-  const h=hex.replace("#","").trim();
-  const full = (h.length===3) ? h.split("").map(c=>c+c).join("") : h;
-  const n=parseInt(full,16);
-  return {r:(n>>16)&255,g:(n>>8)&255,b:n&255};
-}
-function rgbToHex(r,g,b){
-  const to=h=>h.toString(16).padStart(2,"0");
-  return "#"+to(r)+to(g)+to(b);
-}
-function lerp(a,b,t){ return a + (b-a)*t; }
-function lerpColor(c1,c2,t){
-  const a=hexToRgb(c1), b=hexToRgb(c2);
-  return rgbToHex(Math.round(lerp(a.r,b.r,t)), Math.round(lerp(a.g,b.g,t)), Math.round(lerp(a.b,b.b,t)));
-}
-function setAccentFromTime(){
-  const m=minutesOfDay();
-  const stops=[
-    {m:  360, c:"#B8C9CA"},
-    {m:  600, c:"#C1E7B8"},
-    {m:  780, c:"#EBE8B8"},
-    {m:  960, c:"#F8BFC7"},
-    {m: 1140, c:"#F2A9CC"},
-    {m: 1320, c:"#C9A6D8"}
-  ];
-  if(m < stops[0].m){
-    document.documentElement.style.setProperty("--accent", lerpColor(stops[stops.length-1].c, stops[0].c, m / stops[0].m));
-    return;
-  }
-  if(m >= stops[stops.length-1].m){
-    document.documentElement.style.setProperty("--accent", stops[stops.length-1].c);
-    return;
-  }
-  for(let i=0;i<stops.length-1;i++){
-    const a=stops[i], b=stops[i+1];
-    if(m>=a.m && m<b.m){
-      document.documentElement.style.setProperty("--accent", lerpColor(a.c,b.c,(m-a.m)/(b.m-a.m)));
-      return;
-    }
-  }
+/* =================== UI ROUTING =================== */
+function setMode(m){
+  ["hub","clients","stats","shop","board","offer","job","result","end"].forEach(id=>{
+    const el=$(id); if(!el) return;
+    el.classList.toggle("hidden", id!==m);
+  });
+  $("speedBar").classList.toggle("hidden", m!=="job");
+  $("jobControls").classList.toggle("hidden", m!=="job");
+  $("kpiWrap").classList.toggle("hidden", !(m==="hub"||m==="board"||m==="shop"));
+  saveState();
 }
 
-/* ===== CLIENTS / STATS ===== */
-function initClientsIfNeeded(){
-  for(const who of REQUESTORS){
-    if(typeof state.clientSeq[who] !== "number") state.clientSeq[who]=1;
-    if(!state.clientStats[who]){
-      state.clientStats[who]={accepted:0,completed:0,aborted:0,revenue:0,tips:0,penalties:0,net:0};
-    }else{
-      if(typeof state.clientStats[who].accepted!=="number") state.clientStats[who].accepted=0;
-    }
-  }
-  if(!state.stats || typeof state.stats!=="object"){
-    state.stats={miles:0,minutes:0,made:0,spent:0,accepted:0,completed:0,aborted:0,early:0,late:0,snacks:0,events:0};
-  }
-}
-
-function recordClientAccept(job){
-  const st=state.clientStats[job.who];
-  st.accepted++;
-}
-function recordClientComplete(job, tp, total){
-  const who=job.who;
-  const st=state.clientStats[who];
-  st.completed++;
-  st.revenue += job.pay;
-  if(tp>0) st.tips += tp;
-  if(tp<0) st.penalties += Math.abs(tp);
-  st.net += total;
-
-  const cur = state.clientSeq[who] || 1;
-  if(job.seq >= cur) state.clientSeq[who] = Math.min(99, job.seq + 1);
-
-  if(!job.repeat) state.completedOneOffs[job.id]=true;
-}
-function recordClientAbort(job, penAbs){
-  const who=job.who;
-  const st=state.clientStats[who];
-  st.aborted++;
-  st.penalties += penAbs;
-  st.net -= penAbs;
-}
-
-function renderClients(){
-  initClientsIfNeeded();
-  const wrap=$("clientsList");
-  if(!wrap) return;
-  wrap.innerHTML="";
-
-  const active = REQUESTORS.filter(who => (state.clientStats[who]?.accepted || 0) > 0);
-  if(active.length===0){
-    wrap.innerHTML = `<div class="resultBox"><div class="vrow"><span>No clients yet</span><span></span></div></div>`;
-    return;
-  }
-
-  for(const who of active){
-    const st=state.clientStats[who] || {accepted:0,completed:0,aborted:0,revenue:0,tips:0,penalties:0,net:0};
-    const seq=state.clientSeq[who] || 1;
-    const rep=REPUTATION[who] ?? 5;
-
-    const card=document.createElement("div");
-    card.className="clientCard";
-    card.innerHTML=`
-      <div class="clientName">${who}</div>
-      <div class="clientGrid">
-        <div><div class="k">COMPLETED</div><div class="v">${st.completed}</div></div>
-        <div><div class="k">ABORTED</div><div class="v">${st.aborted}</div></div>
-
-        <div><div class="k">REVENUE</div><div class="v">£${st.revenue}</div></div>
-        <div><div class="k">NET PAY</div><div class="v">£${st.net}</div></div>
-
-        <div><div class="k">TIPS</div><div class="v">£${st.tips}</div></div>
-        <div><div class="k">PENALTIES</div><div class="v">£${st.penalties}</div></div>
-
-        <div class="wide"><div class="clientDivider"></div></div>
-
-        <div><div class="k">SEQUENCE</div><div class="v">${seq}</div></div>
-        <div><div class="k">REPUTATION</div><div class="v">${rep}/10</div></div>
-      </div>
-    `;
-    wrap.appendChild(card);
-  }
-}
-
-function weekNumber(){ return Math.floor((state.day-1)/7)+1; }
-function avgSpeedOverall(){
-  if(state.stats.minutes<=0) return 0;
-  return (state.stats.miles * 60) / state.stats.minutes;
-}
-function renderStats(){
-  initClientsIfNeeded();
-  const list=$("statsList");
-  if(!list) return;
-
-  list.innerHTML=`
-    <div class="vrow"><span>Version</span><span>v${VERSION}</span></div>
-    <div class="vrow"><span>Day</span><span>Day ${state.day}</span></div>
-    <div class="vrow"><span>Week</span><span>${weekNumber()}</span></div>
-
-    <div class="vrow"><span>Miles driven</span><span>${state.stats.miles.toFixed(1)} mi</span></div>
-    <div class="vrow"><span>Average speed</span><span>${avgSpeedOverall().toFixed(1)} mph</span></div>
-
-    <div class="vrow"><span>Total money made</span><span>£${Math.round(state.stats.made)}</span></div>
-    <div class="vrow"><span>Total money spent</span><span>£${Math.round(state.stats.spent)}</span></div>
-
-    <div class="vrow"><span>Jobs accepted</span><span>${state.stats.accepted}</span></div>
-    <div class="vrow"><span>Jobs completed</span><span>${state.stats.completed}</span></div>
-    <div class="vrow"><span>Jobs aborted</span><span>${state.stats.aborted}</span></div>
-
-    <div class="vrow"><span>Jobs early</span><span>${state.stats.early}</span></div>
-    <div class="vrow"><span>Jobs late</span><span>${state.stats.late}</span></div>
-
-    <div class="vrow"><span>Snacks eaten</span><span>${state.stats.snacks}</span></div>
-    <div class="vrow"><span>Events encountered</span><span>${state.stats.events}</span></div>
-  `;
-}
-
-/* ===== SAVE / LOAD ===== */
-function safeJsonParse(s){ try{ return JSON.parse(s); }catch(e){ return null; } }
-
-function saveState(force=false){
-  const now=performance.now();
-  if(!force && (now-lastSaveMs)<900) return;
-  lastSaveMs=now;
-
-  const payload={
-    schema:SAVE_SCHEMA,
-    version:VERSION,
-    state:{
-      day:state.day,cash:state.cash,time:state.time,energy:state.energy,speed:state.speed,
-      snacks:state.snacks,drinks:state.drinks,
-      jobsDone:state.jobsDone,dayEarnings:state.dayEarnings,
-      offers:state.offers,job:state.job,
-      elapsed:state.elapsed,progress:state.progress,hiddenDuration:state.hiddenDuration,
-      startEnergy:state.startEnergy,energySpentJob:state.energySpentJob,jobStartAbs:state.jobStartAbs,
-      pendingEndOfDay:state.pendingEndOfDay,eod:state.eod,
-      lastEventAbs:state.lastEventAbs,
-      promptActive:state.promptActive,promptEndMs:state.promptEndMs,lastPromptAbs:state.lastPromptAbs,
-      clientSeq:state.clientSeq,completedOneOffs:state.completedOneOffs,clientStats:state.clientStats,
-      stats:state.stats,
-      snackCdUntil:state.snackCdUntil,
-      drinkCdUntil:state.drinkCdUntil
-    }
-  };
-
-  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(payload)); }catch(e){}
-}
-
-function loadState(){
-  const raw=localStorage.getItem(SAVE_KEY);
-  if(!raw) return false;
-
-  const data=safeJsonParse(raw);
-  if(!data || !data.state) return false;
-
-  const s=data.state;
-
-  state.day = (typeof s.day==="number" && s.day>=1) ? s.day : state.day;
-  state.cash = (typeof s.cash==="number") ? s.cash : state.cash;
-  state.time = (typeof s.time==="number") ? s.time : state.time;
-  state.energy = (typeof s.energy==="number") ? clamp(s.energy,0,100) : state.energy;
-  state.speed = (typeof s.speed==="number") ? clamp(Math.round(s.speed),1,5) : state.speed;
-
-  state.snacks = (typeof s.snacks==="number") ? clamp(Math.round(s.snacks),0,5) : state.snacks;
-  state.drinks = (typeof s.drinks==="number") ? clamp(Math.round(s.drinks),0,5) : state.drinks;
-
-  state.jobsDone = (typeof s.jobsDone==="number") ? Math.max(0,Math.round(s.jobsDone)) : state.jobsDone;
-  state.dayEarnings = (typeof s.dayEarnings==="number") ? Math.round(s.dayEarnings) : state.dayEarnings;
-
-  state.offers = Array.isArray(s.offers) ? s.offers : state.offers;
-
-  state.job = s.job || null;
-  state.elapsed = (typeof s.elapsed==="number") ? s.elapsed : 0;
-  state.progress = (typeof s.progress==="number") ? s.progress : 0;
-  state.hiddenDuration = (typeof s.hiddenDuration==="number") ? s.hiddenDuration : 0;
-  state.startEnergy = (typeof s.startEnergy==="number") ? s.startEnergy : state.energy;
-  state.energySpentJob = (typeof s.energySpentJob==="number") ? s.energySpentJob : 0;
-  state.jobStartAbs = (typeof s.jobStartAbs==="number") ? s.jobStartAbs : nowAbsPrecise();
-
-  state.pendingEndOfDay = !!s.pendingEndOfDay;
-  state.eod = (s.eod && typeof s.eod==="object") ? s.eod : null;
-
-  state.lastEventAbs = (typeof s.lastEventAbs==="number") ? s.lastEventAbs : -1e9;
-
-  state.promptActive = !!s.promptActive;
-  state.promptEndMs = (typeof s.promptEndMs==="number") ? s.promptEndMs : 0;
-  state.lastPromptAbs = (typeof s.lastPromptAbs==="number") ? s.lastPromptAbs : -1e9;
-
-  state.clientSeq = (s.clientSeq && typeof s.clientSeq==="object") ? s.clientSeq : state.clientSeq;
-  state.completedOneOffs = (s.completedOneOffs && typeof s.completedOneOffs==="object") ? s.completedOneOffs : state.completedOneOffs;
-  state.clientStats = (s.clientStats && typeof s.clientStats==="object") ? s.clientStats : state.clientStats;
-
-  state.stats = (s.stats && typeof s.stats==="object") ? s.stats : state.stats;
-
-  state.snackCdUntil = (typeof s.snackCdUntil==="number") ? s.snackCdUntil : 0;
-  state.drinkCdUntil = (typeof s.drinkCdUntil==="number") ? s.drinkCdUntil : 0;
-
-  if(state.promptActive && Date.now() > state.promptEndMs){
-    state.promptActive=false;
-    state.promptEndMs=0;
-  }
-
-  state.snackFx=null;
-  state.drinkFx=null;
-
-  jobsInitialised = Array.isArray(state.offers) && state.offers.length>0;
-  selectedOffer=null;
-
-  initClientsIfNeeded();
-  return true;
-}
-
-function wipeSave(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
-
-/* ===== UI ===== */
 function renderEnergyBar(){
-  const bar=$("energyBar");
-  if(!bar) return;
+  const bar=$("energyBar"); if(!bar) return;
   bar.innerHTML="";
   for(let i=0;i<10;i++){
     const seg=document.createElement("div");
@@ -1209,8 +1009,7 @@ function renderEnergyBar(){
 }
 
 function updateEventBtnUI(){
-  const b=$("eventBtn");
-  if(!b) return;
+  const b=$("eventBtn"); if(!b) return;
   if(state.promptActive){
     b.style.display="";
     b.disabled=false;
@@ -1222,49 +1021,6 @@ function updateEventBtnUI(){
     b.classList.add("btnOutline");
     b.style.display="none";
   }
-}
-
-function updateTimeDialFromDeadline(){
-  const arc=$("timeArc");
-  const rem=$("remaining");
-  if(!arc || !rem || !state.job) return;
-
-  const cx=50, cy=50, r=38;
-  const now=nowAbsPrecise();
-  const total=Math.max(0.000001, state.job.deadlineAbs - state.jobStartAbs);
-  const left=Math.max(0, state.job.deadlineAbs - now);
-  const fracLeft=clamp(left/total, 0, 1);
-
-  if(left<=0){
-    arc.setAttribute("d","");
-    arc.style.opacity="0";
-  }else if(fracLeft >= 0.999999){
-    arc.setAttribute("d", describeFullCircle(cx,cy,r));
-    arc.style.opacity="1";
-  }else{
-    arc.setAttribute("d", describeArc(cx,cy,r,0,360*fracLeft));
-    arc.style.opacity="1";
-  }
-  rem.textContent=Math.max(0,Math.ceil(left))+"m";
-}
-
-function weekdayName(){
-  const days=["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
-  return days[(state.day-1)%7];
-}
-
-function setMode(m){
-  ["hub","clients","stats","shop","board","offer","job","result","end"].forEach(s=>{
-    const el=$(s);
-    if(el) el.classList.toggle("hidden", s!==m);
-  });
-  const speedBar=$("speedBar"); if(speedBar) speedBar.classList.toggle("hidden",m!=="job");
-  const jobControls=$("jobControls"); if(jobControls) jobControls.classList.toggle("hidden",m!=="job");
-
-  const kpiWrap=$("kpiWrap");
-  if(kpiWrap) kpiWrap.classList.toggle("hidden", !(m==="hub" || m==="board" || m==="shop"));
-
-  saveState();
 }
 
 function updateConsumablesModal(){
@@ -1289,67 +1045,200 @@ function updateConsumablesModal(){
 
 function renderTop(){
   setAccentFromTime();
-  elText("headerClock",fmtClock(minutesOfDay()));
+  $("headerClock").textContent = fmtClock(minutesOfDay());
+  $("kpiWeekdayTop").textContent = weekdayName();
+  $("kpiWeekBottom").textContent = "Week "+weekNumber()+", Day "+state.day;
+  $("kpiCashTop").textContent = "Cash: £"+state.cash;
+  $("kpiTargetBottom").textContent = "£"+WEEKLY_TARGET+" due friday";
+  $("shopCash").textContent = "£"+state.cash;
 
-  elText("kpiWeekdayTop", weekdayName());
-  elText("kpiWeekBottom", "Week "+weekNumber()+", Day "+state.day);
-  elText("kpiCashTop", "Cash: £"+state.cash);
-  elText("kpiTargetBottom", "£"+WEEKLY_TARGET+" due friday");
+  $("drinkPrice").textContent = PRICES.drink;
+  $("snackPrice").textContent = PRICES.snack;
+  $("drinkCount").textContent = state.drinks;
+  $("snackCount").textContent = state.snacks;
 
   renderEnergyBar();
   updateEventBtnUI();
   updateConsumablesModal();
 }
 
-function snapshotEOD(){
-  state.eod={dayEnded: state.day-1, jobs: state.jobsDone, earnings: state.dayEarnings, rent: COSTS.rent, food: COSTS.food};
-}
-function showEndOfDay(){
-  if(!state.eod) snapshotEOD();
-  const deductions=state.eod.rent+state.eod.food;
-  const net=state.eod.earnings-deductions;
-  elText("endTitle","End of day (Day "+state.eod.dayEnded+")");
-  const endList=$("endList");
-  if(endList){
-    endList.innerHTML=`
-      <div class="vrow"><span>Jobs</span><span>${state.eod.jobs}</span></div>
-      <div class="vrow"><span>Earnings</span><span>£${state.eod.earnings}</span></div>
-      <div class="vrow"><span>Rent</span><span>-£${state.eod.rent}</span></div>
-      <div class="vrow"><span>Food</span><span>-£${state.eod.food}</span></div>
-      <div class="vrow total"><span>Net</span><span>£${net}</span></div>
-    `;
+/* =================== CLIENTS / STATS =================== */
+function initClientsIfNeeded(){
+  for(const who of REQUESTORS){
+    if(typeof state.clientSeq[who] !== "number") state.clientSeq[who]=1;
+    if(!state.clientStats[who]){
+      state.clientStats[who]={accepted:0,completed:0,aborted:0,revenue:0,tips:0,penalties:0,net:0};
+    }
   }
-  setMode("end");
-  renderTop();
-  saveState(true);
 }
-function onMidnightRollover(){
-  if(!state.eod) snapshotEOD();
-  if(state.job){ state.pendingEndOfDay=true; saveState(true); return; }
-  showEndOfDay();
+function recordClientAccept(job){
+  const st=state.clientStats[job.who];
+  st.accepted++;
 }
-function advanceMinutes(mins){
-  state.time += mins;
-  let rolled=0;
-  while(state.time>=1440){ state.time -= 1440; state.day++; rolled++; }
-  while(state.time<0){ state.time += 1440; state.day = Math.max(1, state.day-1); }
-  if(rolled>0) onMidnightRollover();
+function recordClientComplete(job, tipOrPenalty, net){
+  const st=state.clientStats[job.who];
+  st.completed++;
+  st.revenue += job.pay;
+  if(tipOrPenalty>0) st.tips += tipOrPenalty;
+  if(tipOrPenalty<0) st.penalties += Math.abs(tipOrPenalty);
+  st.net += net;
+
+  const cur=state.clientSeq[job.who] || 1;
+  if(job.seq >= cur) state.clientSeq[job.who]=Math.min(99, job.seq+1);
+  if(!job.repeat) state.completedOneOffs[job.id]=true;
+}
+function recordClientAbort(job, penaltyAbs){
+  const st=state.clientStats[job.who];
+  st.aborted++;
+  st.penalties += penaltyAbs;
+  st.net -= penaltyAbs;
+}
+function renderClients(){
+  initClientsIfNeeded();
+  const wrap=$("clientsList");
+  wrap.innerHTML="";
+  const active=REQUESTORS.filter(w=> (state.clientStats[w]?.accepted||0) > 0);
+  if(active.length===0){
+    wrap.innerHTML=`<div class="resultBox"><div class="vrow"><span>No clients yet</span><span></span></div></div>`;
+    return;
+  }
+  for(const who of active){
+    const st=state.clientStats[who];
+    const seq=state.clientSeq[who]||1;
+    const rep=REPUTATION[who]??5;
+
+    const card=document.createElement("div");
+    card.className="clientCard";
+    card.innerHTML=`
+      <div class="clientName">${who}</div>
+      <div class="clientGrid">
+        <div><div class="k">COMPLETED</div><div class="v">${st.completed}</div></div>
+        <div><div class="k">ABORTED</div><div class="v">${st.aborted}</div></div>
+
+        <div><div class="k">REVENUE</div><div class="v">£${st.revenue}</div></div>
+        <div><div class="k">NET PAY</div><div class="v">£${st.net}</div></div>
+
+        <div><div class="k">TIPS</div><div class="v">£${st.tips}</div></div>
+        <div><div class="k">PENALTIES</div><div class="v">£${st.penalties}</div></div>
+
+        <div class="wide"><div class="clientDivider"></div></div>
+
+        <div><div class="k">SEQUENCE</div><div class="v">${seq}</div></div>
+        <div><div class="k">REPUTATION</div><div class="v">${rep}/10</div></div>
+      </div>
+    `;
+    wrap.appendChild(card);
+  }
+}
+function avgSpeedOverall(){
+  if(state.stats.minutes<=0) return 0;
+  return (state.stats.miles * 60) / state.stats.minutes;
+}
+function renderStats(){
+  const list=$("statsList");
+  list.innerHTML=`
+    <div class="vrow"><span>Version</span><span>v${VERSION}</span></div>
+    <div class="vrow"><span>Day</span><span>Day ${state.day}</span></div>
+    <div class="vrow"><span>Week</span><span>${weekNumber()}</span></div>
+
+    <div class="vrow"><span>Miles driven</span><span>${state.stats.miles.toFixed(1)} mi</span></div>
+    <div class="vrow"><span>Average speed</span><span>${avgSpeedOverall().toFixed(1)} mph</span></div>
+
+    <div class="vrow"><span>Total money made</span><span>£${Math.round(state.stats.made)}</span></div>
+    <div class="vrow"><span>Total money spent</span><span>£${Math.round(state.stats.spent)}</span></div>
+
+    <div class="vrow"><span>Jobs accepted</span><span>${state.stats.accepted}</span></div>
+    <div class="vrow"><span>Jobs completed</span><span>${state.stats.completed}</span></div>
+    <div class="vrow"><span>Jobs aborted</span><span>${state.stats.aborted}</span></div>
+
+    <div class="vrow"><span>Jobs early</span><span>${state.stats.early}</span></div>
+    <div class="vrow"><span>Jobs late</span><span>${state.stats.late}</span></div>
+
+    <div class="vrow"><span>Snacks eaten</span><span>${state.stats.snacks}</span></div>
+    <div class="vrow"><span>Events encountered</span><span>${state.stats.events}</span></div>
+  `;
 }
 
-/* Offer pruning with feasibility buffer (speed 5 theoretical max) */
-function minutesToCompleteAtSpeed5(dist){
-  const mph = 8 * SPEEDS[5].mult;
-  return (dist / mph) * 60;
-}
-function pruneOffers(){
-  const now=nowAbs();
-  state.offers = state.offers.filter(o=>{
-    const left = o.deadlineAbs - now;
-    return left > minutesToCompleteAtSpeed5(o.dist);
-  });
+/* =================== SAVE / LOAD =================== */
+function safeJsonParse(s){ try{return JSON.parse(s);}catch(e){return null;} }
+
+function saveState(force=false){
+  const payload={
+    schema:SAVE_SCHEMA,
+    version:VERSION,
+    state:{
+      day:state.day,cash:state.cash,time:state.time,energy:state.energy,speed:state.speed,
+      snacks:state.snacks,drinks:state.drinks,
+      offers:state.offers,job:state.job,
+      dayEarnings:state.dayEarnings,jobsDone:state.jobsDone,
+      jobStartAbs:state.jobStartAbs,jobStartEnergy:state.jobStartEnergy,
+      jobDistDone:state.jobDistDone,jobDistTotal:state.jobDistTotal,jobElapsedMin:state.jobElapsedMin,
+      promptActive:state.promptActive,promptEndMs:state.promptEndMs,lastPromptAbs:state.lastPromptAbs,lastEventAbs:state.lastEventAbs,
+      eod:state.eod,
+      clientSeq:state.clientSeq,completedOneOffs:state.completedOneOffs,clientStats:state.clientStats,stats:state.stats,
+      snackFx:state.snackFx,drinkFx:state.drinkFx,snackCdUntil:state.snackCdUntil,drinkCdUntil:state.drinkCdUntil
+    }
+  };
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(payload)); }catch(e){}
 }
 
-/* ===== JOB GEN ===== */
+function loadState(){
+  const raw=localStorage.getItem(SAVE_KEY);
+  if(!raw) return false;
+  const data=safeJsonParse(raw);
+  if(!data || !data.state) return false;
+
+  const s=data.state;
+
+  state.day = (typeof s.day==="number" && s.day>=1) ? s.day : 1;
+  state.cash = (typeof s.cash==="number") ? Math.round(s.cash) : 0;
+  state.time = (typeof s.time==="number") ? s.time : 8*60;
+  state.energy = (typeof s.energy==="number") ? clamp(s.energy,0,100) : 100;
+  state.speed = (typeof s.speed==="number") ? clamp(Math.round(s.speed),1,5) : 3;
+
+  state.snacks = (typeof s.snacks==="number") ? clamp(Math.round(s.snacks),0,5) : 1;
+  state.drinks = (typeof s.drinks==="number") ? clamp(Math.round(s.drinks),0,5) : 1;
+
+  state.offers = Array.isArray(s.offers) ? s.offers : [];
+  state.job = (s.job && typeof s.job==="object") ? s.job : null;
+
+  state.dayEarnings = (typeof s.dayEarnings==="number") ? Math.round(s.dayEarnings) : 0;
+  state.jobsDone = (typeof s.jobsDone==="number") ? Math.max(0,Math.round(s.jobsDone)) : 0;
+
+  state.jobStartAbs = (typeof s.jobStartAbs==="number") ? s.jobStartAbs : nowAbsPrecise();
+  state.jobStartEnergy = (typeof s.jobStartEnergy==="number") ? s.jobStartEnergy : state.energy;
+  state.jobDistDone = (typeof s.jobDistDone==="number") ? s.jobDistDone : 0;
+  state.jobDistTotal = (typeof s.jobDistTotal==="number") ? s.jobDistTotal : 0;
+  state.jobElapsedMin = (typeof s.jobElapsedMin==="number") ? s.jobElapsedMin : 0;
+
+  state.promptActive = !!s.promptActive;
+  state.promptEndMs = (typeof s.promptEndMs==="number") ? s.promptEndMs : 0;
+  state.lastPromptAbs = (typeof s.lastPromptAbs==="number") ? s.lastPromptAbs : -1e9;
+  state.lastEventAbs = (typeof s.lastEventAbs==="number") ? s.lastEventAbs : -1e9;
+
+  state.eod = (s.eod && typeof s.eod==="object") ? s.eod : null;
+
+  state.clientSeq = (s.clientSeq && typeof s.clientSeq==="object") ? s.clientSeq : {};
+  state.completedOneOffs = (s.completedOneOffs && typeof s.completedOneOffs==="object") ? s.completedOneOffs : {};
+  state.clientStats = (s.clientStats && typeof s.clientStats==="object") ? s.clientStats : {};
+  state.stats = (s.stats && typeof s.stats==="object") ? s.stats : state.stats;
+
+  state.snackFx = (s.snackFx && typeof s.snackFx==="object") ? s.snackFx : null;
+  state.drinkFx = (s.drinkFx && typeof s.drinkFx==="object") ? s.drinkFx : null;
+  state.snackCdUntil = (typeof s.snackCdUntil==="number") ? s.snackCdUntil : 0;
+  state.drinkCdUntil = (typeof s.drinkCdUntil==="number") ? s.drinkCdUntil : 0;
+
+  if(state.promptActive && Date.now()>state.promptEndMs){
+    state.promptActive=false;
+    state.promptEndMs=0;
+  }
+  initClientsIfNeeded();
+  return true;
+}
+
+function wipeSave(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
+
+/* =================== JOB GEN =================== */
 function eligibleCatalog(){
   initClientsIfNeeded();
   return JOB_CATALOG.filter(j=>{
@@ -1359,9 +1248,23 @@ function eligibleCatalog(){
     return true;
   });
 }
+
+function minutesToCompleteAtSpeed5(dist){
+  const mph = BASE_MPH * SPEEDS[5].mult;
+  return (dist / mph) * 60;
+}
+
+function pruneOffers(){
+  const now=nowAbs();
+  state.offers = state.offers.filter(o=>{
+    const left = o.deadlineAbs - now;
+    return left > minutesToCompleteAtSpeed5(o.dist);
+  });
+}
+
 function genOffers(){
   const base=nowAbs();
-  const eligible = eligibleCatalog();
+  const eligible=eligibleCatalog();
   const shuffled=[...eligible].sort(()=>Math.random()-.5);
 
   const picked=[];
@@ -1376,18 +1279,17 @@ function genOffers(){
   }
 
   state.offers = picked.map(j=>{
-    const avg=(j.dist/8)*60;
+    const avg=(j.dist/BASE_MPH)*60;
     const slow=avg/SPEEDS[1].mult;
     const fast=avg/SPEEDS[5].mult;
-    const hidden=fast+(slow-fast)*(.15+Math.random()*.7);
-    const slack = Math.round(Math.random()*2*60);
-
-    return{
+    const hidden = fast + (slow-fast) * (0.15 + Math.random()*0.7);
+    const slack = Math.round(Math.random()*2*60); // 0–120 mins
+    return {
       id:j.id, who:j.who, seq:j.seq, repeat:!!j.repeat, fb:j.fb,
       name:j.name, dist:j.dist,
       quote: QUOTES[Math.floor(Math.random()*QUOTES.length)],
-      hidden:Math.round(hidden),
-      pay:Math.round(j.dist*12+Math.random()*6),
+      hidden: Math.round(hidden),
+      pay: Math.round(j.dist*12 + Math.random()*6),
       route: ROUTES[Math.floor(Math.random()*ROUTES.length)],
       deadlineAbs: base + Math.round(avg) + slack
     };
@@ -1397,15 +1299,18 @@ function genOffers(){
   saveState(true);
 }
 
+let selectedOffer=null;
+
 function openOffer(o){
   selectedOffer=o;
-  elText("offerTitle",o.name.toUpperCase());
-  elText("ofOrg",o.who);
-  elText("ofQuote","“"+o.quote+"”");
-  elText("ofDistance",o.dist.toFixed(1)+" mi");
-  elText("ofRoute",o.route);
-  elText("ofPay","£"+o.pay);
-  elText("ofDeadline",fmtClock(o.deadlineAbs % 1440));
+
+  $("offerTitle").textContent = o.name.toUpperCase();
+  $("ofOrg").textContent = o.who;
+  $("ofQuote").textContent = "“"+o.quote+"”";
+  $("ofDistance").textContent = o.dist.toFixed(1)+" mi";
+  $("ofRoute").textContent = o.route;
+  $("ofPay").textContent = "£"+o.pay;
+  $("ofDeadline").textContent = fmtClock(o.deadlineAbs % 1440);
 
   setOfferAvatar(o.who);
 
@@ -1416,11 +1321,12 @@ function openOffer(o){
 function renderJobs(){
   pruneOffers();
   const wrap=$("jobs");
-  if(!wrap) return;
   wrap.innerHTML="";
   const noEnergy=state.energy<=0;
 
-  state.offers.forEach(o=>{
+  const sorted=[...state.offers].sort((a,b)=>a.deadlineAbs-b.deadlineAbs);
+
+  for(const o of sorted){
     const r=document.createElement("div");
     r.className="jobRow";
     r.innerHTML=`
@@ -1430,794 +1336,678 @@ function renderJobs(){
       </div>
       <div class="jobPay">£${o.pay}</div>
     `;
-    r.addEventListener("click", ()=>{ if(!noEnergy) openOffer(o); });
+    r.addEventListener("click", ()=>{
+      if(noEnergy) return;
+      openOffer(o);
+    });
     if(noEnergy) r.style.opacity=".4";
     wrap.appendChild(r);
-  });
-}
-
-function maxSpeed(){
-  if(state.energy<=5) return 1;
-  if(state.energy<=10) return 2;
-  if(state.energy<=15) return 3;
-  if(state.energy<=20) return 4;
-  return 5;
-}
-function buildSpeed(){
-  const seg=$("speedSeg");
-  if(!seg) return;
-  seg.innerHTML="";
-  for(let i=1;i<=5;i++){
-    const b=document.createElement("button");
-    b.textContent=i;
-    b.addEventListener("click", ()=>{ state.speed=Math.min(i,maxSpeed()); syncSpeed(); saveState(true); });
-    seg.appendChild(b);
-  }
-  syncSpeed();
-}
-function syncSpeed(){
-  const seg=$("speedSeg");
-  if(!seg) return;
-  const max=maxSpeed();
-  if(state.speed>max) state.speed=max;
-  [...seg.children].forEach((b,i)=>{
-    const s=i+1;
-    b.classList.toggle("active",s===state.speed);
-    b.disabled=s>max;
-  });
-  elText("speedLabel",SPEEDS[state.speed].name);
-}
-
-function clearSnackFx(){
-  if(!state.snackFx) return;
-  if(state.snackFx.delayId) clearTimeout(state.snackFx.delayId);
-  if(state.snackFx.intervalId) clearInterval(state.snackFx.intervalId);
-  state.snackFx=null;
-}
-function clearDrinkFx(){
-  if(!state.drinkFx) return;
-  if(state.drinkFx.timeoutId) clearTimeout(state.drinkFx.timeoutId);
-  state.drinkFx=null;
-}
-function applyPendingEffects(){
-  if(state.snackFx){
-    state.energy=clamp(state.energy+state.snackFx.remaining,0,100);
-    clearSnackFx();
-  }
-  if(state.drinkFx){
-    state.energy=clamp(state.energy-10,0,100);
-    clearDrinkFx();
   }
 }
 
-/* tips unchanged; late penalties harsher */
-function tipPenaltyForFinish(){
-  const now=nowAbsPrecise();
-  const delta = state.job.deadlineAbs - now;
-
-  if(delta>0){
-    const raw = Math.floor(delta/10);
-    const cap = Math.max(1, Math.floor(state.job.pay*0.30));
-    return Math.min(raw, cap);
-  }else if(delta<0){
-    const late = Math.ceil(Math.abs(delta)/5);
-    const raw = -(late*4);
-    return Math.max(raw, -state.job.pay);
-  }
-  return 0;
-}
-function abortPenalty(){ return -Math.max(5, Math.round(state.job.pay*0.35)); }
-
-function showFeedback(who, text){
-  const wrap=$("feedbackWrap");
-  if(!wrap) return;
-  setResultAvatar(who);
-  elText("feedbackWho", who.toUpperCase()+" — FEEDBACK");
-  elText("feedbackText", text);
-  wrap.classList.remove("hidden");
-}
-function hideFeedback(){
-  const wrap=$("feedbackWrap");
-  if(!wrap) return;
-  wrap.classList.add("hidden");
-  elText("feedbackWho","—");
-  elText("feedbackText","—");
-  const av=$("resultAvatar"); if(av) av.innerHTML="";
-}
-function feedbackForOutcome(job, tp, aborted=false){
-  if(!job || !job.fb) return "";
-  if(aborted) return job.fb.aborted;
-  if(tp>0) return job.fb.early;
-  if(tp<0) return job.fb.late;
-  return job.fb.ontime;
+/* =================== JOB PLAY =================== */
+function mphAtSpeed(s){
+  return BASE_MPH * SPEEDS[s].mult;
 }
 
-function startJob(o, resume=false){
-  state.job=o;
+/* heavier energy penalty (mult^2) and scales with mph */
+function energyDrainPerMinute(s){
+  const mult=SPEEDS[s].mult;
+  return 0.9 * (mult*mult); // tuned for "heavy penalty"
+}
 
-  if(!resume){
-    initClientsIfNeeded();
+function acceptOffer(){
+  if(!selectedOffer) return;
 
-    state.stats.accepted++;
-    recordClientAccept(o);
+  state.stats.accepted++;
+  recordClientAccept(selectedOffer);
 
-    state.elapsed=0; state.progress=0; state.hiddenDuration=o.hidden;
-    state.startEnergy=state.energy; state.energySpentJob=0;
-    state.jobStartAbs = nowAbsPrecise();
-    state.lastEventAbs=-1e9; state.lastPromptAbs=-1e9;
-    state.promptActive=false; state.promptEndMs=0;
+  state.job = JSON.parse(JSON.stringify(selectedOffer)); // copy
+  state.jobStartAbs = nowAbsPrecise();
+  state.jobStartEnergy = state.energy;
 
-    state.snackCdUntil=0;
-    state.drinkCdUntil=0;
-  }
+  state.jobDistDone = 0;
+  state.jobDistTotal = selectedOffer.dist;
+  state.jobElapsedMin = 0;
 
-  elText("jobName", o.name.toUpperCase());
+  state.promptActive=false;
+  state.promptEndMs=0;
 
-  const p=clamp(state.hiddenDuration>0 ? (state.progress/state.hiddenDuration) : 0,0,1);
-  elText("pct", Math.floor(p*100)+"%");
-  const fill=$("fill"); if(fill) fill.style.width=(p*100)+"%";
+  $("jobName").textContent = selectedOffer.name.toUpperCase();
 
-  elText("milesDone",(o.dist*p).toFixed(1)+" mi");
-  elText("milesLeft",(o.dist-(o.dist*p)).toFixed(1)+" mi");
-  elText("mph",Math.round(8*SPEEDS[state.speed].mult)+" mph");
-
-  updateTimeDialFromDeadline();
-  syncSpeed();
   setMode("job");
-
-  state.lastTs=performance.now();
-  cancelAnimationFrame(state.raf);
-  state.raf=requestAnimationFrame(tick);
-
   renderTop();
   saveState(true);
 }
 
-/* ===== EVENTS ===== */
-function chanceFromLambda(lambdaPerMin, dtMin){
-  const x = lambdaPerMin * Math.max(0,dtMin);
-  return 1 - Math.exp(-x);
-}
-function lambdaForSpeed(speed){
-  const bySpeed=[0, 0.010, 0.014, 0.020, 0.028, 0.038];
-  return bySpeed[clamp(speed,1,5)];
-}
-function routeTier(route){
-  if(route==="Easy") return 0;
-  if(route==="Mid") return 1;
-  if(route==="Tricky") return 2;
-  if(route==="Hellish") return 3;
-  return 1;
-}
-function routeAccidentMult(route){ return [0.75, 1.0, 1.25, 1.6][routeTier(route)]; }
-function routeBadWeight(route){ return [0.75, 1.0, 1.35, 1.75][routeTier(route)]; }
-function accidentChanceForSpeedAndRoute(speed, route){
-  const base = 0.15 + 0.10*(clamp(speed,1,5)-1);
-  return clamp(base*routeAccidentMult(route), 0.05, 0.90);
-}
-function lambdaPrompt(){ return 0.020; }
+function abortJob(){
+  if(!state.job) return;
 
-function pickWeighted(list, weightFn){
-  let sum=0;
-  for(const it of list) sum += Math.max(0, weightFn(it));
-  if(sum<=0) return list[Math.floor(Math.random()*list.length)];
-  let r=Math.random()*sum;
-  for(const it of list){
-    r -= Math.max(0, weightFn(it));
-    if(r<=0) return it;
-  }
-  return list[list.length-1];
+  const pen = Math.max(5, Math.round(state.job.pay * 0.25));
+  state.cash = Math.max(0, state.cash - pen);
+
+  state.stats.aborted++;
+  state.stats.spent += pen;
+
+  recordClientAbort(state.job, pen);
+
+  showResult(false, "Aborted", -pen, "aborted");
+  state.job = null;
+  saveState(true);
 }
 
-function openEventFromObj(e){
-  initClientsIfNeeded();
-  state.stats.events++;
-
-  const list=$("eventList");
-  if(!list) return;
-
+function showResult(completed, title, tipOrPenalty, outcome){
+  $("resultTitle").textContent = completed ? "Job complete" : "Job ended";
+  const list=$("resultList");
   const rows=[];
-  rows.push(`<div class="vrow"><span>${e.t}</span><span></span></div>`);
-  rows.push(`<div class="vrow"><span style="opacity:.85">${e.d}</span><span></span></div>`);
-  if(e.mins!==0) rows.push(`<div class="vrow"><span>Time</span><span>${e.mins>0?"+":""}${e.mins}m</span></div>`);
-  if(e.energy!==0) rows.push(`<div class="vrow"><span>Energy</span><span>${e.energy>0?"+":""}${e.energy}%</span></div>`);
-  list.innerHTML=rows.join("");
 
-  if(e.mins!==0) advanceMinutes(e.mins);
-  if(e.energy!==0){
-    state.energy=clamp(state.energy+e.energy,0,100);
-    syncSpeed();
+  const pay = completed ? state.job.pay : 0;
+  const avgMph = state.jobElapsedMin>0 ? (state.jobDistDone*60/state.jobElapsedMin) : 0;
+
+  if(completed){
+    rows.push(`<div class="vrow"><span>Pay</span><span>£${pay}</span></div>`);
+    if(tipOrPenalty>0) rows.push(`<div class="vrow"><span>Tip</span><span>£${tipOrPenalty}</span></div>`);
+    if(tipOrPenalty<0) rows.push(`<div class="vrow"><span>Penalty</span><span>-£${Math.abs(tipOrPenalty)}</span></div>`);
+  }else{
+    rows.push(`<div class="vrow"><span>Penalty</span><span>-£${Math.abs(tipOrPenalty)}</span></div>`);
   }
 
-  updateTimeDialFromDeadline();
-  renderTop();
+  rows.push(`<div class="vrow"><span>Distance</span><span>${state.jobDistDone.toFixed(1)} mi</span></div>`);
+  rows.push(`<div class="vrow"><span>Time taken</span><span>${Math.ceil(state.jobElapsedMin)}m</span></div>`);
+  rows.push(`<div class="vrow"><span>Average speed</span><span>${avgMph.toFixed(1)} mph</span></div>`);
 
-  const modal=$("eventModal");
-  if(modal) modal.style.display="flex";
-  saveState(true);
-}
+  const net = completed ? (pay + tipOrPenalty) : tipOrPenalty;
+  rows.push(`<div class="vrow total"><span>Total</span><span>£${net}</span></div>`);
+  list.innerHTML = rows.join("");
 
-function openAutoEvent(){
-  if(!state.job) return;
-  const modal=$("eventModal");
-  if(modal && modal.style.display==="flex") return;
-
-  const route = state.job.route || "Mid";
-  const acc = Math.random() < accidentChanceForSpeedAndRoute(state.speed, route);
-
-  if(acc){
-    openEventFromObj(EVENT_POOL.accident[Math.floor(Math.random()*EVENT_POOL.accident.length)]);
-    return;
-  }
-
-  const badW = routeBadWeight(route);
-  openEventFromObj(pickWeighted(EVENT_POOL.normal, (x)=>{
-    if(x.mood==="bad") return 1.0*badW;
-    if(x.mood==="good") return 1.0;
-    return 0.9;
-  }));
-}
-
-function openPromptEvent(){
-  if(!state.job) return;
-  openEventFromObj(PROMPT_EVENTS[Math.floor(Math.random()*PROMPT_EVENTS.length)]);
-}
-
-function closeEvent(){
-  const modal=$("eventModal");
-  if(modal) modal.style.display="none";
-  renderTop();
-  saveState(true);
-}
-
-function maybeTriggerAutoEvent(dtMin){
-  if(!state.job) return;
-  const modal=$("eventModal");
-  if(modal && modal.style.display==="flex") return;
-  if(state.promptActive) return;
-
-  const now=nowAbsPrecise();
-  if((now - state.lastEventAbs) < 3) return;
-  if((now - state.lastPromptAbs) < 3) return;
-
-  const p=chanceFromLambda(lambdaForSpeed(state.speed), dtMin);
-  if(Math.random() < p){
-    state.lastEventAbs = now;
-    openAutoEvent();
-  }
-}
-
-function maybeStartPromptWindow(dtMin){
-  if(!state.job) return;
-  const modal=$("eventModal");
-  if(modal && modal.style.display==="flex") return;
-
-  if(state.promptActive && Date.now() > state.promptEndMs){
-    state.promptActive=false;
-    state.promptEndMs=0;
-    updateEventBtnUI();
-    saveState(true);
-  }
-  if(state.promptActive) return;
-
-  const now=nowAbsPrecise();
-  if((now - state.lastPromptAbs) < 4) return;
-  if((now - state.lastEventAbs) < 4) return;
-
-  const p=chanceFromLambda(lambdaPrompt(), dtMin);
-  if(Math.random() < p){
-    state.promptActive=true;
-    state.promptEndMs = Date.now() + (3000 + Math.random()*2000);
-    updateEventBtnUI();
-    saveState(true);
-  }
-}
-
-function tick(ts){
-  state.raf=requestAnimationFrame(tick);
-
-  const em=$("eventModal"), cm=$("energyModal"), rm=$("restModal");
-  if((em && em.style.display==="flex") || (cm && cm.style.display==="flex") || (rm && rm.style.display==="flex")){
-    state.lastTs=ts; return;
-  }
-
-  if(state.promptActive && Date.now() > state.promptEndMs){
-    state.promptActive=false; state.promptEndMs=0;
-    updateEventBtnUI(); saveState(true);
-  }
-
-  const dtSec=(ts-state.lastTs)/1000;
-  state.lastTs=ts;
-
-  const dtMin=dtSec;
-  const mult=SPEEDS[state.speed].mult;
-
-  state.elapsed += dtMin;
-  state.progress += dtMin * mult;
-
-  advanceMinutes(dtMin);
-
-  const drain = 0.65*mult*mult*dtMin;
-  state.energySpentJob += drain;
-  state.energy=clamp(state.energy-drain,0,100);
-  syncSpeed();
-
-  const p=clamp(state.progress/state.hiddenDuration,0,1);
-  elText("pct", Math.floor(p*100)+"%");
-  const fill=$("fill"); if(fill) fill.style.width=(p*100)+"%";
-
-  elText("milesDone",(state.job.dist*p).toFixed(1)+" mi");
-  elText("milesLeft",(state.job.dist-(state.job.dist*p)).toFixed(1)+" mi");
-  elText("mph", Math.round(8*mult)+" mph");
-
-  updateTimeDialFromDeadline();
-  maybeStartPromptWindow(dtMin);
-  maybeTriggerAutoEvent(dtMin);
-
-  renderTop();
-  saveState();
-
-  if(p>=1) finish();
-}
-
-function finish(){
-  cancelAnimationFrame(state.raf);
-  applyPendingEffects();
-
-  state.promptActive=false; state.promptEndMs=0;
-
-  const timeTaken=Math.max(1,Math.ceil(state.elapsed));
-  const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
-  const avgSpeed = (state.job.dist * 60) / timeTaken;
-
-  const tp = tipPenaltyForFinish();
-  const total = Math.max(0, state.job.pay + tp);
-
-  initClientsIfNeeded();
-
-  state.cash += total;
-  state.dayEarnings += total;
-  state.jobsDone++;
-
-  state.stats.completed++;
-  state.stats.minutes += timeTaken;
-  state.stats.miles += state.job.dist;
-  state.stats.made += total;
-  if(tp>0) state.stats.early++;
-  if(tp<0) state.stats.late++;
-
-  recordClientComplete(state.job, tp, total);
-
-  elText("resultTitle","Job complete");
-  const rl=$("resultList");
-  if(rl){
-    rl.innerHTML=`
-      <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
-      <div class="vrow"><span>Average speed</span><span>${avgSpeed.toFixed(1)} mph</span></div>
-      <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>
-      <div class="vrow"><span>Pay</span><span>£${state.job.pay}</span></div>
-      <div class="vrow"><span>Tip / penalty</span><span>${tp>=0 ? "£"+tp : "-£"+Math.abs(tp)}</span></div>
-      <div class="vrow total"><span>Total</span><span>£${total}</span></div>
-    `;
-  }
-
-  hideFeedback();
-  showFeedback(state.job.who, feedbackForOutcome(state.job, tp, false));
-
-  state.job=null;
-  pruneOffers();
-  renderJobs();
-
-  if(state.pendingEndOfDay){
-    state.pendingEndOfDay=false;
-    showEndOfDay();
-    return;
-  }
+  /* feedback */
+  const fw=$("feedbackWrap");
+  fw.classList.remove("hidden");
+  $("feedbackWho").textContent = state.job.who.toUpperCase();
+  setResultAvatar(state.job.who);
+  const fb = state.job.fb || fbPack("that job");
+  if(outcome==="early") $("feedbackText").textContent = fb.early;
+  else if(outcome==="late") $("feedbackText").textContent = fb.late;
+  else if(outcome==="aborted") $("feedbackText").textContent = fb.aborted;
+  else $("feedbackText").textContent = fb.ontime;
 
   setMode("result");
   renderTop();
-  saveState(true);
 }
 
-/* UI wiring */
-on("closeEvent","click", closeEvent);
+function completeJob(){
+  if(!state.job) return;
 
-on("goJobs","click", ()=>{
-  if(!jobsInitialised){
-    initClientsIfNeeded();
-    genOffers();
-    renderJobs();
-    jobsInitialised=true;
+  const now = nowAbsPrecise();
+  const late = now > state.job.deadlineAbs;
+
+  let tipOrPenalty = 0;
+  if(late){
+    tipOrPenalty = -Math.max(3, Math.round(state.job.pay * 0.15));
+    state.stats.late++;
   }else{
-    pruneOffers();
-    renderJobs();
+    // early bonus if >= 10 mins left
+    const left = state.job.deadlineAbs - now;
+    if(left >= 10){
+      tipOrPenalty = Math.max(2, Math.round(state.job.pay * 0.1));
+      state.stats.early++;
+    }
   }
-  setMode("board");
-  renderTop();
+
+  const pay = state.job.pay;
+  const net = pay + tipOrPenalty;
+
+  state.cash += net;
+  state.dayEarnings += net;
+  state.jobsDone++;
+
+  state.stats.completed++;
+  state.stats.made += pay + Math.max(0, tipOrPenalty);
+  if(tipOrPenalty<0) state.stats.spent += Math.abs(tipOrPenalty);
+  state.stats.miles += state.jobDistDone;
+  state.stats.minutes += state.jobElapsedMin;
+
+  recordClientComplete(state.job, tipOrPenalty, net);
+
+  showResult(true, "Complete", tipOrPenalty, late ? "late" : (tipOrPenalty>0 ? "early" : "ontime"));
+
+  // remove offer instance (or keep if repeat but regenerate list anyway)
+  state.job = null;
+
+  // If it’s already after midnight, show EOD immediately
+  if(minutesOfDay() < 1){ /* unlikely; guard */ }
   saveState(true);
-});
-
-on("refreshJobs","click", ()=>{
-  initClientsIfNeeded();
-  genOffers();
-  renderJobs();
-  jobsInitialised=true;
-  saveState(true);
-});
-
-on("backHub","click", ()=>{ setMode("hub"); renderTop(); saveState(true); });
-
-on("goClients","click", ()=>{
-  renderClients();
-  setMode("clients");
-  renderTop();
-  saveState(true);
-});
-on("backHubClients","click", ()=>{ setMode("hub"); renderTop(); saveState(true); });
-
-on("goStats","click", ()=>{
-  renderStats();
-  setMode("stats");
-  renderTop();
-  saveState(true);
-});
-on("backHubStats","click", ()=>{ setMode("hub"); renderTop(); saveState(true); });
-
-on("offerBack","click", ()=>{
-  selectedOffer=null;
-  setMode("board");
-  renderTop();
-  saveState(true);
-});
-on("offerAccept","click", ()=>{
-  if(!selectedOffer) return;
-  const o=selectedOffer;
-  selectedOffer=null;
-  startJob(o,false);
-});
-
-on("backBoard","click", ()=>{
-  pruneOffers();
-  renderJobs();
-  setMode("board");
-  renderTop();
-  saveState(true);
-});
-
-/* Shop */
-function updateShopUI(){
-  elText("drinkPrice", PRICES.drink);
-  elText("snackPrice", PRICES.snack);
-  elText("drinkCount", state.drinks);
-  elText("snackCount", state.snacks);
-
-  const bd=$("buyDrink");
-  const bs=$("buySnack");
-  if(bd) bd.disabled = (state.drinks>=5) || (state.cash<PRICES.drink);
-  if(bs) bs.disabled = (state.snacks>=5) || (state.cash<PRICES.snack);
 }
 
-on("goShop","click", ()=>{
-  updateShopUI();
-  setMode("shop");
+function maybeTriggerOptionalEvent(){
+  if(!state.job) return;
+  const abs=nowAbsPrecise();
+  if(abs - state.lastPromptAbs < 30) return; // spacing
+  // chance per minute
+  const chance = 0.03 + (state.speed-1) * 0.01;
+  if(Math.random() < chance){
+    state.promptActive=true;
+    state.promptEndMs=Date.now() + (3000 + Math.random()*2000); // 3–5s
+    state.lastPromptAbs=abs;
+    updateEventBtnUI();
+  }
+}
+
+function applyRandomEvent(fromOptional=false){
+  const abs=nowAbsPrecise();
+  state.lastEventAbs=abs;
+  state.stats.events++;
+
+  const speed=state.speed;
+  const route=state.job.route;
+  const routeWeight = route==="Hellish" ? 0.75 : route==="Tricky" ? 0.55 : route==="Mid" ? 0.35 : 0.25;
+  const accidentChance = clamp(routeWeight + (speed-3)*0.07, 0.15, 0.90);
+
+  let e;
+  if(fromOptional){
+    e = OPTIONAL_EVENTS[Math.floor(Math.random()*OPTIONAL_EVENTS.length)];
+  }else{
+    const pool = (Math.random() < accidentChance) ? EVENT_POOL.accident : EVENT_POOL.normal;
+    e = pool[Math.floor(Math.random()*pool.length)];
+  }
+
+  // apply
+  if(e.energy) state.energy = clamp(state.energy + e.energy, 0, 100);
+  if(e.mins) advanceMinutes(e.mins);
+
+  // show modal
+  const list=$("eventList");
+  list.innerHTML = `
+    <div class="vrow"><span>${e.t}</span><span></span></div>
+    <div class="vrow"><span style="opacity:.85">${e.d}</span><span></span></div>
+  `;
+  $("eventModal").style.display="flex";
   renderTop();
-  saveState(true);
-});
-on("backHub2","click", ()=>{ setMode("hub"); renderTop(); saveState(true); });
+}
 
-on("buyDrink","click", ()=>{
-  if(state.drinks>=5) return;
-  if(state.cash<PRICES.drink) return;
-  initClientsIfNeeded();
-  state.cash-=PRICES.drink;
-  state.stats.spent += PRICES.drink;
-  state.drinks++;
-  updateShopUI();
-  renderTop();
-  saveState(true);
-});
+function updateTimeDialFromDeadline(){
+  if(!state.job) return;
+  const arc=$("timeArc");
+  const rem=$("remaining");
+  const cx=50, cy=50, r=38;
 
-on("buySnack","click", ()=>{
-  if(state.snacks>=5) return;
-  if(state.cash<PRICES.snack) return;
-  initClientsIfNeeded();
-  state.cash-=PRICES.snack;
-  state.stats.spent += PRICES.snack;
-  state.snacks++;
-  updateShopUI();
-  renderTop();
-  saveState(true);
-});
+  const now=nowAbsPrecise();
+  const total=Math.max(0.000001, state.job.deadlineAbs - state.jobStartAbs);
+  const left=Math.max(0, state.job.deadlineAbs - now);
+  const fracLeft=clamp(left/total, 0, 1);
 
-/* Consumables cooldown */
-function cooldownMs(){ return 5000 + Math.floor(Math.random()*5001); } // 5–10s
+  if(left<=0){
+    arc.setAttribute("d","");
+    arc.style.opacity="0";
+  }else if(fracLeft >= 0.999999){
+    arc.setAttribute("d", describeFullCircle(cx,cy,r));
+    arc.style.opacity="1";
+  }else{
+    arc.setAttribute("d", describeArc(cx,cy,r,0,360*fracLeft));
+    arc.style.opacity="1";
+  }
+  rem.textContent = Math.max(0, Math.ceil(left))+"m";
+}
 
-on("openConsumables","click", ()=>{
+/* =================== CONSUMABLES =================== */
+function openEnergyModal(){
+  $("energyModal").style.display="flex";
   updateConsumablesModal();
-  const m=$("energyModal"); if(m) m.style.display="flex";
-  saveState(true);
-});
-on("closeEnergy","click", ()=>{
-  const m=$("energyModal"); if(m) m.style.display="none";
-  saveState(true);
-});
+}
+function closeEnergyModal(){ $("energyModal").style.display="none"; }
 
-on("drinkBtn","click", ()=>{
+function useDrink(){
   const now=Date.now();
   if(state.drinks<=0) return;
   if(now < state.drinkCdUntil) return;
 
   state.drinks--;
-  state.drinkCdUntil = now + cooldownMs();
+  state.stats.spent += 0; // purchase already tracked
+  state.energy = clamp(state.energy + 20, 0, 100);
 
-  state.energy=clamp(state.energy+20,0,100);
+  state.drinkFx = { crashAt: now + 15000, crashed:false };
+  state.drinkCdUntil = now + 12000;
 
-  clearDrinkFx();
-  state.drinkFx={timeoutId:setTimeout(()=>{
-    state.energy=clamp(state.energy-10,0,100);
-    clearDrinkFx();
-    renderTop();
-    saveState(true);
-  },15000)};
-
-  const m=$("energyModal"); if(m) m.style.display="none";
+  updateConsumablesModal();
   renderTop();
   saveState(true);
-});
-
-on("snackBtn","click", ()=>{
+}
+function useSnack(){
   const now=Date.now();
   if(state.snacks<=0) return;
   if(now < state.snackCdUntil) return;
 
-  initClientsIfNeeded();
+  state.snacks--;
   state.stats.snacks++;
 
-  state.snacks--;
-  state.snackCdUntil = now + cooldownMs();
+  // delay 15s, then 15s of +1 energy/s (so +15 total)
+  state.snackFx = { startAt: now + 15000, endAt: now + 30000, lastTick: now };
+  state.snackCdUntil = now + 12000;
 
-  clearSnackFx();
-  state.snackFx={remaining:20,delayId:0,intervalId:0};
-
-  state.snackFx.delayId=setTimeout(()=>{
-    if(!state.snackFx) return;
-    let ticks=0;
-    state.snackFx.intervalId=setInterval(()=>{
-      if(!state.snackFx) return;
-
-      const inc=20/15;
-      const before=state.energy;
-      state.energy=clamp(state.energy+inc,0,100);
-      const gained=state.energy-before;
-
-      state.snackFx.remaining=clamp(state.snackFx.remaining-gained,0,20);
-
-      ticks++;
-      renderTop();
-      saveState();
-      if(ticks>=15 || state.snackFx.remaining<=0){
-        clearSnackFx();
-        saveState(true);
-      }
-    },1000);
-  },15000);
-
-  const m=$("energyModal"); if(m) m.style.display="none";
+  updateConsumablesModal();
   renderTop();
   saveState(true);
-});
+}
 
-/* Abort */
-on("cancel","click", ()=>{
-  cancelAnimationFrame(state.raf);
+/* =================== TIME / END DAY =================== */
+function advanceMinutes(mins){
+  state.time += mins;
+  while(state.time >= 1440){
+    state.time -= 1440;
+    state.day++;
+    // on rollover, if job is active, allow it to continue into next day; EOD will trigger when job ends
+    if(!state.job) showEndOfDay();
+  }
+  while(state.time < 0){
+    state.time += 1440;
+    state.day = Math.max(1, state.day-1);
+  }
+}
 
-  state.promptActive=false;
-  state.promptEndMs=0;
+function genEodExtras(){
+  // "sometimes include random item or two"
+  const r=Math.random();
+  let negCount=0;
+  if(r<0.55) negCount=0;
+  else if(r<0.90) negCount=1;
+  else negCount=2;
 
-  const timeTaken=Math.max(1,Math.ceil(state.elapsed));
-  const energyUsed=Math.round(clamp(state.energySpentJob,0,100));
-
-  const pen = abortPenalty();
-  const penAbs = Math.abs(pen);
-
-  const frac=clamp(state.hiddenDuration>0 ? (state.progress/state.hiddenDuration) : 0, 0, 1);
-  const miles = state.job ? (state.job.dist * frac) : 0;
-
-  initClientsIfNeeded();
-
-  state.cash += pen;
-  state.dayEarnings += pen;
-
-  state.stats.aborted++;
-  state.stats.minutes += timeTaken;
-  state.stats.miles += miles;
-  state.stats.made += pen;
-
-  if(state.job) recordClientAbort(state.job, penAbs);
-
-  elText("resultTitle","Job aborted");
-  const rl=$("resultList");
-  if(rl){
-    rl.innerHTML=`
-      <div class="vrow"><span>Time taken</span><span>${timeTaken}m</span></div>
-      <div class="vrow"><span>Average speed</span><span>${(timeTaken>0 ? ((miles*60)/timeTaken) : 0).toFixed(1)} mph</span></div>
-      <div class="vrow"><span>Energy used</span><span>${energyUsed}%</span></div>
-      <div class="vrow"><span>Penalty</span><span>-£${penAbs}</span></div>
-      <div class="vrow total"><span>Total</span><span>-£${penAbs}</span></div>
-    `;
+  const negs=[];
+  const used=new Set();
+  for(let i=0;i<negCount;i++){
+    let label=pickRand(RANDOM_EOD_NEGATIVES);
+    let guard=0;
+    while(used.has(label) && guard++<25) label=pickRand(RANDOM_EOD_NEGATIVES);
+    used.add(label);
+    const amt = 5 + Math.floor(Math.random()*21); // £5–£25
+    negs.push({label, amt});
   }
 
-  if(state.job){
-    hideFeedback();
-    showFeedback(state.job.who, feedbackForOutcome(state.job, 0, true));
+  const poss=[];
+  // positives occur 1/5th as frequently
+  if(negs.length>0 && Math.random()<0.20){
+    const label=pickRand(RANDOM_EOD_POSITIVES);
+    const amt = 5 + Math.floor(Math.random()*26); // £5–£30
+    poss.push({label, amt});
   }
+  return {negs, poss};
+}
 
-  state.job=null;
+function snapshotEOD(){
+  const extras=genEodExtras();
+  state.eod={
+    dayEnded: state.day-1,
+    jobs: state.jobsDone,
+    earnings: state.dayEarnings,
+    bills: COSTS.bills,
+    food: COSTS.food,
+    rentWeeklyDue: isWeeklyRentDue(),
+    rentWeekly: isWeeklyRentDue() ? WEEKLY_RENT : 0,
+    extrasNeg: extras.negs,
+    extrasPos: extras.poss
+  };
+}
 
-  pruneOffers();
-  renderJobs();
+function showEndOfDay(){
+  if(state.job) return;
+  snapshotEOD();
 
-  if(state.pendingEndOfDay){
-    state.pendingEndOfDay=false;
-    showEndOfDay();
-    return;
+  const negTotal = (state.eod.extrasNeg||[]).reduce((a,x)=>a+(x.amt||0),0);
+  const posTotal = (state.eod.extrasPos||[]).reduce((a,x)=>a+(x.amt||0),0);
+
+  const deductions = state.eod.bills + state.eod.food + (state.eod.rentWeekly||0) + negTotal;
+  const net = state.eod.earnings - deductions + posTotal;
+
+  // apply to cash: daily bills/food + extras +/- weekly rent
+  state.cash = Math.max(0, state.cash - state.eod.bills - state.eod.food - negTotal);
+  if(state.eod.rentWeeklyDue) state.cash = Math.max(0, state.cash - state.eod.rentWeekly);
+  state.cash += posTotal;
+
+  state.stats.spent += (state.eod.bills + state.eod.food + (state.eod.rentWeekly||0) + negTotal);
+
+  $("endTitle").textContent = "End of day (Day "+state.eod.dayEnded+")";
+
+  const rows=[];
+  rows.push(`<div class="vrow"><span>Jobs</span><span>${state.eod.jobs}</span></div>`);
+  rows.push(`<div class="vrow"><span>Earnings</span><span>£${state.eod.earnings}</span></div>`);
+  rows.push(`<div class="vrow"><span>Bills</span><span>-£${state.eod.bills}</span></div>`);
+  rows.push(`<div class="vrow"><span>Food</span><span>-£${state.eod.food}</span></div>`);
+  if(state.eod.rentWeeklyDue){
+    rows.push(`<div class="vrow"><span>Rent (weekly)</span><span>-£${state.eod.rentWeekly}</span></div>`);
   }
+  for(const x of (state.eod.extrasNeg||[])){
+    rows.push(`<div class="vrow"><span>${x.label}</span><span>-£${x.amt}</span></div>`);
+  }
+  for(const x of (state.eod.extrasPos||[])){
+    rows.push(`<div class="vrow"><span>${x.label}</span><span>£${x.amt}</span></div>`);
+  }
+  rows.push(`<div class="vrow total"><span>Net</span><span>£${net}</span></div>`);
+  $("endList").innerHTML = rows.join("");
 
-  setMode("result");
+  // reset day counters for next day
+  state.dayEarnings = 0;
+  state.jobsDone = 0;
+  state.eod = null;
+
+  setMode("end");
   renderTop();
   saveState(true);
-});
-
-/* Optional prompted Event button */
-on("eventBtn","click", ()=>{
-  if(!state.job) return;
-  if(!state.promptActive) return;
-
-  state.promptActive=false;
-  state.promptEndMs=0;
-
-  state.lastPromptAbs = nowAbsPrecise();
-  state.lastEventAbs = state.lastPromptAbs;
-
-  updateEventBtnUI();
-  saveState(true);
-
-  openPromptEvent();
-});
-
-/* Rest */
-function canUntilMorning(){
-  const m=minutesOfDay();
-  return (m>=18*60 || m<6*60);
 }
-function openRest(){
-  const btn=$("restMorning");
-  const allowed=canUntilMorning();
-  if(btn){
-    btn.disabled=!allowed;
-    btn.style.display=allowed ? "block" : "none";
+
+function confirmEndOfDay(){
+  // start next day morning if we're still in night; otherwise just go hub
+  if(minutesOfDay() < 8*60){
+    state.time = 8*60;
   }
-  const rm=$("restModal"); if(rm) rm.style.display="flex";
+  state.energy = clamp(state.energy + 25, 0, 100); // morning reset-ish
+  genOffers();
+  setMode("hub");
+  renderTop();
   saveState(true);
 }
-function closeRest(){
-  const rm=$("restModal"); if(rm) rm.style.display="none";
+
+/* =================== SHOP =================== */
+function buySnack(){
+  if(state.cash < PRICES.snack) return;
+  if(state.snacks >= 5) return;
+  state.cash -= PRICES.snack;
+  state.snacks++;
+  state.stats.spent += PRICES.snack;
+  renderTop();
   saveState(true);
 }
-function restGainChoice(hours){
-  if(hours===4) return 18;
-  if(hours===8) return 40;
-  return hours;
+function buyDrink(){
+  if(state.cash < PRICES.drink) return;
+  if(state.drinks >= 5) return;
+  state.cash -= PRICES.drink;
+  state.drinks++;
+  state.stats.spent += PRICES.drink;
+  renderTop();
+  saveState(true);
 }
+
+/* =================== REST =================== */
+function openRest(){ $("restModal").style.display="flex"; }
+function closeRest(){ $("restModal").style.display="none"; }
 function restHours(h){
+  // resting increases energy modestly and advances time
+  const gain = h===2 ? 10 : h===4 ? 20 : h===8 ? 35 : 50;
+  state.energy = clamp(state.energy + gain, 0, 100);
   advanceMinutes(h*60);
-  state.energy = clamp(state.energy + restGainChoice(h), 0, 100);
-  pruneOffers();
-  renderJobs();
-  renderTop();
   closeRest();
+  renderTop();
   saveState(true);
 }
 function restUntilMorning(){
-  if(!canUntilMorning()) return;
-  const before=nowAbs();
+  // go to next day 08:00
   const m=minutesOfDay();
-  if(m<6*60) advanceMinutes((6*60)-m);
-  else advanceMinutes((1440-m)+(6*60));
-  const after=nowAbs();
-  const sleptHours=Math.max(0,(after-before)/60);
-  state.energy = clamp(state.energy + sleptHours, 0, 100);
-  pruneOffers();
-  renderJobs();
-  renderTop();
+  let delta;
+  if(m < 8*60) delta = (8*60) - m;
+  else delta = (1440 - m) + (8*60);
+  advanceMinutes(delta);
+  state.energy = clamp(state.energy + 50, 0, 100);
   closeRest();
-  saveState(true);
-}
-on("restOpen","click", openRest);
-on("closeRest","click", closeRest);
-on("rest2","click", ()=>restHours(2));
-on("rest4","click", ()=>restHours(4));
-on("rest8","click", ()=>restHours(8));
-on("restMorning","click", restUntilMorning);
-
-on("confirmEnd","click", ()=>{
-  if(!state.eod) snapshotEOD();
-  const deductions=state.eod.rent+state.eod.food;
-
-  initClientsIfNeeded();
-  state.stats.spent += deductions;
-
-  state.cash -= deductions;
-
-  state.jobsDone=0;
-  state.dayEarnings=0;
-  state.eod=null;
-
-  state.energy=100;
-  state.time = 6*60;
-
-  setMode("hub");
   renderTop();
   saveState(true);
-});
+}
 
-/* Reset */
-function hardResetGame(){
-  cancelAnimationFrame(state.raf);
-  clearSnackFx();
-  clearDrinkFx();
+/* =================== MAIN LOOP =================== */
+function step(ts){
+  if(!state.lastTs) state.lastTs = ts;
+  const dtMs = Math.min(100, ts - state.lastTs);
+  state.lastTs = ts;
 
-  const em=$("eventModal"); if(em) em.style.display="none";
-  const cm=$("energyModal"); if(cm) cm.style.display="none";
-  const rm=$("restModal"); if(rm) rm.style.display="none";
+  // Optional event prompt expiry
+  if(state.promptActive && Date.now() > state.promptEndMs){
+    state.promptActive=false;
+    updateEventBtnUI();
+  }
 
-  state.day=1; state.cash=0; state.time=15*60; state.energy=100; state.speed=3;
-  state.snacks=1; state.drinks=1;
+  // Snack effect tick
+  const now=Date.now();
+  if(state.snackFx){
+    if(now >= state.snackFx.startAt){
+      const tickEvery=1000;
+      while(state.snackFx.lastTick + tickEvery <= now && state.snackFx.lastTick + tickEvery <= state.snackFx.endAt){
+        state.snackFx.lastTick += tickEvery;
+        state.energy = clamp(state.energy + 1, 0, 100);
+      }
+    }
+    if(now >= state.snackFx.endAt){
+      state.snackFx = null;
+    }
+  }
 
-  state.jobsDone=0; state.dayEarnings=0;
-  state.offers=[]; state.job=null;
+  // Drink crash
+  if(state.drinkFx && !state.drinkFx.crashed && now >= state.drinkFx.crashAt){
+    state.drinkFx.crashed=true;
+    state.energy = clamp(state.energy - 10, 0, 100);
+  }
 
-  state.elapsed=0; state.progress=0; state.hiddenDuration=0; state.startEnergy=100; state.energySpentJob=0;
-  state.jobStartAbs=0; state.pendingEndOfDay=false; state.eod=null;
-  state.lastEventAbs=-1e9;
+  // Job simulation
+  if(state.job){
+    const dtMin = dtMs / 60000;
 
-  state.promptActive=false; state.promptEndMs=0; state.lastPromptAbs=-1e9;
+    const mph = mphAtSpeed(state.speed);
+    const distInc = mph * dtMin;
 
-  state.clientSeq={}; state.completedOneOffs={}; state.clientStats={};
-  state.stats={miles:0,minutes:0,made:0,spent:0,accepted:0,completed:0,aborted:0,early:0,late:0,snacks:0,events:0};
+    state.jobDistDone = clamp(state.jobDistDone + distInc, 0, state.jobDistTotal);
+    state.jobElapsedMin += dtMin;
 
-  state.snackCdUntil=0;
-  state.drinkCdUntil=0;
+    // energy drain
+    const drain = energyDrainPerMinute(state.speed) * dtMin;
+    state.energy = clamp(state.energy - drain, 0, 100);
 
-  selectedOffer=null; jobsInitialised=false;
+    // time advances with job
+    advanceMinutes(dtMin);
 
-  wipeSave();
-  initClientsIfNeeded();
+    // update UI
+    const pct = state.jobDistTotal>0 ? (state.jobDistDone/state.jobDistTotal) : 0;
+    $("pct").textContent = Math.round(pct*100)+"%";
+    $("fill").style.width = (pct*100)+"%";
+    $("milesDone").textContent = state.jobDistDone.toFixed(1)+" mi";
+    $("milesLeft").textContent = Math.max(0, state.jobDistTotal-state.jobDistDone).toFixed(1)+" mi";
+    $("mph").textContent = Math.round(mph)+" mph";
+
+    updateTimeDialFromDeadline();
+
+    // occasional optional prompt
+    maybeTriggerOptionalEvent();
+
+    // forced random event (not optional): mild chance, worse at higher speed
+    const abs=nowAbsPrecise();
+    if(abs - state.lastEventAbs > 8){ // spacing
+      const chance = 0.012 + (state.speed-1) * 0.006;
+      if(Math.random() < chance){
+        applyRandomEvent(false);
+      }
+    }
+
+    // end job if complete
+    if(state.jobDistDone >= state.jobDistTotal - 1e-6){
+      completeJob();
+    }
+
+    // energy collapse: if 0, slow to very slow automatically
+    if(state.energy<=0){
+      state.speed = 1;
+      updateSpeedUI();
+    }
+  }
+
   renderTop();
-  setMode("hub");
+  state.raf = requestAnimationFrame(step);
+}
+
+/* =================== SPEED UI =================== */
+function buildSpeedButtons(){
+  const wrap=$("speedSeg");
+  wrap.innerHTML="";
+  for(let i=1;i<=5;i++){
+    const b=document.createElement("button");
+    b.textContent = String(i);
+    b.addEventListener("click", ()=>{
+      if(!state.job) return;
+      if(state.energy<=0) return;
+      state.speed=i;
+      updateSpeedUI();
+      saveState(true);
+    });
+    wrap.appendChild(b);
+  }
+}
+function updateSpeedUI(){
+  const wrap=$("speedSeg");
+  const btns=[...wrap.querySelectorAll("button")];
+  btns.forEach((b,idx)=>{
+    const s=idx+1;
+    b.classList.toggle("active", s===state.speed);
+  });
+  $("speedLabel").textContent = SPEEDS[state.speed].name;
+}
+
+/* =================== EVENTS UI =================== */
+function closeEventModal(){
+  $("eventModal").style.display="none";
+  renderTop();
   saveState(true);
 }
-on("resetGame","click", hardResetGame);
-
-/* Boot */
-initClientsIfNeeded();
-buildSpeed();
-
-const loaded = loadState();
-renderTop();
-document.title="Courier v"+VERSION;
-
-if(state.job){
-  startJob(state.job, true);
-}else{
-  setMode("hub");
+function clickOptionalEvent(){
+  if(!state.promptActive) return;
+  state.promptActive=false;
+  updateEventBtnUI();
+  applyRandomEvent(true);
 }
 
-if(loaded && Array.isArray(state.offers) && state.offers.length>0){
-  pruneOffers();
-  renderJobs();
-  saveState(true);
+/* =================== WIRES =================== */
+function wireButtons(){
+  // hub navigation
+  $("goJobs").addEventListener("click", ()=>{
+    if(state.offers.length===0) genOffers();
+    renderJobs();
+    setMode("board");
+    renderTop();
+  });
+  $("goShop").addEventListener("click", ()=>{
+    setMode("shop");
+    renderTop();
+  });
+  $("goClients").addEventListener("click", ()=>{
+    renderClients();
+    setMode("clients");
+    renderTop();
+  });
+  $("goStats").addEventListener("click", ()=>{
+    renderStats();
+    setMode("stats");
+    renderTop();
+  });
+
+  $("backHubClients").addEventListener("click", ()=>{ setMode("hub"); renderTop(); });
+  $("backHubStats").addEventListener("click", ()=>{ setMode("hub"); renderTop(); });
+  $("backHubShop").addEventListener("click", ()=>{ setMode("hub"); renderTop(); });
+  $("backHubBoard").addEventListener("click", ()=>{ setMode("hub"); renderTop(); });
+
+  $("refreshJobs").addEventListener("click", ()=>{
+    genOffers();
+    renderJobs();
+    renderTop();
+  });
+
+  $("offerBack").addEventListener("click", ()=>{
+    setMode("board");
+    renderJobs();
+    renderTop();
+  });
+  $("offerAccept").addEventListener("click", ()=>{
+    acceptOffer();
+  });
+
+  $("cancel").addEventListener("click", ()=>{
+    abortJob();
+  });
+
+  $("openConsumables").addEventListener("click", ()=>{
+    openEnergyModal();
+  });
+  $("closeEnergy").addEventListener("click", (e)=>{
+    e.preventDefault();
+    closeEnergyModal();
+  });
+  $("drinkBtn").addEventListener("click", ()=>{
+    useDrink();
+  });
+  $("snackBtn").addEventListener("click", ()=>{
+    useSnack();
+  });
+
+  $("eventBtn").addEventListener("click", ()=>{
+    clickOptionalEvent();
+  });
+  $("closeEvent").addEventListener("click", ()=>{
+    closeEventModal();
+  });
+
+  $("backBoard").addEventListener("click", ()=>{
+    if(state.offers.length===0) genOffers();
+    renderJobs();
+    setMode("board");
+    renderTop();
+  });
+
+  $("confirmEnd").addEventListener("click", ()=>{
+    confirmEndOfDay();
+  });
+
+  $("buySnack").addEventListener("click", ()=>{ buySnack(); });
+  $("buyDrink").addEventListener("click", ()=>{ buyDrink(); });
+
+  $("restOpen").addEventListener("click", ()=>{ openRest(); });
+  $("closeRest").addEventListener("click", ()=>{ closeRest(); });
+  $("rest2").addEventListener("click", ()=>{ restHours(2); });
+  $("rest4").addEventListener("click", ()=>{ restHours(4); });
+  $("rest8").addEventListener("click", ()=>{ restHours(8); });
+  $("restMorning").addEventListener("click", ()=>{ restUntilMorning(); });
+
+  $("resetGame").addEventListener("click", ()=>{
+    wipeSave();
+    location.reload();
+  });
 }
+
+/* =================== INIT =================== */
+function ensureBasics(){
+  initClientsIfNeeded();
+  if(!state.offers || !Array.isArray(state.offers)) state.offers=[];
+  if(state.day===1 && minutesOfDay()===0) state.time=8*60;
+}
+
+function resumeToRightScreen(){
+  if(state.job){
+    $("jobName").textContent = state.job.name.toUpperCase();
+    setMode("job");
+  }else{
+    setMode("hub");
+  }
+}
+
+function init(){
+  loadState();
+  ensureBasics();
+  buildSpeedButtons();
+  updateSpeedUI();
+  wireButtons();
+
+  // If no offers yet, keep empty until user enters board or hits refresh
+  if(state.offers.length>0) pruneOffers();
+
+  resumeToRightScreen();
+  renderTop();
+
+  state.raf = requestAnimationFrame(step);
+}
+
+document.addEventListener("DOMContentLoaded", init);
 </script>
 </body>
 </html>
